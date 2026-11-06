@@ -21,6 +21,12 @@
 
 The command area is a reference guide, not an unrestricted remote shell. Host checks must only target systems the user is authorized to inspect.
 
+## Phase 2 — Knowledge Center
+- Searchable, filterable MikroTik learning references.
+- Searchable operating-system command reference library.
+- Expandable explanations and read-only examples; the app does not execute commands.
+- No router credentials, remote terminal or configuration mutation are included.
+
 ## Build
 Run the Android Debug APK workflow from the GitHub Actions tab. It uses JDK 17 and Gradle 8.13.
 
@@ -28,4 +34,4 @@ Run the Android Debug APK workflow from the GitHub Actions tab. It uses JDK 17 a
 Selected namespace and application ID: com.HG.Forge.Ts. Keep both aligned unless a deliberate migration is approved.
 
 ## Status
-Initial Phase 0 scaffold. Full module behavior, Room schema, Supabase integration and release signing are subsequent work.
+Phase 0 foundation and Phase 2 Knowledge Center UI are implemented as an incremental milestone. Phase 1 Core Networking, Phase 3 DNS & Protocols, Phase 4 Repository Explorer, Phase 5 cloud/offline sync and Phase 6 release remain separate roadmap work. Room schema, Supabase integration and release signing are not yet implemented.
