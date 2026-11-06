@@ -30,13 +30,19 @@
 - Cloudflare provider and query disclosure.
 - See [Phase 3 documentation](docs/PHASE-3-DNS-AND-PROTOCOLS.md).
 
+### Phase 4 — Repository Explorer
+- Read-only public GitHub repository search.
+- Repository description, stars, language and license metadata.
+- Opens canonical repository pages in the browser.
+- See [Phase 4 documentation](docs/PHASE-4-REPOSITORY-EXPLORER.md).
+
 ## Roadmap
-Phases 4–9 cover the read-only GitHub Repository Explorer, cloud/offline sync, local data and settings, Security & Privacy Center, bounded diagnostics and monitoring, and quality/release preparation.
+Phases 5–9 cover cloud/offline sync, local data and settings, Security & Privacy Center, bounded diagnostics and monitoring, and quality/release preparation.
 
 See [Phases 3–9 roadmap](docs/ROADMAP-PHASES-3-TO-9.md).
 
 ## Safety and privacy
-The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Cloudflare. FORGE-TS does not store DNS query history. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
+The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Cloudflare. Repository search terms are sent to GitHub. FORGE-TS does not store DNS query history. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
 
 ## Build
 Run the Android Debug APK workflow from the GitHub Actions tab. The workflow uses JDK 17 and Gradle 8.13.

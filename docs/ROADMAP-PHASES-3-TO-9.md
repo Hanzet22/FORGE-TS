@@ -1,11 +1,11 @@
 # FORGE-TS Roadmap — Phases 3–9
 
-This roadmap is an implementation sequence, not a release announcement. Phase 0 foundation, Phase 1 Core Networking and Phase 2 Knowledge Center are existing milestones. Phase 3 is the current implementation milestone.
+This roadmap is an implementation sequence, not a release announcement. Phase 0 foundation, Phase 1 Core Networking and Phase 2 Knowledge Center are existing milestones. Phases 3 and 4 are implemented as incremental milestones.
 
 | Phase | Name | Scope | Completion boundary |
 |---|---|---|---|
 | 3 | DNS & Protocols | DNS-over-HTTPS record lookup, protocol/port reference, provider and privacy disclosure | Single-domain queries and offline reference; no enumeration or scanning |
-| 4 | Repository Explorer | Public GitHub repository search/details, README and license metadata, paginated results and rate-limit-aware errors | Public read-only data; no token storage, issue creation, commits or repository mutation |
+| 4 | Repository Explorer | Public GitHub repository search/details, README and license metadata, paginated results and rate-limit-aware errors | Current milestone provides public read-only search and basic metadata; no token storage or repository mutation |
 | 5 | Cloud & Offline Sync | Room entities/DAOs, local-first repositories, sync queue and WorkManager; Supabase adapter behind a repository interface | Only after a dedicated FORGE-TS Supabase project is identified and RLS schema is approved |
 | 6 | Local Data & Settings | DataStore preferences, local history controls, cache lifecycle, export/import and sync preferences | User-controlled local data; no hidden telemetry |
 | 7 | Security & Privacy Center | Permission inventory, provider disclosures, security guidance, privacy controls and dependency/license inventory | Informational and configuration checks; no offensive security features |
@@ -23,4 +23,4 @@ This roadmap is an implementation sequence, not a release announcement. Phase 0 
 - No release/publishing action is implied by completion of these phases.
 
 ## Dependency gate
-The currently connected Supabase account exposes a project named `furfinder`, not a FORGE-TS backend. It must not be repurposed. Phase 5 remains gated until a dedicated project is selected or created with explicit cost approval where applicable.
+The connected Supabase account currently exposes a project named `furfinder`, not a FORGE-TS backend. It must not be repurposed. Phase 5 remains gated until a dedicated project is selected or created with explicit cost approval where applicable.

@@ -1,4 +1,4 @@
-# FORGE-TS Architecture — Phases 0–3
+# FORGE-TS Architecture — Phases 0–4
 
 ## Operating model
 Local-first, online and offline. Local utilities and reference content remain usable without connectivity. Network-backed features disclose their provider and use bounded requests.
@@ -32,6 +32,12 @@ Local-first, online and offline. Local utilities and reference content remain us
 - Domain normalization, validation, response parsing and timeout are repository responsibilities.
 - DNS results are transient UI state and are not persisted.
 - Protocol/port reference data is bundled and works offline.
+
+## Phase 4 — Repository Explorer
+- Public GitHub repository search uses the unauthenticated REST API.
+- Repository results are read-only and show metadata returned by GitHub.
+- Queries are transmitted to GitHub and subject to its unauthenticated rate limits.
+- No access token, private repository data or write operation is included.
 
 ## Security
 - Never bundle Supabase secret/service-role keys, GitHub personal access tokens or provider secrets.
