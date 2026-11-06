@@ -1,5 +1,8 @@
 package com.HG.Forge.Ts.ui.screens
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.HG.Forge.Ts.data.network.CoreNetworkingRepository
@@ -12,21 +15,21 @@ import kotlinx.coroutines.launch
 class CoreNetworkingViewModel : ViewModel() {
     private val repository = CoreNetworkingRepository()
 
-    var cidrResult: CidrResult? = null
+    var cidrResult: CidrResult? by mutableStateOf(null)
         private set
-    var cidrError: String? = null
+    var cidrError: String? by mutableStateOf(null)
         private set
-    var publicIp: PublicIpResult? = null
+    var publicIp: PublicIpResult? by mutableStateOf(null)
         private set
-    var publicIpError: String? = null
+    var publicIpError: String? by mutableStateOf(null)
         private set
-    var isLoadingIp: Boolean = false
+    var isLoadingIp: Boolean by mutableStateOf(false)
         private set
-    var hostResult: HostCheckResult? = null
+    var hostResult: HostCheckResult? by mutableStateOf(null)
         private set
-    var hostError: String? = null
+    var hostError: String? by mutableStateOf(null)
         private set
-    var isCheckingHost: Boolean = false
+    var isCheckingHost: Boolean by mutableStateOf(false)
         private set
 
     fun calculateCidr(input: String) {
