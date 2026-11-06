@@ -6,12 +6,14 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.HG.Forge.Ts.ui.screens.HomeScreen
 import com.HG.Forge.Ts.ui.screens.KnowledgeCenterScreen
 import com.HG.Forge.Ts.ui.screens.CoreNetworkingScreen
+import com.HG.Forge.Ts.ui.screens.DnsProtocolsScreen
 import com.HG.Forge.Ts.ui.screens.SettingsScreen
 
 @Composable
@@ -41,6 +43,12 @@ fun ForgeApp() {
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
+                    icon = { Icon(Icons.Outlined.Language, contentDescription = "DNS & Protocols") },
+                    label = { Text("DNS") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 4,
+                    onClick = { selectedTab = 4 },
                     icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") }
                 )
@@ -51,6 +59,7 @@ fun ForgeApp() {
             0 -> HomeScreen(Modifier.padding(padding))
             1 -> KnowledgeCenterScreen(Modifier.padding(padding))
             2 -> CoreNetworkingScreen(Modifier.padding(padding))
+            3 -> DnsProtocolsScreen(Modifier.padding(padding))
             else -> SettingsScreen(Modifier.padding(padding))
         }
     }
