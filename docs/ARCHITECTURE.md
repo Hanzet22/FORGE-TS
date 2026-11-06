@@ -1,4 +1,4 @@
-# FORGE-TS Architecture — Phase 0 and Phase 2
+# FORGE-TS Architecture — Phase 0, Phase 1 and Phase 2
 ## Operating model
 Local-first, online and offline. Local utilities should work without connectivity. Shared catalog content is synchronized into local storage when a connection is available.
 
@@ -22,3 +22,10 @@ Local-first, online and offline. Local utilities should work without connectivit
 
 ## Security
 No service-role keys or provider secrets in the APK. Do not store passwords or SSH private keys. Host checks are limited to systems the user is authorized to inspect.
+
+## Core Networking (Phase 1)
+- CIDR calculation is local-only and supports IPv4 and IPv6 address/prefix input.
+- Public IP lookup uses HTTPS and identifies the external lookup provider in the UI. The request necessarily exposes the connection's public IP to that provider; FORGE-TS does not maintain IP history.
+- Host Checker performs a single DNS resolution and one user-selected TCP port check. Optional TLS checks use the platform HTTPS stack so certificate-chain and hostname verification remain enabled.
+- Network operations run away from the main thread and use bounded timeouts.
+- Host checks are intended only for systems the user owns or is authorized to inspect. No port-range scanning, exploitation, credential collection, or shell execution is provided.
