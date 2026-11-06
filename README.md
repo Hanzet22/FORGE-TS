@@ -35,3 +35,11 @@ Selected namespace and application ID: com.HG.Forge.Ts. Keep both aligned unless
 
 ## Status
 Phase 0 foundation and Phase 2 Knowledge Center UI are implemented as an incremental milestone. Phase 1 Core Networking, Phase 3 DNS & Protocols, Phase 4 Repository Explorer, Phase 5 cloud/offline sync and Phase 6 release remain separate roadmap work. Room schema, Supabase integration and release signing are not yet implemented.
+
+
+### Phase 1 — Core Networking (implementation started)
+- IPv4 and IPv6 CIDR calculator
+- Public IP lookup with provider disclosure
+- Authorized single-host DNS, TCP and optional TLS checks
+
+See [Phase 1 documentation](docs/PHASE-1-CORE-NETWORKING.md).
