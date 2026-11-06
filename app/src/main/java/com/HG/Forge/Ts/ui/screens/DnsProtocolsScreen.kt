@@ -20,13 +20,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.HG.Forge.Ts.data.preferences.AppPreferencesRepository
 
 private val dnsTypes = listOf("A", "AAAA", "CNAME", "MX", "TXT", "NS", "SRV", "CAA")
 
@@ -57,9 +61,13 @@ fun DnsProtocolsScreen(
     modifier: Modifier = Modifier,
     viewModel: DnsProtocolsViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val preferences = remember(context) { AppPreferencesRepository(context) }
+    val defaultType by preferences.defaultDnsRecordType.collectAsState(initial = "A")
     var domain by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf("A") }
     var selectedSection by remember { mutableStateOf(0) }
+    LaunchedEffect(defaultType) { selectedType = defaultType }
 
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),

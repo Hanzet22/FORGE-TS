@@ -5,44 +5,41 @@
 - Native Android APK built with Kotlin, Jetpack Compose and Material 3.
 - MVVM-oriented presentation and repository-based data boundaries.
 - Light professional UI direction: white, grey, navy and blue.
-- Selected namespace and application ID: `com.HG.Forge.Ts` (keep aligned unless a deliberate migration is approved).
+- Selected namespace and application ID: `com.HG.Forge.Ts`.
 
 ## Implemented milestones
 ### Phase 0 — Foundation
-- Android project foundation and GitHub Actions debug APK workflow.
-- Room, DataStore, WorkManager and Ktor dependencies included for staged implementation.
-- Supabase integration boundary; no privileged credentials in the APK.
+Android project foundation and GitHub Actions debug APK workflow. Room, DataStore, WorkManager and Ktor dependencies are staged for incremental implementation.
 
 ### Phase 1 — Core Networking
-- IPv4 and IPv6 CIDR calculator.
-- Public IP lookup with provider disclosure.
-- Authorized single-host DNS, TCP and optional TLS checks.
-- See [Phase 1 documentation](docs/PHASE-1-CORE-NETWORKING.md).
+IPv4/IPv6 CIDR calculator, public IP lookup with provider disclosure, and authorized single-host DNS/TCP/optional TLS checks. See [Phase 1](docs/PHASE-1-CORE-NETWORKING.md).
 
 ### Phase 2 — Knowledge Center
-- Searchable, filterable MikroTik and OS command references.
-- Expandable explanations and read-only examples; commands are never executed.
-- See [Phase 2 documentation](docs/PHASE-2-KNOWLEDGE-CENTER.md).
+Searchable MikroTik and OS command references with read-only examples. Commands are never executed. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
 
 ### Phase 3 — DNS & Protocols
-- DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV and CAA records.
-- Offline reference for common network protocols and ports.
-- Cloudflare provider and query disclosure.
-- See [Phase 3 documentation](docs/PHASE-3-DNS-AND-PROTOCOLS.md).
+Cloudflare DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV and CAA records, plus offline protocol references. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md).
 
 ### Phase 4 — Repository Explorer
-- Read-only public GitHub repository search.
-- Repository description, stars, language and license metadata.
-- Opens canonical repository pages in the browser.
-- See [Phase 4 documentation](docs/PHASE-4-REPOSITORY-EXPLORER.md).
+Read-only public GitHub repository search and basic repository metadata. See [Phase 4](docs/PHASE-4-REPOSITORY-EXPLORER.md).
 
-## Roadmap
-Phases 5–9 cover cloud/offline sync, local data and settings, Security & Privacy Center, bounded diagnostics and monitoring, and quality/release preparation.
+### Phase 6 — Local Data & Settings
+DataStore persistence for the preferred DNS record type. See [Phase 6](docs/PHASE-6-LOCAL-DATA-AND-SETTINGS.md).
+
+### Phase 7 — Security & Privacy
+Provider/data disclosures and safe-use boundaries. See [Phase 7](docs/PHASE-7-SECURITY-PRIVACY.md).
+
+### Phase 8 — Diagnostics
+Local Android network capability snapshot with manual refresh. See [Phase 8](docs/PHASE-8-DIAGNOSTICS.md).
+
+## Gated and preparation phases
+- **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
+- **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
 
 See [Phases 3–9 roadmap](docs/ROADMAP-PHASES-3-TO-9.md).
 
 ## Safety and privacy
-The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Cloudflare. Repository search terms are sent to GitHub. FORGE-TS does not store DNS query history. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
+The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Cloudflare. Repository search terms are sent to GitHub. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
 
 ## Build
 Run the Android Debug APK workflow from the GitHub Actions tab. The workflow uses JDK 17 and Gradle 8.13.
