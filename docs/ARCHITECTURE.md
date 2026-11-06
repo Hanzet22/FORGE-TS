@@ -1,4 +1,4 @@
-# FORGE-TS Architecture — Phase 0
+# FORGE-TS Architecture — Phase 0 and Phase 2
 ## Operating model
 Local-first, online and offline. Local utilities should work without connectivity. Shared catalog content is synchronized into local storage when a connection is available.
 
@@ -14,6 +14,11 @@ Local-first, online and offline. Local utilities should work without connectivit
 - DataStore: lightweight preferences.
 - Supabase: persistent remote source of truth for shared catalog data.
 - Upstash Redis: optional future cache, never the source of truth; deferred beyond Phase 0.
+
+## Knowledge Center (Phase 2)
+- MikroTik Academy entries are educational references and use read-only inspection examples.
+- OS command entries explain common diagnostic commands; they are displayed as text and never executed by the app.
+- Search and category filtering run locally on the device.
 
 ## Security
 No service-role keys or provider secrets in the APK. Do not store passwords or SSH private keys. Host checks are limited to systems the user is authorized to inspect.
