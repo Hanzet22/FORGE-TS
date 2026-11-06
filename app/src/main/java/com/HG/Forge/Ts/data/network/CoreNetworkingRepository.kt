@@ -4,6 +4,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 import java.net.InetAddress
 import java.net.InetSocketAddress
@@ -24,7 +25,7 @@ data class HostCheckResult(
 
 class CoreNetworkingRepository {
     suspend fun fetchPublicIp(): PublicIpResult = withContext(Dispatchers.IO) {
-        val response = HttpClientProvider.client.get("https://api.ipify.org?format=json").bodyAsText()
+        val response = withTimeout(8000) { HttpClientProvider.client.get("https://api.ipify.org?format=json").bodyAsText() }
         val address = JSONObject(response).optString("ip")
         require(address.isNotBlank()) { "The IP lookup service returned no address" }
         PublicIpResult(address, "api.ipify.org")
@@ -32,8 +33,8 @@ class CoreNetworkingRepository {
 
     suspend fun checkHost(hostInput: String, port: Int, checkTls: Boolean): HostCheckResult =
         withContext(Dispatchers.IO) {
-            val host = hostInput.trim().removePrefix("https://").removePrefix("http://").substringBefore("/")
-                .substringBefore(":").trim()
+            val rawHost = hostInput.trim().removePrefix("https://").removePrefix("http://").substringBefore("/")
+            val host = if (rawHost.startsWith("[")) rawHost.substringAfter("[").substringBefore("]") else if (rawHost.count { it == ':' } > 1) rawHost else rawHost.substringBefore(":").trim()
             require(host.isNotBlank()) { "Enter a hostname or IP address" }
             require(host.length <= 253 && host.none { it.isWhitespace() }) { "Invalid hostname" }
             require(port in 1..65535) { "Port must be between 1 and 65535" }
@@ -52,7 +53,8 @@ class CoreNetworkingRepository {
             var tlsValid: Boolean? = null
             var details = if (reachable) "TCP connection succeeded." else "TCP connection failed or timed out."
             if (checkTls) {
-                val connection = (URL("https://$host:$port/").openConnection() as HttpsURLConnection)
+                val urlHost = if (host.contains(":")) "[$host]" else host
+                val connection = (URL("https://$urlHost:$port/").openConnection() as HttpsURLConnection)
                 try {
                     connection.connectTimeout = 5000
                     connection.readTimeout = 5000
