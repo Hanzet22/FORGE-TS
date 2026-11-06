@@ -3,12 +3,13 @@ package com.HG.Forge.Ts.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.ui.screens.HomeScreen
+import com.HG.Forge.Ts.ui.screens.KnowledgeCenterScreen
 import com.HG.Forge.Ts.ui.screens.SettingsScreen
 
 @Composable
@@ -26,16 +27,22 @@ fun ForgeApp() {
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
+                    icon = { Icon(Icons.Outlined.MenuBook, contentDescription = "Learn") },
+                    label = { Text("Learn") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
                     icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") }
                 )
             }
         }
     ) { padding ->
-        if (selectedTab == 0) {
-            HomeScreen(Modifier.padding(padding))
-        } else {
-            SettingsScreen(Modifier.padding(padding))
+        when (selectedTab) {
+            0 -> HomeScreen(Modifier.padding(padding))
+            1 -> KnowledgeCenterScreen(Modifier.padding(padding))
+            else -> SettingsScreen(Modifier.padding(padding))
         }
     }
 }
