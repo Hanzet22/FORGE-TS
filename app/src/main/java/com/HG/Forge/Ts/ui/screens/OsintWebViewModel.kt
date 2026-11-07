@@ -11,9 +11,12 @@ import com.HG.Forge.Ts.data.network.NativeWebReport
 import com.HG.Forge.Ts.data.network.DnsLookupResult
 import com.HG.Forge.Ts.data.network.DnsResolver
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 
 data class OsintDnsCheck(
     val recordType: String,
+    val queryName: String,
     val result: DnsLookupResult? = null,
     val error: String? = null
 )
@@ -21,7 +24,7 @@ data class OsintDnsCheck(
 class OsintWebViewModel : ViewModel() {
     private val repository = DnsLookupRepository()
     private val nativeRepository = NativeWebCheckRepository()
-    private val recordTypes = listOf("A", "AAAA", "NS", "MX", "TXT", "CAA")
+    private val recordTypes = listOf("A", "AAAA", "NS", "MX", "TXT", "CAA", "SOA", "CNAME", "SRV", "DS", "DNSKEY", "RRSIG", "NSEC", "TLSA", "HTTPS", "SVCB")
 
     var checks by mutableStateOf<List<OsintDnsCheck>>(emptyList())
         private set
@@ -49,20 +52,25 @@ class OsintWebViewModel : ViewModel() {
             nativeReport = null
             nativeError = null
             target = domain
+            val queries = recordTypes.map { type -> Triple(type, domain, type) } + listOf(
+                Triple("DMARC TXT", "_dmarc.$domain", "TXT"),
+                Triple("DKIM TXT · selector1", "selector1._domainkey.$domain", "TXT"),
+                Triple("DKIM TXT · selector2", "selector2._domainkey.$domain", "TXT"),
+                Triple("DKIM TXT · google", "google._domainkey.$domain", "TXT"),
+                Triple("DKIM TXT · default", "default._domainkey.$domain", "TXT")
+            )
             val collected = mutableListOf<OsintDnsCheck>()
-            for (type in recordTypes) {
-                val check = try {
-                    OsintDnsCheck(
-                        recordType = type,
-                        result = repository.lookup(domain, type, DnsResolver.GOOGLE)
-                    )
-                } catch (exception: Exception) {
-                    OsintDnsCheck(
-                        recordType = type,
-                        error = exception.message ?: "Lookup failed"
-                    )
-                }
-                collected += check
+            for (batch in queries.chunked(5)) {
+                val completed = batch.map { (label, queryName, lookupType) ->
+                    async {
+                        try {
+                            OsintDnsCheck(recordType = label, queryName = queryName, result = repository.lookup(queryName, lookupType, DnsResolver.GOOGLE))
+                        } catch (exception: Exception) {
+                            OsintDnsCheck(recordType = label, queryName = queryName, error = exception.message ?: "Lookup failed")
+                        }
+                    }
+                }.awaitAll()
+                collected += completed
                 checks = collected.toList()
             }
             try {
