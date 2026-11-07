@@ -18,7 +18,7 @@ CIDR calculation is local-only. Public IP lookup uses HTTPS and identifies its p
 MikroTik and OS command content is educational reference material. Search and filtering run locally. Commands are never executed.
 
 ## Phase 3 — DNS & Protocols
-DNS lookup uses Cloudflare DNS-over-HTTPS for selected record types. Results are transient UI state and are not persisted. Protocol/port reference data is bundled and works offline.
+DNS lookup uses Google Public DNS over HTTPS for selected record types. Results are transient UI state and are not persisted. Protocol/port reference data is bundled and works offline.
 
 ## Phase 4 — Repository Explorer
 Public GitHub repository search uses the unauthenticated REST API. Results are read-only. Queries are transmitted to GitHub and subject to its unauthenticated rate limits.
