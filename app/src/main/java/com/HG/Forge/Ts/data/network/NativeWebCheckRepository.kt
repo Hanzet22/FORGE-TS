@@ -286,7 +286,7 @@ class NativeWebCheckRepository {
                 val host = URI(fetched.url).resolve(link).host?.lowercase() ?: return@runCatching null
                 if (socialHosts.any { host == it || host.endsWith(".$it") }) link else null
             }.getOrNull()
-        }.distinct().take(20)
+        }.distinct().take(20).toList()
         findings += NativeWebFinding(
             category = "Social",
             title = "Public social links",
