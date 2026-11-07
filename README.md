@@ -50,6 +50,9 @@ Introduces a native OSINT workspace under Tools, inspired by the public Web-Chec
 ### Phase 16 — Native Web-Check Expansion
 Expands OSINT Web with native Kotlin/Compose DNSSEC/mail-record hints, HTTP status and redirects, TLS peer-certificate metadata, security headers, cookie attributes, robots.txt, sitemap and security.txt, page/social metadata, heuristic technology indicators, mixed-content hints, server/CDN signals, bounded link inventory and selected tracker signatures. Requests are bounded and public-host validated; private/local destinations and HTTPS downgrade redirects are blocked. This is a selective native port: active port scans, traceroute, vulnerability/breach checks and provider-key-dependent checks are deliberately excluded or deferred. See [Phase 16](docs/PHASE-16-NATIVE-WEB-CHECK.md).
 
+### Phase 18 — DNS Security Intelligence
+Adds transparent interpretation of Google Public DNS DNSSEC AD response signals and passive CAA record policy summaries. The app does not label an absent AD bit as DNSSEC failure or claim independent DS/DNSKEY/RRSIG cryptographic-chain validation. See [Phase 18](docs/PHASE-18-DNSSEC-AND-CAA-INTELLIGENCE.md).
+
 ### Phase 17 — Mail Security Intelligence
 Adds passive DNS-based checks for MX, SPF, DMARC, common DKIM selector candidates, MTA-STS and SMTP TLS Reporting (TLS-RPT). Results are evidence indicators, not a complete mail-server audit: DKIM selector guesses are not exhaustive, and the MTA-STS policy file is not fetched or validated. Native website inspection now uses a 12-second connect/read timeout and explains common DNS, TCP-connect and TLS failure classes without treating a timeout as proof that a website is offline. See [Phase 17](docs/PHASE-17-MAIL-SECURITY-INTELLIGENCE.md).
 
