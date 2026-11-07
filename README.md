@@ -18,7 +18,7 @@ IPv4/IPv6 CIDR calculator with subnet/broadcast/usable-host details and binary c
 Searchable offline MikroTik, OS command, addressing, network type, transport, VPN, tunneling and proxy protocol references. SSH host identity, key safety, TLS concepts and certificate verification are educational references only; the app does not execute commands, open SSH sessions or establish proxy/VPN tunnels. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
 
 ### Phase 3 — DNS & Protocols
-Cloudflare DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV and CAA records, plus offline protocol references. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md).
+Expanded live DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC records. Supports Cloudflare and Google Public DNS resolvers, TTL and DNS response sections/status, response time and resolver-reported DNSSEC AD metadata. Includes protocol detail cards for usage, pros, cons, risks and references. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md) and [Phase 11](docs/PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
 
 ### Phase 4 — Repository Explorer
 Read-only public GitHub repository search and basic repository metadata. See [Phase 4](docs/PHASE-4-REPOSITORY-EXPLORER.md).
