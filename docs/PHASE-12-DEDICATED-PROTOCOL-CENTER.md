@@ -51,3 +51,7 @@ Where a project-specific protocol has no IETF standard (for example, VLESS, VMes
 - SNMP framework: RFC 3411; Syslog: RFC 5424; NETCONF: RFC 6241; RESTCONF: RFC 8040.
 - LDAP: RFC 4511; RADIUS: RFC 2865; TACACS+: RFC 8907; Kerberos: RFC 4120.
 - MQTT: OASIS MQTT 5.0; CoAP: RFC 7252; AMQP 1.0: OASIS specification; RTP/RTCP: RFC 3550; SIP: RFC 3261.
+
+
+## Phase 13 — Full technical documentation
+The Protocol Center now provides eight additional protocol-specific technical chapters for all 83 entries: architecture, wire/message model, operation lifecycle, security, performance, deployment/interoperability, troubleshooting, and primary references. See [Phase 13](PHASE-13-FULL-TECHNICAL-PROTOCOL-DOCUMENTATION.md).
