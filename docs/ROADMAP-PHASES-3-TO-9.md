@@ -27,6 +27,6 @@ The connected Supabase account currently exposes a project named `furfinder`, no
 
 
 ## Subsequent expansion — Phase 11
-Phase 11 extends the Phase 3 DNS module with additional DNS record types, selectable Cloudflare and Google Public DNS-over-HTTPS resolvers, response sections/status/TTL/timing, resolver-reported DNSSEC metadata, and a protocol detail library. See [Phase 11 — DNS Record Explorer & Protocol Guides](PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
+Phase 11 extends the Phase 3 DNS module with additional DNS record types, Google Public DNS-over-HTTPS resolver, response sections/status/TTL/timing, resolver-reported DNSSEC metadata, and a protocol detail library. See [Phase 11 — DNS Record Explorer & Protocol Guides](PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
 
 This extension remains a read-only DNS lookup and educational reference. It does not provide DNS zone write access, DNS transfers, enumeration, proxy clients, VPN tunnels or network-control bypass.
