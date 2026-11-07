@@ -1,6 +1,7 @@
 package com.HG.Forge.Ts.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -134,13 +135,12 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
             value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
             label = { Text("Search protocol") }, placeholder = { Text("e.g. BGP, DNS, VLAN, MQTT") }, singleLine = true
         )
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            categories.chunked(3).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    row.forEach { category ->
-                        FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
-                    }
-                }
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            categories.forEach { category ->
+                FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
             }
         }
         Text("${visible.size} result(s)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
