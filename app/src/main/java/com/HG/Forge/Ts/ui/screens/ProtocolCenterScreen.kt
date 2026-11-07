@@ -121,64 +121,87 @@ private val protocolProfiles = listOf(
 fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
-    var expanded by remember { mutableStateOf<String?>(null) }
+    var selectedProtocol by remember { mutableStateOf<ProtocolProfile?>(null) }
     val categories = listOf("All") + protocolProfiles.map { it.category }.distinct()
     val visible = protocolProfiles.filter {
         (selectedCategory == "All" || it.category == selectedCategory) &&
             (query.isBlank() || it.name.contains(query, true) || it.overview.contains(query, true) || it.category.contains(query, true))
     }
 
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("Protocol Center", style = MaterialTheme.typography.headlineSmall)
-        Text("${protocolProfiles.size} protocol and protocol-family references · offline learning guide", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        OutlinedTextField(
-            value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
-            label = { Text("Search protocol") }, placeholder = { Text("e.g. BGP, DNS, VLAN, MQTT") }, singleLine = true
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            categories.forEach { category ->
-                FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
+    val current = selectedProtocol
+    if (current != null) {
+        Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            OutlinedButton(onClick = { selectedProtocol = null }) {
+                Text("← Back to Protocol Center")
+            }
+            Text(current.name, style = MaterialTheme.typography.headlineSmall)
+            Text("${current.category} · ${current.layer}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(current.overview, style = MaterialTheme.typography.bodyLarge)
+            ProtocolDetail("1. Penjelasan", current.overview)
+            ProtocolDetail("2. Detail teknis", current.technical)
+            ProtocolDetail("3. Penggunaan", current.usage)
+            ProtocolDetail("4. Fungsi", current.function)
+            ProtocolDetail("5. Pros", current.pros)
+            ProtocolDetail("6. Cons", current.cons)
+            ProtocolDetail("7. Hambatan", current.hurdles)
+            ProtocolDetail("8. Standar / Draft / Registry", current.standard)
+            ProtocolDetail("9. Cocok / tidak cocok digunakan", current.fit)
+            ProtocolDetail("10. Environment yang sesuai", current.environment)
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                Text(
+                    "Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan.",
+                    Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            OutlinedButton(onClick = { selectedProtocol = null }, modifier = Modifier.fillMaxWidth()) {
+                Text("Kembali ke daftar protokol")
             }
         }
-        Text("${visible.size} result(s)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        visible.forEach { item ->
-            val open = expanded == item.name
-            Card(onClick = { expanded = if (open) null else item.name }, modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                    Text(item.category.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-                    Text(item.name, style = MaterialTheme.typography.titleMedium)
-                    Text(item.layer, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(item.overview, style = MaterialTheme.typography.bodyMedium)
-                    if (open) {
-                        ProtocolDetail("1. Penjelasan", item.overview)
-                        ProtocolDetail("2. Detail teknis", item.technical)
-                        ProtocolDetail("3. Penggunaan", item.usage)
-                        ProtocolDetail("4. Fungsi", item.function)
-                        ProtocolDetail("5. Pros", item.pros)
-                        ProtocolDetail("5. Cons", item.cons)
-                        ProtocolDetail("6. Hambatan", item.hurdles)
-                        ProtocolDetail("7. Standar / Draft / Registry", item.standard)
-                        ProtocolDetail("8. Cocok digunakan", item.fit)
-                        ProtocolDetail("9. Environment yang sesuai", item.environment)
-                        Text("Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    } else {
-                        Text("Tap untuk membuka 9 bagian dokumentasi", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+    } else {
+        Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Protocol Center", style = MaterialTheme.typography.headlineSmall)
+            Text("${protocolProfiles.size} protocol and protocol-family references · offline learning guide", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedTextField(
+                value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
+                label = { Text("Search protocol") }, placeholder = { Text("e.g. BGP, DNS, VLAN, MQTT") }, singleLine = true
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                categories.forEach { category ->
+                    FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
+                }
+            }
+            Text("${visible.size} result(s)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            visible.forEach { item ->
+                Card(onClick = { selectedProtocol = item }, modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                        Text(item.category.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        Text(item.name, style = MaterialTheme.typography.titleMedium)
+                        Text(item.layer, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(item.overview, style = MaterialTheme.typography.bodyMedium)
+                        Text("Tap to open dedicated protocol page →", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
+            if (visible.isEmpty()) Text("No matching protocol found.", style = MaterialTheme.typography.bodyMedium)
+            Text("Standards note: an RFC is not automatically an Internet Standard. Entries identify the relevant RFC, IEEE/ISO/ITU-T standard, project specification or implementation documentation where applicable. Internet-Drafts may expire or change; verify status before production use.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        if (visible.isEmpty()) Text("No matching protocol found.", style = MaterialTheme.typography.bodyMedium)
-        Text("Standards note: an RFC is not automatically an Internet Standard. Entries identify the relevant RFC, IEEE/ISO/ITU-T standard, project specification or implementation documentation where applicable. Internet-Drafts may expire or change; verify status before production use.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
 private fun ProtocolDetail(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        Text(value, style = MaterialTheme.typography.bodyMedium)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Text(value, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }
