@@ -12,6 +12,8 @@ import com.HG.Forge.Ts.data.network.DnsLookupResult
 import com.HG.Forge.Ts.data.network.DnsResolver
 import com.HG.Forge.Ts.data.network.RdapDomainRepository
 import com.HG.Forge.Ts.data.network.RdapDomainReport
+import com.HG.Forge.Ts.data.network.WebsiteCarbonRepository
+import com.HG.Forge.Ts.data.network.WebsiteCarbonReport
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -38,6 +40,7 @@ class OsintWebViewModel : ViewModel() {
     private val repository = DnsLookupRepository()
     private val nativeRepository = NativeWebCheckRepository()
     private val rdapRepository = RdapDomainRepository()
+    private val carbonRepository = WebsiteCarbonRepository()
     private val recordTypes = listOf("A", "AAAA", "NS", "MX", "TXT", "CAA", "SOA", "CNAME", "SRV", "DS", "DNSKEY", "RRSIG", "NSEC", "TLSA", "HTTPS", "SVCB")
 
     var checks by mutableStateOf<List<OsintDnsCheck>>(emptyList())
@@ -55,6 +58,10 @@ class OsintWebViewModel : ViewModel() {
     var rdapReport by mutableStateOf<RdapDomainReport?>(null)
         private set
     var rdapError by mutableStateOf<String?>(null)
+        private set
+    var carbonReport by mutableStateOf<WebsiteCarbonReport?>(null)
+        private set
+    var carbonError by mutableStateOf<String?>(null)
         private set
 
     val dnssecFindings: List<MailSecurityFinding>
@@ -184,7 +191,7 @@ class OsintWebViewModel : ViewModel() {
                 )
             )
         }
-    fun inspect(input: String) {
+    fun inspect(input: String, includeCarbon: Boolean = false) {
         val domain = input.trim()
         if (domain.isBlank()) {
             error = "Enter a fully qualified domain name."
@@ -198,6 +205,8 @@ class OsintWebViewModel : ViewModel() {
             nativeError = null
             rdapReport = null
             rdapError = null
+            carbonReport = null
+            carbonError = null
             target = domain
             val queries = recordTypes.map { type -> Triple(type, domain, type) } + listOf(
                 Triple("DMARC TXT", "_dmarc.$domain", "TXT"),
@@ -231,6 +240,13 @@ class OsintWebViewModel : ViewModel() {
                 rdapReport = rdapRepository.lookup(domain)
             } catch (exception: Exception) {
                 rdapError = exception.message?.take(400) ?: "RDAP lookup unavailable."
+            }
+            if (includeCarbon) {
+                try {
+                    carbonReport = carbonRepository.estimate(nativeReport?.finalUrl ?: "https://$domain")
+                } catch (exception: Exception) {
+                    carbonError = exception.message?.take(350) ?: "Carbon estimate unavailable."
+                }
             }
             if (collected.all { it.result == null } && nativeReport == null) {
                 error = "No DNS checks completed successfully. Review the domain and network connection."
