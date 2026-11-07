@@ -136,6 +136,29 @@ fun OsintWebScreen(
             }
         }
 
+        if (viewModel.mailSecurityFindings.isNotEmpty()) {
+            Text("Mail Security Intelligence", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Passive DNS checks for mail-routing and domain-level email security. DKIM checks use common selector guesses only.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            viewModel.mailSecurityFindings.forEach { finding ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(finding.title, style = MaterialTheme.typography.titleMedium)
+                        Text(finding.status, style = MaterialTheme.typography.bodyMedium)
+                        finding.details.forEach { detail ->
+                            Text(detail, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+        }
+
         viewModel.nativeError?.let { message ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
                 Text("Website inspection: $message", modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
