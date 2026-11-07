@@ -116,6 +116,30 @@ private val knowledgeEntries = listOf(
         "Identify the operating system and kernel version.",
         "System information helps when checking compatibility, documenting a lab machine or reporting a technical issue.",
         "Windows: systeminfo\nLinux: uname -a"
+    ),
+    KnowledgeEntry(
+        "ssh-basics", "SSH & TLS", "SSH fundamentals",
+        "Understand encrypted remote administration and host identity.",
+        "Secure Shell (SSH) provides an encrypted channel between an SSH client and server. Server host keys help the client recognize the server on later connections. Verify a host-key change through a trusted administrator or another trusted channel before accepting it; do not blindly bypass host-key warnings.",
+        "ssh -V\nssh -G example.com"
+    ),
+    KnowledgeEntry(
+        "ssh-keys", "SSH & TLS", "SSH keys and authentication",
+        "Learn the role of public and private keys.",
+        "An SSH key pair contains a private key that must remain secret and a public key that can be installed on an account or server. A passphrase can protect a private key at rest. Never paste private-key contents into chat, logs or support requests.",
+        "ssh-keygen -lf ~/.ssh/id_ed25519.pub"
+    ),
+    KnowledgeEntry(
+        "tls-basics", "SSH & TLS", "TLS and HTTPS",
+        "Understand encryption, server authentication and integrity.",
+        "Transport Layer Security (TLS) protects data in transit. During a TLS handshake, peers negotiate cryptographic parameters and the server presents a certificate. A valid certificate helps bind a server identity to a public key; encryption alone does not prove that the intended service is trustworthy.",
+        "HTTPS uses TLS to protect HTTP connections.\nDefault HTTPS port: 443"
+    ),
+    KnowledgeEntry(
+        "tls-certificates", "SSH & TLS", "Certificate inspection",
+        "Read certificate identity, validity and trust information.",
+        "Check the certificate subject or subject alternative names, validity dates, issuer and verification result. A certificate can be expired, issued for another hostname or chain to an untrusted authority. Never treat disabling certificate verification as a fix.",
+        "openssl version\nopenssl s_client -connect example.com:443 -servername example.com -brief"
     )
 )
 
@@ -124,7 +148,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
     var selectedSection by remember { mutableStateOf("All") }
     var expandedId by remember { mutableStateOf<String?>(null) }
-    val sections = listOf("All", "MikroTik", "OS Commands")
+    val sections = listOf("All", "MikroTik", "OS Commands", "SSH & TLS")
     val filtered = knowledgeEntries.filter { entry ->
         (selectedSection == "All" || entry.section == selectedSection) &&
             (query.isBlank() || listOf(entry.title, entry.summary, entry.explanation, entry.example)
@@ -149,7 +173,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "MikroTik learning notes and operating-system command references.",
+                    "MikroTik, operating-system, SSH and TLS learning references.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

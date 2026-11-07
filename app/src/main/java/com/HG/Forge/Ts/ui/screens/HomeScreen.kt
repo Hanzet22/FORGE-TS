@@ -30,7 +30,7 @@ private val tools = listOf(
     ToolItem("Host Checker", "Checks for authorized hosts", Icons.Outlined.Hub, 2),
     ToolItem("What Is My IP", "Public network information", Icons.Outlined.Language, 2),
     ToolItem("DNS Lists", "DNS records and resolver references", Icons.Outlined.Dns, 3, 0),
-    ToolItem("SSH & TLS", "Secure protocol references", Icons.Outlined.Security, 3, 0),
+    ToolItem("SSH & TLS", "Secure protocol learning references", Icons.Outlined.Security, 1),
     ToolItem("Repositories", "Explore public source repositories", Icons.Outlined.Source, 3, 1)
 )
 

@@ -15,7 +15,7 @@ Android project foundation and GitHub Actions debug APK workflow. Room, DataStor
 IPv4/IPv6 CIDR calculator, public IP lookup with provider disclosure, and authorized single-host DNS/TCP/optional TLS checks. See [Phase 1](docs/PHASE-1-CORE-NETWORKING.md).
 
 ### Phase 2 — Knowledge Center
-Searchable MikroTik and OS command references with read-only examples. Commands are never executed. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
+Searchable offline MikroTik, OS command, SSH and TLS references with expandable read-only examples. SSH host identity, key safety, TLS concepts and certificate verification are educational references only; the app does not execute commands or open SSH sessions. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
 
 ### Phase 3 — DNS & Protocols
 Cloudflare DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV and CAA records, plus offline protocol references. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md).
