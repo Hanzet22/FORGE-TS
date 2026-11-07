@@ -419,7 +419,6 @@ class NativeWebCheckRepository {
                             val fingerprint = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
                                 .joinToString(":") { "%02X".format(it) }
                             listOf(
-                                "Negotiated TLS protocol: ${runCatching { connection.sslSession.orElse(null)?.protocol }.getOrNull() ?: "Not exposed by platform"}",
                                 "TLS cipher suite: ${connection.cipherSuite}",
                                 "Subject: ${cert.subjectX500Principal.name}",
                                 "Issuer: ${cert.issuerX500Principal.name}",
