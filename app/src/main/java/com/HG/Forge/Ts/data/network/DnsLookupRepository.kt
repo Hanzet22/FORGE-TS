@@ -71,9 +71,25 @@ class DnsLookupRepository {
             val resolverMessage = runCatching {
                 JSONObject(response).optString("error").takeIf { it.isNotBlank() }
             }.getOrNull()
-            val detail = resolverMessage?.let { ": $it" } ?: ""
+            val rawBody = response
+                .replace(Regex("\\s+"), " ")
+                .trim()
+                .take(300)
+            val diagnostic = resolverMessage
+                ?: rawBody.takeIf { it.isNotBlank() }
+                ?: "response body was empty"
+            val server = httpResponse.headers["Server"]
+            val cfRay = httpResponse.headers["CF-Ray"]
+            val contentLength = httpResponse.headers["Content-Length"]
+            val metadata = buildList {
+                if (server != null) add("server=$server")
+                if (cfRay != null) add("cf-ray=$cfRay")
+                if (contentLength != null) add("content-length=$contentLength")
+            }.joinToString(", ").takeIf { it.isNotBlank() }
+            val detail = ": $diagnostic"
+            val headerDetail = metadata?.let { " [$it]" } ?: ""
             throw IllegalStateException(
-                "${resolver.label} returned HTTP $httpStatus ($contentType)$detail"
+                "${resolver.label} returned HTTP $httpStatus ($contentType)$headerDetail$detail"
             )
         }
         if (response.isBlank()) {
