@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +32,7 @@ fun OsintWebScreen(
     viewModel: OsintWebViewModel = viewModel()
 ) {
     var domain by remember { mutableStateOf("") }
+    var includeCarbon by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -52,11 +55,19 @@ fun OsintWebScreen(
             singleLine = true
         )
         Button(
-            onClick = { viewModel.inspect(domain) },
+            onClick = { viewModel.inspect(domain, includeCarbon) },
             enabled = domain.isNotBlank() && !viewModel.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Run native inspection")
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = includeCarbon, onCheckedChange = { includeCarbon = it })
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Optional Website Carbon estimate", style = MaterialTheme.typography.bodyMedium)
+                Text("When enabled, the page URL is sent to Website Carbon, a third-party estimator. Off by default.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
 
         if (viewModel.isLoading) {
@@ -172,19 +183,6 @@ fun OsintWebScreen(
             }
         }
 
-        if (viewModel.dnssecFindings.isNotEmpty() || viewModel.caaFindings.isNotEmpty()) {
-            Text("DNSSEC & Certificate Authority Policy", style = MaterialTheme.typography.headlineSmall)
-            (viewModel.dnssecFindings + viewModel.caaFindings).forEach { finding ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(finding.title, style = MaterialTheme.typography.titleMedium)
-                        Text(finding.status, style = MaterialTheme.typography.bodyMedium)
-                        finding.details.forEach { detail -> Text(detail, style = MaterialTheme.typography.bodySmall) }
-                    }
-                }
-            }
-        }
-
         Text("RDAP Domain Intelligence", style = MaterialTheme.typography.headlineSmall)
         viewModel.rdapError?.let { message ->
             Text("RDAP unavailable: $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -207,6 +205,24 @@ fun OsintWebScreen(
         viewModel.nativeError?.let { message ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
                 Text("Website inspection: $message", modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
+            }
+        }
+
+        if (includeCarbon) {
+            Text("Website Carbon Intelligence", style = MaterialTheme.typography.headlineSmall)
+            viewModel.carbonError?.let { Text("Estimate unavailable: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            viewModel.carbonReport?.let { report ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(report.rating ?: "Provider rating unavailable", style = MaterialTheme.typography.titleMedium)
+                        report.gridCo2Grams?.let { Text("Estimated grid CO₂ per page view: ${"%.4f".format(it)} g") }
+                        report.renewableCo2Grams?.let { Text("Estimated renewable-hosting CO₂: ${"%.4f".format(it)} g") }
+                        report.bytes?.let { Text("Provider-measured transfer: $it bytes") }
+                        report.cleanerThanPercent?.let { Text("Cleaner than: ${"%.1f".format(it)}% of tested pages") }
+                        Text("Green hosting signal: ${report.greenHosting?.toString() ?: "Not reported"}")
+                        Text("Provider: ${report.provider}. Estimates depend on the provider's model and assumptions; they are not direct energy measurements.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
             }
         }
 
