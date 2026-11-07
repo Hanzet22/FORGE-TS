@@ -18,7 +18,7 @@ IPv4/IPv6 CIDR calculator with subnet/broadcast/usable-host details and binary c
 Searchable offline MikroTik, OS command, addressing, network type, transport, VPN, tunneling and proxy protocol references. SSH host identity, key safety, TLS concepts and certificate verification are educational references only; the app does not execute commands, open SSH sessions or establish proxy/VPN tunnels. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
 
 ### Phase 3 — DNS & Protocols
-Expanded live DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC records. Supports Cloudflare and Google Public DNS resolvers, TTL and DNS response sections/status, response time and resolver-reported DNSSEC AD metadata. Includes a legacy Protocol Library plus the dedicated searchable Protocol Center with 80+ structured protocol profiles, category filters, technical details, use cases, functions, pros/cons, deployment hurdles, standards/specification references, suitability and environment guidance. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md) and [Phase 11](docs/PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
+Expanded live DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC records. Uses Google Public DNS over HTTPS, TTL and DNS response sections/status, response time and resolver-reported DNSSEC AD metadata. Includes a legacy Protocol Library plus the dedicated searchable Protocol Center with 80+ structured protocol profiles, category filters, technical details, use cases, functions, pros/cons, deployment hurdles, standards/specification references, suitability and environment guidance. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md) and [Phase 11](docs/PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
 
 ### Phase 4 — Repository Explorer
 Read-only public GitHub repository search and basic repository metadata. See [Phase 4](docs/PHASE-4-REPOSITORY-EXPLORER.md).
@@ -48,7 +48,7 @@ A fourth dedicated section adds a searchable application-protocol catalog coveri
 See [Phases 3–9 roadmap](docs/ROADMAP-PHASES-3-TO-9.md) and [Phase 10 — Addressing, Network Design & Protocol Knowledge](docs/PHASE-10-ADDRESSING-NETWORK-DESIGN-PROTOCOLS.md).
 
 ## Safety and privacy
-The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Cloudflare. Repository search terms are sent to GitHub. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
+The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Google Public DNS. Repository search terms are sent to GitHub. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
 
 ## Build
 Run the Android Debug APK workflow from the GitHub Actions tab. The workflow uses JDK 17 and Gradle 8.13.
