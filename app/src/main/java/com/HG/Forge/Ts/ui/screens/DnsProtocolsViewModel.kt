@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.HG.Forge.Ts.data.network.DnsLookupRepository
 import com.HG.Forge.Ts.data.network.DnsLookupResult
+import com.HG.Forge.Ts.data.network.DnsResolver
 import kotlinx.coroutines.launch
 
 class DnsProtocolsViewModel : ViewModel() {
@@ -19,13 +20,13 @@ class DnsProtocolsViewModel : ViewModel() {
     var isLoading: Boolean by mutableStateOf(false)
         private set
 
-    fun lookup(domain: String, recordType: String) {
+    fun lookup(domain: String, recordType: String, resolver: DnsResolver) {
         viewModelScope.launch {
             isLoading = true
             error = null
             result = null
             try {
-                result = repository.lookup(domain, recordType)
+                result = repository.lookup(domain, recordType, resolver)
             } catch (exception: Exception) {
                 error = exception.message ?: "DNS lookup failed"
             } finally {
