@@ -140,8 +140,7 @@ private val knowledgeEntries = listOf(
         "Read certificate identity, validity and trust information.",
         "Check the certificate subject or subject alternative names, validity dates, issuer and verification result. A certificate can be expired, issued for another hostname or chain to an untrusted authority. Never treat disabling certificate verification as a fix.",
         "openssl version\nopenssl s_client -connect example.com:443 -servername example.com -brief"
-    )
-
+    ),
     KnowledgeEntry("ip-v4", "Addressing", "IPv4 addressing", "32-bit addresses, dotted-decimal notation and subnet boundaries.", "IPv4 uses 32-bit addresses, commonly written as four decimal octets. A prefix length identifies the network portion. Private ranges are intended for internal networks and are not globally routed.", "Example: 192.168.10.25/24"),
     KnowledgeEntry("ip-v6", "Addressing", "IPv6 addressing", "128-bit addresses and hexadecimal notation.", "IPv6 uses 128-bit addresses written as hexadecimal groups separated by colons. Double-colon compression can replace one consecutive run of zero groups. IPv6 has no broadcast address; multicast and anycast serve related delivery roles.", "Example: 2001:db8:10::25/64"),
     KnowledgeEntry("ip-cidr", "Addressing", "CIDR and prefix length", "Classless network notation such as /24 or /64.", "CIDR expresses the network prefix length directly and supports flexible subnet sizes and route aggregation. A smaller IPv4 prefix number means a larger address block.", "192.168.10.0/24 = 256 total IPv4 addresses"),
