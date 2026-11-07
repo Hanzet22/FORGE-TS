@@ -91,7 +91,7 @@ class NativeWebCheckRepository {
         )
 
         val hsts = header("Strict-Transport-Security")
-        val hstsMaxAge = hsts?.let { Regex("""(?i)(?:^|;)\\s*max-age\\s*=\\s*(\\d+)""").find(it)?.groupValues?.getOrNull(1)?.toLongOrNull() }
+        val hstsMaxAge = hsts?.let { Regex("""(?i)(?:^|;)\s*max-age\s*=\s*(\d+)""").find(it)?.groupValues?.getOrNull(1)?.toLongOrNull() }
         findings += NativeWebFinding(
             category = "Security",
             title = "HSTS policy analysis",
