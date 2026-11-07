@@ -50,6 +50,9 @@ Introduces a native OSINT workspace under Tools, inspired by the public Web-Chec
 ### Phase 16 — Native Web-Check Expansion
 Expands OSINT Web with native Kotlin/Compose DNSSEC/mail-record hints, HTTP status and redirects, TLS peer-certificate metadata, security headers, cookie attributes, robots.txt, sitemap and security.txt, page/social metadata, heuristic technology indicators, mixed-content hints, server/CDN signals, bounded link inventory and selected tracker signatures. Requests are bounded and public-host validated; private/local destinations and HTTPS downgrade redirects are blocked. This is a selective native port: active port scans, traceroute, vulnerability/breach checks and provider-key-dependent checks are deliberately excluded or deferred. See [Phase 16](docs/PHASE-16-NATIVE-WEB-CHECK.md).
 
+### Phase 17 — Mail Security Intelligence
+Adds passive DNS-based checks for MX, SPF, DMARC, common DKIM selector candidates, MTA-STS and SMTP TLS Reporting (TLS-RPT). Results are evidence indicators, not a complete mail-server audit: DKIM selector guesses are not exhaustive, and the MTA-STS policy file is not fetched or validated. Native website inspection now uses a 12-second connect/read timeout and explains common DNS, TCP-connect and TLS failure classes without treating a timeout as proof that a website is offline. See [Phase 17](docs/PHASE-17-MAIL-SECURITY-INTELLIGENCE.md).
+
 ## Gated and preparation phases
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
