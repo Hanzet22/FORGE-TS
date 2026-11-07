@@ -32,7 +32,12 @@ Provider/data disclosures and safe-use boundaries. See [Phase 7](docs/PHASE-7-SE
 ### Phase 8 — Diagnostics
 Local Android network capability snapshot with manual refresh. See [Phase 8](docs/PHASE-8-DIAGNOSTICS.md).
 
-### Phase 12 — Dedicated Protocol Center\nA standalone tab expands the catalog across addressing, transport, routing, switching, multicast, VPN/security, overlays, application services, identity, management, IoT and real-time communication. Each entry separates the protocol concept from its implementation and identifies RFC, IEEE/ISO/ITU-T, IETF registry or project specification status. See [Phase 12](docs/PHASE-12-DEDICATED-PROTOCOL-CENTER.md).\n\n## Gated and preparation phases
+### Phase 12 — Dedicated Protocol Center
+A standalone tab expands the catalog across addressing, transport, routing, switching, multicast, VPN/security, overlays, application services, identity, management, IoT and real-time communication. See [Phase 12](docs/PHASE-12-DEDICATED-PROTOCOL-CENTER.md).
+
+### Phase 13 — Full Technical Protocol Documentation
+All 83 protocol and protocol-family entries now include dedicated technical chapters covering architecture, packet/frame/message models, operation lifecycle, security boundaries, performance, deployment/interoperability, troubleshooting and primary references. The detail view also explains how to verify RFC status, updates, obsoletes, errata and non-IETF standards. See [Phase 13](docs/PHASE-13-FULL-TECHNICAL-PROTOCOL-DOCUMENTATION.md).
+\n## Gated and preparation phases
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
 
