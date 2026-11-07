@@ -40,7 +40,8 @@ All 83 protocol and protocol-family entries now include dedicated technical chap
 
 ### Phase 14 — Application Protocol Center
 A fourth dedicated section adds a searchable application-protocol catalog covering HTTP/1.1, HTTP/2, HTTP/3, HTTPS, TLS 1.3, WebSocket, Server-Sent Events, WebDAV, REST, GraphQL, gRPC, SOAP 1.2, JSON-RPC 2.0 and Protocol Buffers. Each entry includes a technical detail view for architecture, message model, lifecycle, security, performance, deployment, troubleshooting, advantages, limitations and primary references. The documentation distinguishes wire protocols from architectural styles, query specifications and serialization formats. See [Phase 14](docs/PHASE-14-APPLICATION-PROTOCOL-CENTER.md).
-\n## Gated and preparation phases
+
+## Gated and preparation phases
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
 
