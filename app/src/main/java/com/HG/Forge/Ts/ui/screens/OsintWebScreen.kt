@@ -40,7 +40,7 @@ fun OsintWebScreen(
     ) {
         Text("OSINT Web", style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Collect public domain intelligence using passive DNS-over-HTTPS lookups. This first integration establishes the native OSINT workflow; additional Web-Check capabilities will be ported in separate modules.",
+            "Inspect public DNS, HTTP responses, TLS certificates, security headers, cookies, robots.txt, sitemaps, security.txt, page metadata and technology indicators using native Android networking.",
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         OutlinedTextField(
@@ -56,7 +56,7 @@ fun OsintWebScreen(
             enabled = domain.isNotBlank() && !viewModel.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Inspect domain")
+            Text("Run native inspection")
         }
 
         if (viewModel.isLoading) {
@@ -135,13 +135,35 @@ fun OsintWebScreen(
             }
         }
 
+        viewModel.nativeError?.let { message ->
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
+                Text("Website inspection: $message", modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
+            }
+        }
+
+        viewModel.nativeReport?.let { report ->
+            Text("Native Web-Check report", style = MaterialTheme.typography.headlineSmall)
+            Text("Final URL: ${report.finalUrl}\nChecked: ${report.checkedAt}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            report.findings.forEach { finding ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(finding.category.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        Text(finding.title, style = MaterialTheme.typography.titleMedium)
+                        Text(finding.status, style = MaterialTheme.typography.bodyMedium)
+                        finding.details.forEach { detail -> Text(detail, style = MaterialTheme.typography.bodySmall) }
+                        Text("Source: ${finding.source}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+
         Text(
-            "Scope: passive public DNS metadata only. Queries are sent to Google Public DNS; DNS records can reveal infrastructure details and may be logged by the resolver. DNSSEC AD is resolver-reported metadata, not a complete independent validation report. FORGE-TS does not save this report. Inspect only domains you own or are authorized to assess.",
+            "Scope: passive public metadata only. DNS queries are sent to Google Public DNS; website requests go directly to the selected public domain. Local/private/link-local destinations are blocked, redirects are manually limited, response bodies are capped, and HTTPS downgrade redirects are rejected. FORGE-TS does not persist reports. Inspect only domains you own or are authorized to assess.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            "Reference project: Web-Check by Alicia Sykes (MIT). This initial native implementation reuses FORGE-TS DNS infrastructure and does not bundle the Web-Check web application.",
+            "Reference project: Web-Check by Alicia Sykes (MIT). This is an independently implemented native Kotlin/Compose adaptation; it does not bundle the upstream web application or copy its runtime.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
