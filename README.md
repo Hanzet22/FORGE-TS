@@ -3,6 +3,9 @@
 
 ## Platform
 - Native Android APK built with Kotlin, Jetpack Compose and Material 3.
+- **Minimum supported OS: Android 10 (API 29).**
+- **Android 16 (API 36) and later:** built against API 36 and configured with target SDK 36; newer Android releases remain subject to compatibility verification.
+- Android 10 through Android 16+ is the intended supported device range; devices below Android 10 are not supported.
 - MVVM-oriented presentation and repository-based data boundaries.
 - Light professional UI direction: white, grey, navy and blue.
 - Selected namespace and application ID: `com.HG.Forge.Ts`.
