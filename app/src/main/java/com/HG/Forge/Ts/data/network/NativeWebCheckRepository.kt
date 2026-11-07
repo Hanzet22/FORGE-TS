@@ -131,7 +131,6 @@ class NativeWebCheckRepository {
         )
 
         val base = URI(fetched.url)
-        val origin = "${base.scheme}://${base.rawAuthority}"
         val root = base.resolve("/")
         val robots = safeFetchText(root.resolve("/robots.txt").toString())
         findings += NativeWebFinding(
@@ -324,7 +323,7 @@ class NativeWebCheckRepository {
                             val fingerprint = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
                                 .joinToString(":") { "%02X".format(it) }
                             listOf(
-                                "TLS protocol: ${connection.sslSocketFactory.javaClass.simpleName}",
+                                "TLS cipher suite: ${connection.cipherSuite}",
                                 "Subject: ${cert.subjectX500Principal.name}",
                                 "Issuer: ${cert.issuerX500Principal.name}",
                                 "Valid from: ${cert.notBefore}",
@@ -337,7 +336,7 @@ class NativeWebCheckRepository {
                 return FetchResult(
                     url = current.toString(),
                     status = status,
-                    headers = connection.headerFields.filterKeys { it != null },
+                    headers = connection.headerFields.mapNotNull { (key, value) -> key?.let { it to (value ?: emptyList()) } }.toMap(),
                     body = bytes.toString(Charsets.UTF_8),
                     redirectChain = chain.toList(),
                     tlsDetails = tls
