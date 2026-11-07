@@ -136,6 +136,19 @@ fun OsintWebScreen(
             }
         }
 
+        if (viewModel.dnsSecurityFindings.isNotEmpty()) {
+            Text("DNS Security Intelligence", style = MaterialTheme.typography.headlineSmall)
+            Text("Resolver-reported DNSSEC authentication and passive CAA policy interpretation. These are evidence signals, not a full independent DNSSEC chain validator.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            viewModel.dnsSecurityFindings.forEach { finding ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(finding.title, style = MaterialTheme.typography.titleMedium)
+                        Text(finding.status, style = MaterialTheme.typography.bodyMedium)
+                        finding.details.forEach { detail -> Text(detail, style = MaterialTheme.typography.bodySmall) }
+                    }
+                }
+            }
+        }
         if (viewModel.mailSecurityFindings.isNotEmpty()) {
             Text("Mail Security Intelligence", style = MaterialTheme.typography.headlineSmall)
             Text(
