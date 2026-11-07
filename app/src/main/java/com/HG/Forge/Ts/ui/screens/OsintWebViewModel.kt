@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.HG.Forge.Ts.data.network.DnsLookupRepository
+import com.HG.Forge.Ts.data.network.NativeWebCheckRepository
+import com.HG.Forge.Ts.data.network.NativeWebReport
 import com.HG.Forge.Ts.data.network.DnsLookupResult
 import com.HG.Forge.Ts.data.network.DnsResolver
 import kotlinx.coroutines.launch
@@ -18,6 +20,7 @@ data class OsintDnsCheck(
 
 class OsintWebViewModel : ViewModel() {
     private val repository = DnsLookupRepository()
+    private val nativeRepository = NativeWebCheckRepository()
     private val recordTypes = listOf("A", "AAAA", "NS", "MX", "TXT", "CAA")
 
     var checks by mutableStateOf<List<OsintDnsCheck>>(emptyList())
@@ -56,7 +59,7 @@ class OsintWebViewModel : ViewModel() {
                 collected += check
                 checks = collected.toList()
             }
-            if (collected.all { it.result == null }) {
+            try {\n                nativeReport = nativeRepository.inspect(domain)\n            } catch (exception: Exception) {\n                nativeError = exception.message ?: "Native website inspection failed."\n            }\n            if (collected.all { it.result == null } && nativeReport == null) {
                 error = "No DNS checks completed successfully. Review the domain and network connection."
             }
             isLoading = false
