@@ -6,7 +6,7 @@ Expand Phase 15 into a native Kotlin/Jetpack Compose website-inspection workflow
 ## Native checks implemented
 The current native inspection collects:
 
-- DNS: A, AAAA, NS, MX, TXT and CAA through the existing Google Public DNS-over-HTTPS repository.
+- DNS: A, AAAA, NS, MX, TXT, CAA, SOA, CNAME, SRV, DS, DNSKEY, RRSIG, NSEC, TLSA, HTTPS and SVCB through Google Public DNS-over-HTTPS. Common DMARC and DKIM TXT names are queried as limited hints; selector guesses are not exhaustive.
 - HTTP: response status, final URL, content type/length, bounded redirect chain and selected response headers.
 - TLS: peer X.509 certificate subject, issuer, validity dates and SHA-256 fingerprint when a trusted HTTPS connection succeeds.
 - Security headers: HSTS, CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, COOP and CORP.
@@ -14,6 +14,9 @@ The current native inspection collects:
 - SEO/site files: robots.txt, common sitemap.xml location and sitemap declarations in robots.txt, and security.txt at the RFC 9116 conventional locations.
 - Page metadata: title, description, canonical URL, selected Open Graph and Twitter tags.
 - Technology indicators: heuristic public HTML signatures for common frameworks and platforms.
+- Server and edge hints: selected public Server/X-Powered-By/cache/CDN headers, without active firewall probing.
+- Linked-page inventory: bounded same-host versus other-host link counts; linked pages are not crawled.
+- Privacy hints: static signatures for selected analytics/tracker families and public social-profile links.
 - Mixed-content hints: simple HTTP src/href references in a bounded HTML sample.
 
 ## Upstream API inventory and porting decisions
@@ -30,14 +33,14 @@ The upstream repository exposes these API check modules. The native app does not
 | dns-server | Partial; nameserver records are shown, resolver infrastructure profiling is not |
 | dns | Implemented for selected common records |
 | dnssec | Partial; resolver-reported AD metadata is shown, not an independent DNSSEC validator |
-| firewall | Partial; only explicit public response-header signals may be shown, no evasion/probing |
+| firewall | Partial; selected public CDN/WAF response-header hints only, no evasion/probing |
 | get-ip | Covered by public A/AAAA DNS results |
 | headers | Implemented |
 | hsts | Implemented in the security-header review |
 | http-security | Implemented as a bounded header checklist |
-| linked-pages | Partial; page link inventory is planned, not a crawler |
+| linked-pages | Partial; bounded link inventory only, not a crawler |
 | location | Deferred; no geolocation inference from a target IP |
-| mail-config | Partial; MX and domain TXT are shown; SPF/DMARC/DKIM validation is a follow-up |
+| mail-config | Partial; MX, SPF TXT, common DMARC and a few common DKIM selector TXT names are queried; this is not exhaustive validation |
 | mixed-content | Implemented as a static HTML hint, not a browser execution test |
 | ports | Excluded; active port scanning is not part of the native passive workflow |
 | quality | Deferred; requires PageSpeed provider/API policy and credentials |
@@ -58,7 +61,7 @@ The upstream repository exposes these API check modules. The native app does not
 | tls-connection | Partial; trusted HTTPS connection and peer certificate details |
 | tls-labs | Deferred; external assessment provider |
 | trace-route | Excluded; active route probing is not part of this native passive workflow |
-| trackers | Deferred; requires a maintained tracker-signature dataset |
+| trackers | Partial; static signatures for selected common tracker families, not a maintained exhaustive dataset |
 | txt-records | Implemented through DNS TXT lookup |
 | whois | Deferred; RDAP/WHOIS provider and registration-data privacy handling required |
 
