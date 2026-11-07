@@ -90,6 +90,28 @@ class NativeWebCheckRepository {
             source = "HTTP response headers"
         )
 
+        val hsts = header("Strict-Transport-Security")
+        val hstsMaxAge = hsts?.let { Regex("""(?i)(?:^|;)\\s*max-age\\s*=\\s*(\\d+)""").find(it)?.groupValues?.getOrNull(1)?.toLongOrNull() }
+        findings += NativeWebFinding(
+            category = "Security",
+            title = "HSTS policy analysis",
+            status = when {
+                !fetched.url.startsWith("https://") -> "Not evaluated on an HTTP page"
+                hsts == null -> "HSTS header not observed"
+                hstsMaxAge == null -> "Header present; max-age not parsed"
+                hstsMaxAge == 0L -> "HSTS max-age is zero"
+                hstsMaxAge < 15552000L -> "HSTS configured with a short max-age"
+                else -> "HSTS max-age meets the six-month baseline"
+            },
+            details = listOf(
+                hsts ?: "Strict-Transport-Security was not present in the final HTTPS response.",
+                "includeSubDomains: ${hsts?.contains("includeSubDomains", true) == true}",
+                "preload directive: ${hsts?.split(';')?.any { it.trim().equals("preload", true) } == true}",
+                "The app does not verify browser preload-list inclusion or policy behavior on subdomains."
+            ),
+            source = "Strict-Transport-Security response header"
+        )
+
         val cookies = headers.entries
             .filter { it.key.equals("Set-Cookie", true) }
             .flatMap { it.value }
@@ -397,6 +419,7 @@ class NativeWebCheckRepository {
                             val fingerprint = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
                                 .joinToString(":") { "%02X".format(it) }
                             listOf(
+                                "Negotiated TLS protocol: ${runCatching { connection.sslSession.orElse(null)?.protocol }.getOrNull() ?: "Not exposed by platform"}",
                                 "TLS cipher suite: ${connection.cipherSuite}",
                                 "Subject: ${cert.subjectX500Principal.name}",
                                 "Issuer: ${cert.issuerX500Principal.name}",
