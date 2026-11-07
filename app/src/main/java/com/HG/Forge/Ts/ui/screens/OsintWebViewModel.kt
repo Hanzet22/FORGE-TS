@@ -10,11 +10,16 @@ import com.HG.Forge.Ts.data.network.NativeWebCheckRepository
 import com.HG.Forge.Ts.data.network.NativeWebReport
 import com.HG.Forge.Ts.data.network.DnsLookupResult
 import com.HG.Forge.Ts.data.network.DnsResolver
+import com.HG.Forge.Ts.data.network.RdapDomainRepository
+import com.HG.Forge.Ts.data.network.RdapDomainReport
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import java.net.ConnectException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import java.net.NoRouteToHostException
+import javax.net.ssl.SSLHandshakeException
 
 data class OsintDnsCheck(
     val recordType: String,
@@ -32,6 +37,7 @@ data class MailSecurityFinding(
 class OsintWebViewModel : ViewModel() {
     private val repository = DnsLookupRepository()
     private val nativeRepository = NativeWebCheckRepository()
+    private val rdapRepository = RdapDomainRepository()
     private val recordTypes = listOf("A", "AAAA", "NS", "MX", "TXT", "CAA", "SOA", "CNAME", "SRV", "DS", "DNSKEY", "RRSIG", "NSEC", "TLSA", "HTTPS", "SVCB")
 
     var checks by mutableStateOf<List<OsintDnsCheck>>(emptyList())
@@ -46,6 +52,47 @@ class OsintWebViewModel : ViewModel() {
         private set
     var nativeError by mutableStateOf<String?>(null)
         private set
+    var rdapReport by mutableStateOf<RdapDomainReport?>(null)
+        private set
+    var rdapError by mutableStateOf<String?>(null)
+        private set
+
+    val dnssecFindings: List<MailSecurityFinding>
+        get() {
+            val signedTypes = listOf("DS", "DNSKEY", "RRSIG", "NSEC")
+            val queried = checks.filter { it.recordType in signedTypes }
+            val authenticated = queried.filter { it.result?.dnssecAuthenticated == true }
+            val failed = queried.filter { it.result?.status == 2 }
+            val details = buildList {
+                add("Google Public DNS AD flag is resolver-provided evidence that the answer was authenticated by its validating resolver.")
+                add("FORGE-TS does not locally verify the DS → DNSKEY → RRSIG cryptographic chain in this phase.")
+                if (authenticated.isNotEmpty()) add("Authenticated responses: ${authenticated.joinToString { it.recordType }}.")
+                if (failed.isNotEmpty()) add("SERVFAIL responses: ${failed.joinToString { it.recordType }}; this can have several causes and is not by itself a definitive DNSSEC-bogus verdict.")
+            }
+            return listOf(MailSecurityFinding(
+                "DNSSEC validation signal",
+                when { authenticated.isNotEmpty() -> "Resolver authenticated response(s)"; failed.isNotEmpty() -> "Resolver returned SERVFAIL"; queried.isNotEmpty() -> "No authenticated response flag observed"; else -> "Awaiting DNSSEC queries" },
+                details
+            ))
+        }
+
+    val caaFindings: List<MailSecurityFinding>
+        get() {
+            val records = checks.firstOrNull { it.recordType == "CAA" }?.result?.answers.orEmpty().map { it.data }
+            val issuers = records.filter { it.contains("issue", true) }
+            val wildcards = records.filter { it.contains("issuewild", true) }
+            val iodef = records.filter { it.contains("iodef", true) }
+            return listOf(MailSecurityFinding(
+                "CAA certificate-authority policy",
+                if (records.isEmpty()) "No CAA answer returned" else "${records.size} CAA record(s) observed",
+                listOf(
+                    if (issuers.isEmpty()) "No issue directive observed in returned answers." else "Issuance directives: ${issuers.joinToString("; ")}",
+                    if (wildcards.isEmpty()) "No issuewild directive observed; wildcard handling may inherit issue policy under the standard." else "Wildcard directives: ${wildcards.joinToString("; ")}",
+                    if (iodef.isEmpty()) "No iodef reporting directive observed." else "Incident-reporting directives: ${iodef.joinToString("; ")}",
+                    "This is a record summary, not a complete CA authorization evaluation."
+                )
+            ))
+        }
 
     val mailSecurityFindings: List<MailSecurityFinding>
         get() {
@@ -117,6 +164,8 @@ class OsintWebViewModel : ViewModel() {
             checks = emptyList()
             nativeReport = null
             nativeError = null
+            rdapReport = null
+            rdapError = null
             target = domain
             val queries = recordTypes.map { type -> Triple(type, domain, type) } + listOf(
                 Triple("DMARC TXT", "_dmarc.$domain", "TXT"),
@@ -146,6 +195,11 @@ class OsintWebViewModel : ViewModel() {
             } catch (exception: Exception) {
                 nativeError = explainNativeFailure(exception)
             }
+            try {
+                rdapReport = rdapRepository.lookup(domain)
+            } catch (exception: Exception) {
+                rdapError = exception.message?.take(400) ?: "RDAP lookup unavailable."
+            }
             if (collected.all { it.result == null } && nativeReport == null) {
                 error = "No DNS checks completed successfully. Review the domain and network connection."
             }
@@ -155,21 +209,25 @@ class OsintWebViewModel : ViewModel() {
 
     private fun explainNativeFailure(exception: Exception): String {
         val causes = generateSequence(exception as Throwable?) { it.cause }.toList()
-        val messages = causes.mapNotNull { it.message }.joinToString(" | ")
-        val isConnectTimeout = causes.any { it is SocketTimeoutException || it is ConnectException } ||
-            messages.contains("failed to connect", true) ||
+        val messages = causes.mapNotNull { it.message }
+            .filterNot { it.contains(" from /") || it.contains("local address", true) }
+            .joinToString(" | ")
+        val connectTimeout = messages.contains("failed to connect", true) ||
             messages.contains("connect timed out", true) ||
-            messages.contains("after 7000ms", true) ||
             messages.contains("after 12000ms", true)
-
         return when {
-            isConnectTimeout ->
-                "TCP connection could not be established before the timeout. DNS may have resolved the host, but the HTTPS server or network route did not complete the connection. Try again later or compare on another trusted network. This is not an SSL-certificate verdict. Details: ${messages.take(500)}"
-            messages.contains("UnknownHost", true) || messages.contains("unable to resolve", true) ->
-                "DNS resolution failed before the website connection. Check the domain spelling and DNS/network availability. Details: ${messages.take(500)}"
-            messages.contains("SSL", true) || messages.contains("certificate", true) || messages.contains("handshake", true) ->
-                "The HTTPS/TLS negotiation failed. The site may have a certificate, protocol or interception issue. Details: ${messages.take(500)}"
-            else -> messages.take(700).ifBlank { "Native website inspection failed for an unspecified network reason." }
+            causes.any { it is UnknownHostException } ->
+                "DNS resolution failed before a connection could be attempted. Check the domain and resolver availability."
+            causes.any { it is SSLHandshakeException } ||
+                messages.contains("certificate", true) || messages.contains("handshake", true) ->
+                "TLS negotiation failed after the connection stage. Review certificate validity, hostname matching, device time and network interception. Details: ${messages.take(350)}"
+            causes.any { it is NoRouteToHostException } ->
+                "The device network reports no route to the destination. This is a routing/connectivity issue, not a certificate verdict."
+            connectTimeout || causes.any { it is ConnectException } ->
+                "TCP connection to the resolved HTTPS endpoint did not complete before timeout. Possible causes include remote service availability, edge filtering, routing or the current network. DNS resolution alone does not prove HTTPS reachability. Compare on another trusted network; do not treat this as an SSL verdict. Details: ${messages.take(350)}"
+            causes.any { it is SocketTimeoutException } ->
+                "The server connection was established or attempted, but a network read timed out while waiting for data. This differs from a DNS failure and is not an SSL verdict. Details: ${messages.take(350)}"
+            else -> messages.take(500).ifBlank { "Native website inspection failed for an unspecified network reason." }
         }
     }
 }
