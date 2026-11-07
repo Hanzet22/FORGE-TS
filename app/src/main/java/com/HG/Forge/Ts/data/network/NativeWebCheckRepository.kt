@@ -281,12 +281,14 @@ class NativeWebCheckRepository {
         )
 
         val socialHosts = listOf("github.com", "linkedin.com", "instagram.com", "facebook.com", "x.com", "twitter.com", "youtube.com")
-        val socialLinks = links.mapNotNull { link ->
-            runCatching {
-                val host = URI(fetched.url).resolve(link).host?.lowercase() ?: return@runCatching null
-                if (socialHosts.any { host == it || host.endsWith(".$it") }) link else null
-            }.getOrNull()
-        }.distinct().take(20).toList()
+        val socialLinks: List<String> = buildList {
+            links.forEach { link ->
+                val host = runCatching { URI(fetched.url).resolve(link).host?.lowercase() }.getOrNull()
+                if (host != null && socialHosts.any { host == it || host.endsWith(".$it") }) {
+                    add(link)
+                }
+            }
+        }.distinct().take(20)
         findings += NativeWebFinding(
             category = "Social",
             title = "Public social links",
