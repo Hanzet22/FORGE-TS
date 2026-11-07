@@ -354,13 +354,14 @@ class NativeWebCheckRepository {
             chain += current.toString()
             val connection = (current.openConnection() as HttpURLConnection).apply {
                 instanceFollowRedirects = false
-                connectTimeout = 7000
-                readTimeout = 7000
+                connectTimeout = 12000
+                readTimeout = 12000
                 requestMethod = "GET"
                 setRequestProperty("User-Agent", "FORGE-TS-NativeOSINT/1.0")
                 setRequestProperty("Accept", "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.2")
                 setRequestProperty("Range", "bytes=0-131071")
                 setRequestProperty("Connection", "close")
+                useCaches = false
             }
             try {
                 val status = connection.responseCode
