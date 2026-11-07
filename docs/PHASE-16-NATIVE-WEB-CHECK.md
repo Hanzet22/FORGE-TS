@@ -20,7 +20,7 @@ The current native inspection collects:
 - Mixed-content hints: simple HTTP src/href references in a bounded HTML sample.
 
 ## Upstream API inventory and porting decisions
-The upstream repository exposes these API check modules. The native app does not assume that every server-side integration is suitable for an offline-capable Android client.
+The inspected upstream tree contains 40 API check handlers and 44 check definitions (excluding shared helpers and the registry index). The native app does not assume that every server-side integration is suitable for an offline-capable Android client.
 
 | Upstream check | Native disposition |
 |---|---|
@@ -31,6 +31,9 @@ The upstream repository exposes these API check modules. The native app does not
 | carbon | Deferred; third-party estimation service and methodology disclosure required |
 | cookies | Implemented as response-cookie attribute inspection |
 | dns-server | Partial; nameserver records are shown, resolver infrastructure profiling is not |
+| domain-info | Deferred; registrar/RDAP enrichment needs provider discovery and privacy handling |
+| hosts | Partial; A/AAAA and nameserver data are shown, no host-file or broad host enumeration |
+| server-info | Partial; selected response headers only |
 | dns | Implemented for selected common records |
 | dnssec | Partial; resolver-reported AD metadata is shown, not an independent DNSSEC validator |
 | firewall | Partial; selected public CDN/WAF response-header hints only, no evasion/probing |
@@ -59,6 +62,9 @@ The upstream repository exposes these API check modules. The native app does not
 | tech-stack | Partial; heuristic HTML indicators only, not definitive fingerprinting |
 | threats | Excluded from this native passive inspection scope |
 | tls-connection | Partial; trusted HTTPS connection and peer certificate details |
+| tls-client-compat | Deferred; no multi-client handshake simulation in the Android client |
+| tls-security-audit | Partial; certificate metadata only, no cipher-suite enumeration or external lab scan |
+| vulnerabilities | Excluded from this native passive inspection scope |
 | tls-labs | Deferred; external assessment provider |
 | trace-route | Excluded; active route probing is not part of this native passive workflow |
 | trackers | Partial; static signatures for selected common tracker families, not a maintained exhaustive dataset |
