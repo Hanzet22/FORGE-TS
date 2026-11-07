@@ -16,7 +16,7 @@
 - RDAP availability and data fields vary by registry; a missing field is displayed as unavailable rather than inferred.
 
 ## Phase 20 — TLS Connection Intelligence
-- Displays the negotiated TLS protocol when exposed by the Android platform, cipher suite and peer certificate metadata.
+- Displays the TLS cipher suite and peer certificate metadata available through Android's standard HTTPS connection API. The negotiated protocol version is not exposed by this implementation's current API path and is not guessed.
 - Certificate subject, issuer, validity dates and SHA-256 fingerprint remain informational.
 - The Android TLS stack performs certificate-chain and hostname verification; FORGE-TS does not disable trust checks.
 - A TCP connection timeout is not classified as a TLS/certificate failure because the handshake may never have started.
