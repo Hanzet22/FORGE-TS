@@ -20,6 +20,9 @@
 - HTTPS and SVCB records are returned as resolver-provided record data; this phase does not attempt to reinterpret every service parameter.
 
 ## Protocol guide
+
+The expanded reference experience is documented in [Phase 12 — Dedicated Protocol Center](PHASE-12-DEDICATED-PROTOCOL-CENTER.md). The dedicated tab contains 50+ categorized protocol profiles and nine requested documentation dimensions, including technical detail, deployment suitability, environment and standards status.
+
 The Protocol Library provides educational and operational context for DNS, DHCP/DHCPv6, NAT/CGNAT, TCP, UDP, TCP/IP, OSI, SSH, SSH over WebSocket, HTTP, HTTPS/TLS, NTP, SMTP, IMAP, POP3, SMB, RDP, Trojan Proxy, VLESS, VMess, Shadowsocks, ShadowsocksR, TUIC, Hysteria, QUIC, WireGuard, OpenVPN, IPsec, L2TP, DoH and DNSSEC.
 
 Each entry includes:
