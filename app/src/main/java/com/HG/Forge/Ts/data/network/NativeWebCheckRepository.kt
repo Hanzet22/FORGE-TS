@@ -336,7 +336,7 @@ class NativeWebCheckRepository {
                 return FetchResult(
                     url = current.toString(),
                     status = status,
-                    headers = connection.headerFields.mapNotNull { (key, value) -> key?.let { it to (value ?: emptyList()) } }.toMap(),
+                    headers = connection.headerFields.entries.filter { it.key != null && it.value != null }.associate { it.key!! to it.value!! },
                     body = bytes.toString(Charsets.UTF_8),
                     redirectChain = chain.toList(),
                     tlsDetails = tls
