@@ -94,6 +94,7 @@ fun OsintWebScreen(
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(check.recordType, style = MaterialTheme.typography.titleMedium)
+                        Text(check.queryName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (check.result != null) {
                             val result = check.result
                             Text(
