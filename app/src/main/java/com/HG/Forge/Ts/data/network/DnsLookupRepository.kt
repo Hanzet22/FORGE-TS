@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 import java.net.IDN
+import android.os.SystemClock
 
 data class DnsAnswer(
     val name: String,
@@ -21,65 +22,84 @@ data class DnsLookupResult(
     val domain: String,
     val recordType: String,
     val answers: List<DnsAnswer>,
+    val authority: List<DnsAnswer>,
+    val additional: List<DnsAnswer>,
     val status: Int,
-    val provider: String
+    val provider: String,
+    val elapsedMs: Long,
+    val dnssecAuthenticated: Boolean,
+    val checkingDisabled: Boolean
 )
+
+enum class DnsResolver(val label: String, val endpoint: String) {
+    CLOUDFLARE("Cloudflare", "https://cloudflare-dns.com/dns-query"),
+    GOOGLE("Google Public DNS", "https://dns.google/resolve")
+}
 
 class DnsLookupRepository {
     private val recordTypes = mapOf(
-        "A" to 1,
-        "AAAA" to 28,
-        "CNAME" to 5,
-        "MX" to 15,
-        "TXT" to 16,
-        "NS" to 2,
-        "SRV" to 33,
+        "A" to 1, "NS" to 2, "CNAME" to 5, "SOA" to 6, "PTR" to 12,
+        "MX" to 15, "TXT" to 16, "AAAA" to 28, "SRV" to 33,
+        "DS" to 43, "SSHFP" to 44, "RRSIG" to 46, "NSEC" to 47,
+        "DNSKEY" to 48, "TLSA" to 52, "SVCB" to 64, "HTTPS" to 65,
         "CAA" to 257
     )
 
-    suspend fun lookup(input: String, recordType: String): DnsLookupResult =
-        withContext(Dispatchers.IO) {
-            val normalized = normalizeDomain(input)
-            val typeCode = recordTypes[recordType]
-                ?: throw IllegalArgumentException("Unsupported DNS record type")
-
-            val response = withTimeout(8_000) {
-                HttpClientProvider.client.get("https://cloudflare-dns.com/dns-query") {
-                    parameter("name", normalized)
-                    parameter("type", typeCode)
+    suspend fun lookup(
+        input: String,
+        recordType: String,
+        resolver: DnsResolver = DnsResolver.CLOUDFLARE
+    ): DnsLookupResult = withContext(Dispatchers.IO) {
+        val normalized = normalizeDomain(input)
+        val typeCode = recordTypes[recordType]
+            ?: throw IllegalArgumentException("Unsupported DNS record type")
+        val started = SystemClock.elapsedRealtime()
+        val response = withTimeout(10_000) {
+            HttpClientProvider.client.get(resolver.endpoint) {
+                parameter("name", normalized)
+                parameter("type", typeCode)
+                parameter("do", "true")
+                if (resolver == DnsResolver.CLOUDFLARE) {
+                    parameter("ct", "application/dns-json")
                     header("accept", "application/dns-json")
-                }.bodyAsText()
-            }
+                }
+            }.bodyAsText()
+        }
+        val elapsed = SystemClock.elapsedRealtime() - started
+        val json = JSONObject(response)
+        val status = json.optInt("Status", -1)
 
-            val json = JSONObject(response)
-            val status = json.optInt("Status", -1)
-            val answerArray = json.optJSONArray("Answer")
-            val answers = buildList {
-                if (answerArray != null) {
-                    for (index in 0 until answerArray.length()) {
-                        val item = answerArray.optJSONObject(index) ?: continue
-                        add(
-                            DnsAnswer(
-                                name = item.optString("name"),
-                                type = recordTypes.entries.firstOrNull {
-                                    it.value == item.optInt("type")
-                                }?.key ?: "TYPE ${item.optInt("type")}",
-                                ttl = item.optLong("TTL"),
-                                data = item.optString("data")
-                            )
-                        )
-                    }
+        fun parseSection(section: String): List<DnsAnswer> {
+            val array = json.optJSONArray(section) ?: return emptyList()
+            return buildList {
+                for (index in 0 until array.length()) {
+                    val item = array.optJSONObject(index) ?: continue
+                    val code = item.optInt("type", -1)
+                    val type = recordTypes.entries.firstOrNull { it.value == code }?.key
+                        ?: "TYPE $code"
+                    add(DnsAnswer(
+                        name = item.optString("name"),
+                        type = type,
+                        ttl = item.optLong("TTL", item.optLong("ttl", 0L)),
+                        data = item.optString("data")
+                    ))
                 }
             }
-
-            DnsLookupResult(
-                domain = normalized,
-                recordType = recordType,
-                answers = answers,
-                status = status,
-                provider = "Cloudflare DNS over HTTPS"
-            )
         }
+
+        DnsLookupResult(
+            domain = normalized,
+            recordType = recordType,
+            answers = parseSection("Answer"),
+            authority = parseSection("Authority"),
+            additional = parseSection("Additional"),
+            status = status,
+            provider = resolver.label,
+            elapsedMs = elapsed,
+            dnssecAuthenticated = json.optBoolean("AD", false),
+            checkingDisabled = json.optBoolean("CD", false)
+        )
+    }
 
     private fun normalizeDomain(input: String): String {
         val trimmed = input.trim().trimEnd('.')
