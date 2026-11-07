@@ -244,7 +244,7 @@ class NativeWebCheckRepository {
             source = "Passive response-header hints only; no firewall detection probes"
         )
 
-        val links = Regex("<a[^>]+href=[\\"']([^\\"']+)", RegexOption.IGNORE_CASE)
+        val links = Regex("""<a[^>]+href=["']([^"']+)""", RegexOption.IGNORE_CASE)
             .findAll(html).map { it.groupValues[1] }.distinct().take(250).toList()
         val internalLinks = links.count { link ->
             runCatching { URI(fetched.url).resolve(link).host.equals(URI(fetched.url).host, true) }.getOrDefault(false)
