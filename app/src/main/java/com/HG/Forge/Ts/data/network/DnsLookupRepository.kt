@@ -73,7 +73,7 @@ class DnsLookupRepository {
             }.getOrNull()
             val detail = resolverMessage?.let { ": $it" } ?: ""
             throw IllegalStateException(
-                "${resolver.label} returned HTTP $httpStatus$contentType$detail"
+                "${resolver.label} returned HTTP $httpStatus ($contentType)$detail"
             )
         }
         if (response.isBlank()) {
