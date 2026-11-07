@@ -67,6 +67,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(section == 0, { section = 0 }, label = { Text("DNS Lookup") })
             FilterChip(section == 1, { section = 1 }, label = { Text("Protocol Library") })
+            FilterChip(section == 2, { section = 2 }, label = { Text("Protocol Center") })
         }
         if (section == 0) {
             OutlinedTextField(domain, { domain = it }, Modifier.fillMaxWidth(), label = { Text("Domain name") }, placeholder = { Text("example.com") }, singleLine = true)
@@ -106,7 +107,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                 }
             }
             Text("Privacy: the selected resolver receives the domain and record type. DoH encrypts transport to that resolver but does not make queries anonymous. DNSSEC validation is separate. FORGE-TS does not save lookup history.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        } else {
+        } else if (section == 1) {
             Text("Select a protocol to read its purpose, usage, pros, cons, risks and references. This is educational guidance; the app does not establish tunnels or run protocol clients.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             guides.forEach { guide ->
                 val open = expanded == guide.name
@@ -125,6 +126,8 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                     }
                 }
             }
+        } else {
+            ProtocolCenterScreen()
         }
     }
 }
