@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 private data class PrivacyProvider(val name: String, val data: String, val purpose: String)
 
 private val providers = listOf(
-    PrivacyProvider("Cloudflare DNS", "Queried domain and DNS record type", "DNS-over-HTTPS lookups"),
+    PrivacyProvider("Google Public DNS", "Queried domain and DNS record type", "DNS-over-HTTPS lookups"),
     PrivacyProvider("GitHub", "Repository search terms and normal API request metadata", "Public repository search"),
     PrivacyProvider("api.ipify.org", "The connection's public IP address", "What Is My IP lookup"),
     PrivacyProvider("User-selected host", "Hostname or IP and selected port", "Single-host connectivity check")
