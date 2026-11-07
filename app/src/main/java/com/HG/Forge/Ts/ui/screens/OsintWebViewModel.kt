@@ -152,6 +152,38 @@ class OsintWebViewModel : ViewModel() {
             )
         }
 
+    val dnsSecurityFindings: List<MailSecurityFinding>
+        get() {
+            if (checks.isEmpty()) return emptyList()
+            val dnssecChecks = checks.filter { it.recordType in setOf("DS", "DNSKEY", "RRSIG") }
+            val authenticated = dnssecChecks.any { it.result?.dnssecAuthenticated == true }
+            val completed = dnssecChecks.count { it.result != null }
+            val caa = checks.firstOrNull { it.recordType == "CAA" }?.result?.answers.orEmpty()
+            val caaDetails = caa.map { answer ->
+                val value = answer.data.trim()
+                when {
+                    value.contains("issuewild", true) -> "Wildcard issuance: $value"
+                    value.contains("issue", true) -> "Certificate issuance: $value"
+                    value.contains("iodef", true) -> "Incident reporting: $value"
+                    else -> value
+                }
+            }
+            return listOf(
+                MailSecurityFinding(
+                    "DNSSEC resolver validation",
+                    when { authenticated -> "Authenticated-data (AD) signal present"; completed == 0 -> "Validation status unavailable"; else -> "No authenticated-data signal observed" },
+                    listOf(
+                        "Google Public DNS AD flag: ${if (authenticated) "true on at least one DS/DNSKEY/RRSIG response" else "not observed on sampled responses"}.",
+                        "This is the recursive resolver validation signal, not an independent local DS to DNSKEY to RRSIG cryptographic-chain validator. A false AD flag does not by itself mean the domain is bogus."
+                    )
+                ),
+                MailSecurityFinding(
+                    "CAA certificate-authority policy",
+                    if (caa.isEmpty()) "No CAA answers detected" else "${caa.size} CAA record(s) detected",
+                    if (caaDetails.isEmpty()) listOf("No CAA records were returned. This does not mean certificate issuance is blocked; it means this lookup found no CAA policy.") else caaDetails.take(12)
+                )
+            )
+        }
     fun inspect(input: String) {
         val domain = input.trim()
         if (domain.isBlank()) {
