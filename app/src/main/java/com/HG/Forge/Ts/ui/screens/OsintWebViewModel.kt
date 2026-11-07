@@ -258,7 +258,7 @@ class OsintWebViewModel : ViewModel() {
     private fun explainNativeFailure(exception: Exception): String {
         val causes = generateSequence(exception as Throwable?) { it.cause }.toList()
         val messages = causes.mapNotNull { it.message }
-            .map { it.replace(Regex(""" from /[0-9a-fA-F:.]+ \\(port \\d+\\)"""), " from [local endpoint redacted]") }
+            .map { it.replace(Regex(""" from /[0-9a-fA-F:.]+ \(port \d+\)"""), " from [local endpoint redacted]") }
             .filterNot { it.contains("local address", true) }
             .joinToString(" | ")
         val connectTimeout = messages.contains("failed to connect", true) ||
