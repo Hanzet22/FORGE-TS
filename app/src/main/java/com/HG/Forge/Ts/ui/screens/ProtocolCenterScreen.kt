@@ -130,6 +130,7 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
 
     val current = selectedProtocol
     if (current != null) {
+        val deep = protocolDeepDocs[current.name]
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(onClick = { selectedProtocol = null }) {
                 Text("← Back to Protocol Center")
@@ -147,6 +148,28 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
             ProtocolDetail("8. Standar / Draft / Registry", current.standard)
             ProtocolDetail("9. Cocok / tidak cocok digunakan", current.fit)
             ProtocolDetail("10. Environment yang sesuai", current.environment)
+            Text("Full technical documentation", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "The following chapters are protocol-specific. Shared concepts are explained only where they apply; implementation details can differ by version and vendor.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (deep != null) {
+                ProtocolDetail("11. Architecture & component roles", deep.architecture)
+                ProtocolDetail("12. Packet, frame & message model", deep.wireModel)
+                ProtocolDetail("13. Operation lifecycle", deep.lifecycle)
+                ProtocolDetail("14. Security model & trust boundaries", deep.security)
+                ProtocolDetail("15. Performance characteristics", deep.performance)
+                ProtocolDetail("16. Deployment & interoperability", deep.operations)
+                ProtocolDetail("17. Troubleshooting methodology", deep.troubleshooting)
+                ProtocolDetail("18. Primary specifications & references", deep.references)
+            } else {
+                ProtocolDetail("Full technical chapter", "A protocol-specific chapter has not yet been added for this entry.")
+            }
+            ProtocolDetail(
+                "Standards status verification",
+                "An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols"
+            )
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Text(
                     "Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan.",
