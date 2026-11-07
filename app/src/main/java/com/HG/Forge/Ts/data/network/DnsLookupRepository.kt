@@ -141,18 +141,28 @@ class DnsLookupRepository {
         require(trimmed.length <= 253 && !trimmed.contains('/') && !trimmed.contains(':')) {
             "Enter a domain name without a URL, path or port"
         }
-        val ascii = try {
-            IDN.toASCII(trimmed, IDN.USE_STD3_ASCII_RULES).lowercase()
-        } catch (_: IllegalArgumentException) {
-            throw IllegalArgumentException("The domain name is not valid")
+        val labels = trimmed.split('.')
+        require(labels.size >= 2) { "Enter a valid fully qualified domain name" }
+        val asciiLabels = labels.map { label ->
+            try {
+                if (label.startsWith("_")) {
+                    require(label.length in 2..63 && label.drop(1).all {
+                        it.isLetterOrDigit() || it == '-' || it == '_'
+                    }) { "The DNS label is not valid" }
+                    label.lowercase()
+                } else {
+                    IDN.toASCII(label, IDN.USE_STD3_ASCII_RULES).lowercase()
+                }
+            } catch (_: IllegalArgumentException) {
+                throw IllegalArgumentException("The domain name is not valid")
+            }
         }
-        val labels = ascii.split('.')
-        require(labels.size >= 2 && labels.all { label ->
+        require(asciiLabels.all { label ->
             label.length in 1..63 &&
-                label.firstOrNull()?.isLetterOrDigit() == true &&
+                label.firstOrNull()?.let { it.isLetterOrDigit() || it == '_' } == true &&
                 label.lastOrNull()?.isLetterOrDigit() == true &&
-                label.all { it.isLetterOrDigit() || it == '-' }
+                label.all { it.isLetterOrDigit() || it == '-' || it == '_' }
         }) { "Enter a valid fully qualified domain name" }
-        return ascii
+        return asciiLabels.joinToString(".")
     }
 }
