@@ -18,7 +18,7 @@ IPv4/IPv6 CIDR calculator with subnet/broadcast/usable-host details and binary c
 Searchable offline MikroTik, OS command, addressing, network type, transport, VPN, tunneling and proxy protocol references. SSH host identity, key safety, TLS concepts and certificate verification are educational references only; the app does not execute commands, open SSH sessions or establish proxy/VPN tunnels. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
 
 ### Phase 3 — DNS & Protocols
-Expanded live DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC records. Supports Cloudflare and Google Public DNS resolvers, TTL and DNS response sections/status, response time and resolver-reported DNSSEC AD metadata. Includes protocol detail cards for usage, pros, cons, risks and references. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md) and [Phase 11](docs/PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
+Expanded live DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC records. Supports Cloudflare and Google Public DNS resolvers, TTL and DNS response sections/status, response time and resolver-reported DNSSEC AD metadata. Includes a legacy Protocol Library plus the dedicated searchable Protocol Center with 50+ structured protocol profiles, category filters, technical details, use cases, functions, pros/cons, deployment hurdles, standards/specification references, suitability and environment guidance. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md) and [Phase 11](docs/PHASE-11-DNS-RECORD-EXPLORER-AND-PROTOCOL-GUIDES.md).
 
 ### Phase 4 — Repository Explorer
 Read-only public GitHub repository search and basic repository metadata. See [Phase 4](docs/PHASE-4-REPOSITORY-EXPLORER.md).
@@ -32,7 +32,7 @@ Provider/data disclosures and safe-use boundaries. See [Phase 7](docs/PHASE-7-SE
 ### Phase 8 — Diagnostics
 Local Android network capability snapshot with manual refresh. See [Phase 8](docs/PHASE-8-DIAGNOSTICS.md).
 
-## Gated and preparation phases
+### Phase 12 — Dedicated Protocol Center\nA standalone tab expands the catalog across addressing, transport, routing, switching, multicast, VPN/security, overlays, application services, identity, management, IoT and real-time communication. Each entry separates the protocol concept from its implementation and identifies RFC, IEEE/ISO/ITU-T, IETF registry or project specification status. See [Phase 12](docs/PHASE-12-DEDICATED-PROTOCOL-CENTER.md).\n\n## Gated and preparation phases
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
 
