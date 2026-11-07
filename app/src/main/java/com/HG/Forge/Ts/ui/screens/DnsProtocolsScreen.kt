@@ -57,7 +57,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
     val defaultType by preferences.defaultDnsRecordType.collectAsState(initial = "A")
     var domain by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf("A") }
-    var resolver by remember { mutableStateOf(DnsResolver.CLOUDFLARE) }
+    var resolver by remember { mutableStateOf(DnsResolver.GOOGLE) }
     var section by remember { mutableIntStateOf(0) }
     var expanded by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(defaultType) { if (dnsTypes.contains(defaultType)) selectedType = defaultType }
@@ -82,7 +82,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                     row.forEach { type -> FilterChip(selectedType == type, { selectedType = type }, label = { Text(type) }) }
                 }
             }
-            Text("Public resolver", style = MaterialTheme.typography.titleSmall)
+            Text("DNS-over-HTTPS resolver", style = MaterialTheme.typography.titleSmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DnsResolver.values().forEach { item -> FilterChip(resolver == item, { resolver = item }, label = { Text(item.label) }) }
             }
