@@ -32,7 +32,6 @@ data class DnsLookupResult(
 )
 
 enum class DnsResolver(val label: String, val endpoint: String) {
-    CLOUDFLARE("Cloudflare", "https://cloudflare-dns.com/dns-query"),
     GOOGLE("Google Public DNS", "https://dns.google/resolve")
 }
 
@@ -48,7 +47,7 @@ class DnsLookupRepository {
     suspend fun lookup(
         input: String,
         recordType: String,
-        resolver: DnsResolver = DnsResolver.CLOUDFLARE
+        resolver: DnsResolver = DnsResolver.GOOGLE
     ): DnsLookupResult = withContext(Dispatchers.IO) {
         val normalized = normalizeDomain(input)
         val typeCode = recordTypes[recordType]
@@ -79,11 +78,9 @@ class DnsLookupRepository {
                 ?: rawBody.takeIf { it.isNotBlank() }
                 ?: "response body was empty"
             val server = httpResponse.headers["Server"]
-            val cfRay = httpResponse.headers["CF-Ray"]
             val contentLength = httpResponse.headers["Content-Length"]
             val metadata = buildList {
                 if (server != null) add("server=$server")
-                if (cfRay != null) add("cf-ray=$cfRay")
                 if (contentLength != null) add("content-length=$contentLength")
             }.joinToString(", ").takeIf { it.isNotBlank() }
             val detail = ": $diagnostic"
