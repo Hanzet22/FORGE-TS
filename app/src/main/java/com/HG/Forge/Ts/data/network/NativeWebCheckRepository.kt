@@ -224,6 +224,77 @@ class NativeWebCheckRepository {
             source = "Bounded HTML response scan"
         )
 
+        val serverSignals = listOf("Server", "X-Powered-By", "Via", "X-Cache", "X-CDN")
+            .mapNotNull { name -> header(name)?.let { "$name: ${it.take(250)}" } }
+        findings += NativeWebFinding(
+            category = "Server",
+            title = "Public server response signals",
+            status = if (serverSignals.isEmpty()) "No identifying headers exposed" else "${serverSignals.size} signal(s)",
+            details = serverSignals.ifEmpty { listOf("The response did not expose the selected server-identification headers.") },
+            source = "HTTP response headers; values may be absent, masked or intentionally modified"
+        )
+
+        val wafSignals = listOf("cf-ray", "x-sucuri-id", "x-akamai-transformed", "x-iinfo", "x-cdn")
+            .mapNotNull { name -> header(name)?.let { "$name: ${it.take(160)}" } }
+        findings += NativeWebFinding(
+            category = "Security",
+            title = "Edge and firewall response hints",
+            status = if (wafSignals.isEmpty()) "No selected edge signals detected" else "${wafSignals.size} signal(s)",
+            details = wafSignals.ifEmpty { listOf("No selected CDN/WAF response headers were observed; this does not prove that no firewall is present.") },
+            source = "Passive response-header hints only; no firewall detection probes"
+        )
+
+        val links = Regex("<a[^>]+href=[\\"']([^\\"']+)", RegexOption.IGNORE_CASE)
+            .findAll(html).map { it.groupValues[1] }.distinct().take(250).toList()
+        val internalLinks = links.count { link ->
+            runCatching { URI(fetched.url).resolve(link).host.equals(URI(fetched.url).host, true) }.getOrDefault(false)
+        }
+        findings += NativeWebFinding(
+            category = "SEO",
+            title = "Linked-page inventory",
+            status = "${links.size} unique link(s) in sampled HTML",
+            details = listOf(
+                "Same-host links: $internalLinks",
+                "Other-host or unresolved links: ${links.size - internalLinks}",
+                "This is a static link count; linked pages are not crawled."
+            ),
+            source = "Bounded HTML document; maximum 250 unique links"
+        )
+
+        val trackerPatterns = listOf(
+            "Google Analytics" to listOf("google-analytics.com", "googletagmanager.com", "gtag("),
+            "Meta Pixel" to listOf("connect.facebook.net", "fbq("),
+            "Hotjar" to listOf("static.hotjar.com", "hotjar.com"),
+            "Microsoft Clarity" to listOf("clarity.ms"),
+            "Matomo" to listOf("matomo.js", "piwik.js")
+        )
+        val trackerHits = trackerPatterns.mapNotNull { (name, signatures) ->
+            if (signatures.any { html.contains(it, true) }) name else null
+        }
+        findings += NativeWebFinding(
+            category = "Privacy",
+            title = "Common tracker indicators",
+            status = if (trackerHits.isEmpty()) "No selected signatures detected" else "${trackerHits.size} tracker family hint(s)",
+            details = trackerHits.ifEmpty { listOf("No selected tracker signatures were found in the sampled HTML.") } +
+                listOf("Static signature matching only; dynamically loaded trackers may be missed."),
+            source = "HTML and script-source signature list"
+        )
+
+        val socialHosts = listOf("github.com", "linkedin.com", "instagram.com", "facebook.com", "x.com", "twitter.com", "youtube.com")
+        val socialLinks = links.mapNotNull { link ->
+            runCatching {
+                val host = URI(fetched.url).resolve(link).host?.lowercase() ?: return@runCatching null
+                if (socialHosts.any { host == it || host.endsWith(".$it") }) link else null
+            }.getOrNull()
+        }.distinct().take(20)
+        findings += NativeWebFinding(
+            category = "Social",
+            title = "Public social links",
+            status = if (socialLinks.isEmpty()) "No selected social links found" else "${socialLinks.size} link(s)",
+            details = socialLinks.ifEmpty { listOf("No selected social profile links were found in the sampled HTML.") },
+            source = "Anchor links in the public HTML response"
+        )
+
         NativeWebReport(
             finalUrl = fetched.url,
             checkedAt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss 'UTC'", Locale.US).apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }.format(Date()),
