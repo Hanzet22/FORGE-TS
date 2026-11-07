@@ -40,7 +40,7 @@ fun OsintWebScreen(
     ) {
         Text("OSINT Web", style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Inspect public DNS, HTTP responses, TLS certificates, security headers, cookies, robots.txt, sitemaps, security.txt, page metadata and technology indicators using native Android networking.",
+            "Inspect passive DNS, DNSSEC resolver signals, CAA policy, RDAP domain metadata, HTTP/TLS, HSTS, cookies, robots.txt, sitemaps, page metadata and technology indicators using native Android networking.",
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         OutlinedTextField(
@@ -155,6 +155,38 @@ fun OsintWebScreen(
                             Text(detail, style = MaterialTheme.typography.bodySmall)
                         }
                     }
+                }
+            }
+        }
+
+        if (viewModel.dnssecFindings.isNotEmpty() || viewModel.caaFindings.isNotEmpty()) {
+            Text("DNSSEC & Certificate Authority Policy", style = MaterialTheme.typography.headlineSmall)
+            (viewModel.dnssecFindings + viewModel.caaFindings).forEach { finding ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(finding.title, style = MaterialTheme.typography.titleMedium)
+                        Text(finding.status, style = MaterialTheme.typography.bodyMedium)
+                        finding.details.forEach { detail -> Text(detail, style = MaterialTheme.typography.bodySmall) }
+                    }
+                }
+            }
+        }
+
+        Text("RDAP Domain Intelligence", style = MaterialTheme.typography.headlineSmall)
+        viewModel.rdapError?.let { message ->
+            Text("RDAP unavailable: $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        viewModel.rdapReport?.let { report ->
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(report.domain, style = MaterialTheme.typography.titleMedium)
+                    Text("Registrar: ${report.registrar ?: "Not disclosed"}")
+                    report.handle?.let { Text("RDAP handle: $it", style = MaterialTheme.typography.bodySmall) }
+                    Text("Domain statuses: ${report.statuses.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
+                    Text("Registration events:", style = MaterialTheme.typography.labelLarge)
+                    report.events.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                    Text("Nameservers: ${report.nameServers.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
+                    Text("Source: ${report.source} · Public RDAP metadata only; registrant contact/vCard data is not collected.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
