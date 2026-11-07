@@ -110,7 +110,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
             Text("Select a protocol to read its purpose, usage, pros, cons, risks and references. This is educational guidance; the app does not establish tunnels or run protocol clients.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             guides.forEach { guide ->
                 val open = expanded == guide.name
-                Card(Modifier.fillMaxWidth(), onClick = { expanded = if(open) null else guide.name }) {
+                Card(onClick = { expanded = if(open) null else guide.name }, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                         Text(guide.group.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                         Text(guide.name, style = MaterialTheme.typography.titleMedium)
