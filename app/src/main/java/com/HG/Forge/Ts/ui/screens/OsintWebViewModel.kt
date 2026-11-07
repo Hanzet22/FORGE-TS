@@ -31,6 +31,10 @@ class OsintWebViewModel : ViewModel() {
         private set
     var isLoading by mutableStateOf(false)
         private set
+    var nativeReport by mutableStateOf<NativeWebReport?>(null)
+        private set
+    var nativeError by mutableStateOf<String?>(null)
+        private set
 
     fun inspect(input: String) {
         val domain = input.trim()
@@ -42,6 +46,8 @@ class OsintWebViewModel : ViewModel() {
             isLoading = true
             error = null
             checks = emptyList()
+            nativeReport = null
+            nativeError = null
             target = domain
             val collected = mutableListOf<OsintDnsCheck>()
             for (type in recordTypes) {
@@ -59,7 +65,12 @@ class OsintWebViewModel : ViewModel() {
                 collected += check
                 checks = collected.toList()
             }
-            try {\n                nativeReport = nativeRepository.inspect(domain)\n            } catch (exception: Exception) {\n                nativeError = exception.message ?: "Native website inspection failed."\n            }\n            if (collected.all { it.result == null } && nativeReport == null) {
+            try {
+                nativeReport = nativeRepository.inspect(domain)
+            } catch (exception: Exception) {
+                nativeError = exception.message ?: "Native website inspection failed."
+            }
+            if (collected.all { it.result == null } && nativeReport == null) {
                 error = "No DNS checks completed successfully. Review the domain and network connection."
             }
             isLoading = false
