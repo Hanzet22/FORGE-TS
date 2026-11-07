@@ -1,6 +1,6 @@
 # FORGE-TS Roadmap — Phases 3–9
 
-This roadmap is an implementation sequence, not a release announcement. Phase 0 foundation, Phase 1 Core Networking and Phase 2 Knowledge Center are existing milestones. Phase 2 includes MikroTik, OS command, SSH and TLS learning references. Phases 3, 4, 6, 7 and 8 have incremental implementations. Phase 5 cloud sync is gated by backend selection; Phase 9 is a preparation checklist only.
+This roadmap is an implementation sequence, not a release announcement. Phase 0 foundation, Phase 1 Core Networking and Phase 2 Knowledge Center are existing milestones. The Phase 1 and Phase 2 modules now include the first expansion of IP planning and protocol references. Phase 2 includes MikroTik, OS command, SSH and TLS learning references. Phases 3, 4, 6, 7 and 8 have incremental implementations. Phase 5 cloud sync is gated by backend selection; Phase 9 is a preparation checklist only.
 
 | Phase | Name | Scope | Current status and boundary |
 |---|---|---|---|

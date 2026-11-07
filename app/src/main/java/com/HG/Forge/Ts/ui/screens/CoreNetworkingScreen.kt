@@ -20,7 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Checkbox
@@ -44,14 +44,16 @@ fun CoreNetworkingScreen(modifier: Modifier = Modifier, viewModel: CoreNetworkin
             Text("Core Networking", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Text("Practical network utilities for everyday diagnostics.", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        TabRow(selectedTabIndex = selectedTool) {
-            listOf("CIDR", "My IP", "Host").forEachIndexed { index, label ->
+        ScrollableTabRow(selectedTabIndex = selectedTool) {
+            listOf("CIDR", "VLSM", "IP Plan", "My IP", "Host").forEachIndexed { index, label ->
                 Tab(selected = selectedTool == index, onClick = { selectedTool = index }, text = { Text(label) })
             }
         }
         when (selectedTool) {
             0 -> CidrTool(viewModel)
-            1 -> PublicIpTool(viewModel)
+            1 -> VlsmPlannerScreen()
+            2 -> NetworkIpAllocationScreen()
+            3 -> PublicIpTool(viewModel)
             else -> HostTool(viewModel)
         }
     }
@@ -60,22 +62,44 @@ fun CoreNetworkingScreen(modifier: Modifier = Modifier, viewModel: CoreNetworkin
 @Composable
 private fun CidrTool(viewModel: CoreNetworkingViewModel) {
     var input by remember { mutableStateOf("192.168.1.10/24") }
+    var binary by remember { mutableStateOf<String?>(null) }
+    var binaryError by remember { mutableStateOf<String?>(null) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("IPv4 & IPv6 subnet calculator", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(value = input, onValueChange = { input = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Address / prefix") }, placeholder = { Text("2001:db8::1/64") }, singleLine = true)
-        Button(onClick = { viewModel.calculateCidr(input) }, modifier = Modifier.fillMaxWidth()) { Text("Calculate network") }
+        Button(onClick = {
+            viewModel.calculateCidr(input)
+            try {
+                binary = com.HG.Forge.Ts.data.network.CidrCalculator.toBinary(input.substringBefore("/"))
+                binaryError = null
+            } catch (error: Exception) {
+                binary = null
+                binaryError = error.message ?: "Invalid address"
+            }
+        }, modifier = Modifier.fillMaxWidth()) { Text("Calculate network") }
         viewModel.cidrError?.let { ErrorText(it) }
+        binaryError?.let { ErrorText(it) }
         viewModel.cidrResult?.let { result ->
             ResultCard {
                 Text(result.addressFamily, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 ResultRow("Address", result.address)
                 ResultRow("Prefix", "/${result.prefix}")
                 ResultRow("Network address", result.network)
-                ResultRow("Last address", result.lastAddress)
+                ResultRow("Last address / broadcast", result.lastAddress)
+                result.subnetMask?.let { ResultRow("Subnet mask", it) }
+                result.broadcastAddress?.let { ResultRow("Broadcast address", it) }
+                result.firstUsableAddress?.let { ResultRow("First usable host", it) }
+                result.lastUsableAddress?.let { ResultRow("Last usable host", it) }
+                result.usableHostCount?.let { ResultRow("Usable host count", it) }
                 ResultRow("Total addresses", result.addressCount)
+                if (result.addressFamily == "IPv6") {
+                    Text("IPv6 has no broadcast address. Usable host counts are not calculated using IPv4 network/broadcast subtraction.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                binary?.let { ResultRow("Binary address", it) }
             }
         }
-        Text("Calculations run locally on this device. No address is uploaded.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("IPv4 /31 is treated as a two-address point-to-point subnet (RFC 3021); /32 is one host route. IPv6 does not use broadcast addressing.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Calculations and binary conversion run locally on this device. No address is uploaded.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

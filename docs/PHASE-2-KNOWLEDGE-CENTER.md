@@ -6,16 +6,22 @@ Deliver an offline-first learning area for MikroTik fundamentals, operating-syst
 ## Included in this milestone
 - Native Jetpack Compose screen reachable from the Learn navigation item.
 - Search across titles, summaries, explanations and examples.
-- Category filters: All, MikroTik, OS Commands, and SSH & TLS.
+- Category filters: MikroTik, OS Commands, SSH & TLS, Addressing, Network Types, Core Protocols, Remote Access, Transport & Tunneling, VPN & Tunneling, and Proxy Protocols.
 - Expandable reference cards with explanations and read-only examples.
 - MikroTik fundamentals: RouterOS orientation, interfaces, IP addressing, routes, DHCP and firewall inspection.
 - Operating-system references: interface configuration, routes, DNS, ping, path tracing and system information.
 - SSH references: encrypted remote administration, host identity, key pairs and safe host-key handling.
 - TLS references: HTTPS, handshake concepts, certificate identity, validity, issuer and verification.
+- Addressing: IPv4, IPv6, CIDR, VLSM and binary notation.
+- Network types: PAN, LAN, WLAN and VLAN, with capacity planning guidance.
+- Protocols: DHCP/DHCPv6, NAT, CGNAT, TCP, UDP, TCP/IP, OSI, SSHWS, QUIC, WireGuard, OpenVPN, Shadowsocks/SSR, VLESS, VMess, Trojan proxy protocol, TUIC, Hysteria, IPsec and L2TP.
 - Static content works without a network connection.
 
 ## Safety boundary
-- This module is a learning/reference library, not a terminal.
+- This module is a learning/reference library, not a terminal or proxy client.
+- Proxy and tunnel entries describe architecture and security properties; they do not provide traffic-evasion, access-control bypass or credential-harvesting instructions.
+- Trojan proxy protocol is explicitly distinguished from Trojan horse malware.
+- SSHWS is documented as a deployment pattern (SSH over WebSocket), not a separate IETF standard.
 - It does not connect to routers, run commands, change device settings or store credentials.
 - MikroTik examples are inspection-only.
 - SSH private keys must remain private; never paste them into support requests or logs.

@@ -12,10 +12,10 @@
 Android project foundation and GitHub Actions debug APK workflow. Room, DataStore, WorkManager and Ktor dependencies are staged for incremental implementation.
 
 ### Phase 1 — Core Networking
-IPv4/IPv6 CIDR calculator, public IP lookup with provider disclosure, and authorized single-host DNS/TCP/optional TLS checks. See [Phase 1](docs/PHASE-1-CORE-NETWORKING.md).
+IPv4/IPv6 CIDR calculator with subnet/broadcast/usable-host details and binary conversion; local VLSM and PAN/LAN/WLAN/VLAN IP allocation planners; public IP lookup and authorized single-host checks. See [Phase 1](docs/PHASE-1-CORE-NETWORKING.md).
 
 ### Phase 2 — Knowledge Center
-Searchable offline MikroTik, OS command, SSH and TLS references with expandable read-only examples. SSH host identity, key safety, TLS concepts and certificate verification are educational references only; the app does not execute commands or open SSH sessions. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
+Searchable offline MikroTik, OS command, addressing, network type, transport, VPN, tunneling and proxy protocol references. SSH host identity, key safety, TLS concepts and certificate verification are educational references only; the app does not execute commands, open SSH sessions or establish proxy/VPN tunnels. See [Phase 2](docs/PHASE-2-KNOWLEDGE-CENTER.md).
 
 ### Phase 3 — DNS & Protocols
 Cloudflare DNS-over-HTTPS lookup for A, AAAA, CNAME, MX, TXT, NS, SRV and CAA records, plus offline protocol references. See [Phase 3](docs/PHASE-3-DNS-AND-PROTOCOLS.md).
@@ -36,7 +36,7 @@ Local Android network capability snapshot with manual refresh. See [Phase 8](doc
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
 
-See [Phases 3–9 roadmap](docs/ROADMAP-PHASES-3-TO-9.md).
+See [Phases 3–9 roadmap](docs/ROADMAP-PHASES-3-TO-9.md) and [Phase 10 — Addressing, Network Design & Protocol Knowledge](docs/PHASE-10-ADDRESSING-NETWORK-DESIGN-PROTOCOLS.md).
 
 ## Safety and privacy
 The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Cloudflare. Repository search terms are sent to GitHub. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
