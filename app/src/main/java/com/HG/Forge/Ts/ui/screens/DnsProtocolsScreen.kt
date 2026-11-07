@@ -64,10 +64,14 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("DNS & Protocols", style = MaterialTheme.typography.headlineMedium)
         Text("Live DNS record inspection and practical protocol guidance.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             FilterChip(section == 0, { section = 0 }, label = { Text("DNS Lookup") })
             FilterChip(section == 1, { section = 1 }, label = { Text("Protocol Library") })
             FilterChip(section == 2, { section = 2 }, label = { Text("Protocol Center") })
+            FilterChip(section == 3, { section = 3 }, label = { Text("Application Protocols") })
         }
         if (section == 0) {
             OutlinedTextField(domain, { domain = it }, Modifier.fillMaxWidth(), label = { Text("Domain name") }, placeholder = { Text("example.com") }, singleLine = true)
@@ -126,8 +130,10 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                     }
                 }
             }
-        } else {
+        } else if (section == 2) {
             ProtocolCenterScreen()
+        } else {
+            ApplicationProtocolCenterScreen()
         }
     }
 }
