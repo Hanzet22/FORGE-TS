@@ -2,7 +2,7 @@
 
 ## Delivered scope
 - Added a dedicated **Protocol Center** tab alongside DNS Lookup and the earlier Protocol Library.
-- Added a searchable and category-filtered catalog containing 50+ protocol and protocol-family profiles.
+- Added a searchable and category-filtered catalog containing 80+ protocol and protocol-family profiles.
 - Categories cover addressing and discovery, naming, transport, routing and traffic engineering, switching and LAN, multicast, VPN/security, tunneling and overlays, application services, identity/AAA, management, IoT messaging, voice and real-time communication, remote access and proxy protocol families.
 - Each profile provides: explanation, technical details, usage, function, pros, cons, operational hurdles, standards/draft/registry references, suitable and unsuitable scenarios, and recommended environment.
 - The earlier Protocol Library remains available; Protocol Center is an expanded, dedicated reference experience.
