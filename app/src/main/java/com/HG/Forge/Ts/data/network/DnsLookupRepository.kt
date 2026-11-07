@@ -54,19 +54,40 @@ class DnsLookupRepository {
         val typeCode = recordTypes[recordType]
             ?: throw IllegalArgumentException("Unsupported DNS record type")
         val started = SystemClock.elapsedRealtime()
-        val response = withTimeout(10_000) {
+        val httpResponse = withTimeout(10_000) {
             HttpClientProvider.client.get(resolver.endpoint) {
                 parameter("name", normalized)
                 parameter("type", typeCode)
                 parameter("do", "true")
-                if (resolver == DnsResolver.CLOUDFLARE) {
-                    parameter("ct", "application/dns-json")
-                    header("accept", "application/dns-json")
-                }
-            }.bodyAsText()
+                header("Accept", "application/dns-json")
+            }
         }
+        val response = httpResponse.bodyAsText()
         val elapsed = SystemClock.elapsedRealtime() - started
-        val json = JSONObject(response)
+        val httpStatus = httpResponse.status.value
+        val contentType = httpResponse.headers["Content-Type"] ?: "unknown"
+
+        if (httpStatus !in 200..299) {
+            val resolverMessage = runCatching {
+                JSONObject(response).optString("error").takeIf { it.isNotBlank() }
+            }.getOrNull()
+            val detail = resolverMessage?.let { ": $it" } ?: ""
+            throw IllegalStateException(
+                "${resolver.label} returned HTTP $httpStatus$contentType$detail"
+            )
+        }
+        if (response.isBlank()) {
+            throw IllegalStateException(
+                "${resolver.label} returned an empty response (HTTP $httpStatus, content-type $contentType)"
+            )
+        }
+        val json = try {
+            JSONObject(response)
+        } catch (_: Exception) {
+            throw IllegalStateException(
+                "${resolver.label} returned a non-JSON response (HTTP $httpStatus, content-type $contentType)"
+            )
+        }
         val status = json.optInt("Status", -1)
 
         fun parseSection(section: String): List<DnsAnswer> {
