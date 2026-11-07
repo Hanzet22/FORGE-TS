@@ -41,6 +41,9 @@ All 83 protocol and protocol-family entries now include dedicated technical chap
 ### Phase 14 — Application Protocol Center
 A fourth dedicated section adds a searchable application-protocol catalog covering HTTP/1.1, HTTP/2, HTTP/3, HTTPS, TLS 1.3, WebSocket, Server-Sent Events, WebDAV, REST, GraphQL, gRPC, SOAP 1.2, JSON-RPC 2.0 and Protocol Buffers. Each entry includes a technical detail view for architecture, message model, lifecycle, security, performance, deployment, troubleshooting, advantages, limitations and primary references. The documentation distinguishes wire protocols from architectural styles, query specifications and serialization formats. See [Phase 14](docs/PHASE-14-APPLICATION-PROTOCOL-CENTER.md).
 
+### Phase 15 — OSINT Web
+Introduces a native OSINT workspace under Tools, inspired by the public Web-Check project. The initial implementation performs passive Google Public DNS-over-HTTPS collection for A, AAAA, NS, MX, TXT and CAA records, with per-check status, answers, TTL, timing and resolver-reported DNSSEC metadata. Results remain transient and are not uploaded or persisted. This is a selective native port, not an embedded copy of the Astro/Express application. See [Phase 15](docs/PHASE-15-OSINT-WEB.md).
+
 ## Gated and preparation phases
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
@@ -48,7 +51,7 @@ A fourth dedicated section adds a searchable application-protocol catalog coveri
 See [Phases 3–9 roadmap](docs/ROADMAP-PHASES-3-TO-9.md) and [Phase 10 — Addressing, Network Design & Protocol Knowledge](docs/PHASE-10-ADDRESSING-NETWORK-DESIGN-PROTOCOLS.md).
 
 ## Safety and privacy
-The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Google Public DNS. Repository search terms are sent to GitHub. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
+The command area is a reference guide, not an unrestricted remote shell. Host checks are for systems the user owns or is authorized to inspect. DNS lookups disclose the requested domain and record type to Google Public DNS. Repository search terms are sent to GitHub. OSINT Web currently collects passive public DNS metadata only; future URL-fetching modules must apply strict target validation and SSRF protections. No Supabase secret/service-role credentials or GitHub personal access tokens belong in the APK.
 
 ## Build
 Run the Android Debug APK workflow from the GitHub Actions tab. The workflow uses JDK 17 and Gradle 8.13.
