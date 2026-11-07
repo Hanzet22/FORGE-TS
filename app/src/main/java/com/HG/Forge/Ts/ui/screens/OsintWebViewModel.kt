@@ -258,7 +258,8 @@ class OsintWebViewModel : ViewModel() {
     private fun explainNativeFailure(exception: Exception): String {
         val causes = generateSequence(exception as Throwable?) { it.cause }.toList()
         val messages = causes.mapNotNull { it.message }
-            .filterNot { it.contains(" from /") || it.contains("local address", true) }
+            .map { it.replace(Regex(""" from /[0-9a-fA-F:.]+ \\(port \\d+\\)"""), " from [local endpoint redacted]") }
+            .filterNot { it.contains("local address", true) }
             .joinToString(" | ")
         val connectTimeout = messages.contains("failed to connect", true) ||
             messages.contains("connect timed out", true) ||
@@ -271,6 +272,8 @@ class OsintWebViewModel : ViewModel() {
                 "TLS negotiation failed after the connection stage. Review certificate validity, hostname matching, device time and network interception. Details: ${messages.take(350)}"
             causes.any { it is NoRouteToHostException } ->
                 "The device network reports no route to the destination. This is a routing/connectivity issue, not a certificate verdict."
+            messages.contains("connection refused", true) ->
+                "The destination actively refused the TCP connection. DNS resolution succeeded, but no HTTPS session was established. This is not an SSL-certificate verdict."
             connectTimeout || causes.any { it is ConnectException } ->
                 "TCP connection to the resolved HTTPS endpoint did not complete before timeout. Possible causes include remote service availability, edge filtering, routing or the current network. DNS resolution alone does not prove HTTPS reachability. Compare on another trusted network; do not treat this as an SSL verdict. Details: ${messages.take(350)}"
             causes.any { it is SocketTimeoutException } ->
