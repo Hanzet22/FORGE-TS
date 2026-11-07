@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun ToolsScreen(modifier: Modifier = Modifier, initialSelectedTool: Int = 0) {
-    var selectedTool by remember(initialSelectedTool) { mutableIntStateOf(initialSelectedTool.coerceIn(0, 3)) }
+    var selectedTool by remember(initialSelectedTool) { mutableIntStateOf(initialSelectedTool.coerceIn(0, 4)) }
     Column(modifier = modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = selectedTool) {
-            listOf("DNS & Protocols", "Repositories", "Security", "Diagnostics").forEachIndexed { index, title ->
+            listOf("DNS & Protocols", "Repositories", "Security", "Diagnostics", "OSINT Web").forEachIndexed { index, title ->
                 Tab(selected = selectedTool == index, onClick = { selectedTool = index }, text = { Text(title) })
             }
         }
@@ -25,7 +25,8 @@ fun ToolsScreen(modifier: Modifier = Modifier, initialSelectedTool: Int = 0) {
             0 -> DnsProtocolsScreen(modifier = Modifier.weight(1f))
             1 -> RepositoryExplorerScreen(modifier = Modifier.weight(1f))
             2 -> SecurityPrivacyScreen(modifier = Modifier.weight(1f))
-            else -> DiagnosticsScreen(modifier = Modifier.weight(1f))
+            3 -> DiagnosticsScreen(modifier = Modifier.weight(1f))
+            else -> OsintWebScreen(modifier = Modifier.weight(1f))
         }
     }
 }
