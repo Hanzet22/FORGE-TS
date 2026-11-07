@@ -47,6 +47,9 @@ A fourth dedicated section adds a searchable application-protocol catalog coveri
 ### Phase 15 — OSINT Web
 Introduces a native OSINT workspace under Tools, inspired by the public Web-Check project. The initial implementation performs passive Google Public DNS-over-HTTPS collection for A, AAAA, NS, MX, TXT and CAA records, with per-check status, answers, TTL, timing and resolver-reported DNSSEC metadata. Results remain transient and are not uploaded or persisted. This is a selective native port, not an embedded copy of the Astro/Express application. See [Phase 15](docs/PHASE-15-OSINT-WEB.md).
 
+### Phase 16 — Native Web-Check Expansion
+Expands OSINT Web with native Kotlin/Compose HTTP status and redirect inspection, TLS peer-certificate metadata, security-header review, cookie-attribute inspection, robots.txt, sitemap and security.txt retrieval, page/social metadata, heuristic technology indicators and mixed-content hints. Requests are bounded and public-host validated; private/local destinations and HTTPS downgrade redirects are blocked. This is a selective native port: active port scans, traceroute, vulnerability/breach checks and provider-key-dependent checks are deliberately excluded or deferred. See [Phase 16](docs/PHASE-16-NATIVE-WEB-CHECK.md).
+
 ## Gated and preparation phases
 - **Phase 5 — Cloud & Offline Sync:** waiting for a dedicated FORGE-TS Supabase project and approved RLS schema. The connected FurFinder project will not be reused.
 - **Phase 9 — Quality & Release Preparation:** checklist only. No release signing, publishing or store submission has been performed.
