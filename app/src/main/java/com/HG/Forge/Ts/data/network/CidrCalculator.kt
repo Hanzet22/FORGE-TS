@@ -35,8 +35,8 @@ object CidrCalculator {
         val isIpv4 = bits == 32
         val ipv4Usable = when {
             !isIpv4 -> null
-            prefix <= 30 -> block.subtract(BigInteger.TWO)
-            prefix == 31 -> BigInteger.TWO // RFC 3021 point-to-point links
+            prefix <= 30 -> block.subtract(BigInteger.valueOf(2))
+            prefix == 31 -> BigInteger.valueOf(2) // RFC 3021 point-to-point links
             else -> BigInteger.ONE
         }
         val firstUsable = when {
@@ -166,7 +166,7 @@ object VlsmCalculator {
         var cursor = baseStart
 
         return requests.sortedByDescending { it.requiredHosts }.map { request ->
-            val needed = BigInteger.valueOf(request.requiredHosts.toLong()).add(BigInteger.TWO)
+            val needed = BigInteger.valueOf(request.requiredHosts.toLong()).add(BigInteger.valueOf(2))
             val hostBits = needed.subtract(BigInteger.ONE).bitLength()
             require(hostBits <= 30) { "A subnet request is too large for a usable IPv4 host allocation" }
             val blockSize = BigInteger.ONE.shiftLeft(hostBits.coerceAtLeast(2))
@@ -177,7 +177,7 @@ object VlsmCalculator {
             val end = start.add(blockSize).subtract(BigInteger.ONE)
             require(end <= baseEnd) { "Address space exhausted while allocating ${request.name}" }
             val prefix = 32 - hostBits.coerceAtLeast(2)
-            val available = blockSize.subtract(BigInteger.TWO)
+            val available = blockSize.subtract(BigInteger.valueOf(2))
             val allocation = VlsmAllocation(
                 name = request.name.trim(),
                 cidr = "${formatIpv4(start)}/$prefix",
