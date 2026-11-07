@@ -2,9 +2,6 @@ package com.HG.Forge.Ts.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -14,19 +11,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
-fun ToolsScreen(modifier: Modifier = Modifier) {
-    var selectedTool by remember { mutableIntStateOf(0) }
+fun ToolsScreen(modifier: Modifier = Modifier, initialSelectedTool: Int = 0) {
+    var selectedTool by remember(initialSelectedTool) { mutableIntStateOf(initialSelectedTool.coerceIn(0, 3)) }
     Column(modifier = modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = selectedTool) {
             listOf("DNS & Protocols", "Repositories", "Security", "Diagnostics").forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTool == index,
-                    onClick = { selectedTool = index },
-                    text = { Text(title) }
-                )
+                Tab(selected = selectedTool == index, onClick = { selectedTool = index }, text = { Text(title) })
             }
         }
         when (selectedTool) {
