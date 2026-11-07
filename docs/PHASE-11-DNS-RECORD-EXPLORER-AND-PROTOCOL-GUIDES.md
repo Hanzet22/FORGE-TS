@@ -2,7 +2,7 @@
 
 ## Delivered scope
 - Expanded the live DNS-over-HTTPS lookup from the original eight types to A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC.
-- Added selectable Cloudflare and Google Public DNS resolvers.
+- Configured Google Public DNS as the DNS-over-HTTPS resolver.
 - Displays DNS response status, Answer / Authority / Additional sections, record type, owner name, TTL and elapsed request time.
 - Requests DNSSEC data using the DO flag and displays the resolver-reported AD (Authenticated Data) flag without claiming that the app independently validates the DNSSEC chain.
 - Added an offline Protocol Library with overview, usage guidance, pros, cons, operational/security risks and references.
@@ -10,9 +10,8 @@
 
 ## DNS lookup behavior
 - The app is a DNS-over-HTTPS client, not an authoritative DNS server or recursive resolver.
-- Cloudflare endpoint: `https://cloudflare-dns.com/dns-query`
 - Google Public DNS endpoint: `https://dns.google/resolve`
-- Both providers are selectable by the user; each receives the queried domain and record type.
+- Google Public DNS receives the queried domain and record type.
 - TTL is the DNS cache lifetime supplied in the response, not a guaranteed record-expiry timestamp.
 - DNS response codes are rendered as NOERROR, FORMERR, SERVFAIL, NXDOMAIN, NOTIMP and REFUSED where applicable.
 - The AD flag is reported as the resolver's assertion that data is authenticated. FORGE-TS does not perform independent DNSSEC chain validation in this phase.
