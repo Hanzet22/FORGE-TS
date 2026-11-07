@@ -67,3 +67,27 @@ The implementation research used Exa, Firecrawl, Tavily, Parallel Search, Geekfl
 ## Files
 - `ProtocolDeepDocs.kt`: offline technical chapters for all 83 entries.
 - `ProtocolCenterScreen.kt`: dedicated detail sections and standards-status verification guidance.
+
+## Research synthesis
+
+The Undermind literature review completed with 268 relevant papers and technical publications identified. Its summary is based on available abstracts and metadata rather than a full-text review of every paper. The main cross-cutting findings used to shape the documentation are:
+
+- Protocol behavior depends on deployment, policy, middleboxes, and implementation—not only on the base specification.
+- Every protocol family has trade-offs between service guarantees, overhead, compatibility, and recovery speed.
+- Transport performance is workload- and path-dependent; QUIC's stream and connection design does not remove congestion-control, CPU, or middlebox constraints.
+- Routing documentation must explain policy and trust, not just path selection; RPKI/route-origin validation reduces some BGP risks but does not eliminate all routing threats.
+- DNS privacy, DNS data integrity, and DNS availability are separate properties and should not be conflated.
+- IoT protocols must be explained in the context of constrained devices, loss, power, and interoperability.
+- Troubleshooting is strongest when end-to-end measurements are combined with routing, topology, and protocol-state evidence.
+
+Selected literature:
+- [Cla88] D. Clark, “The Design Philosophy of the DARPA Internet Protocols” (1988), DOI: https://doi.org/10.1145/52324.52336
+- [Too22] O. van der Toorn et al., “Addressing the Challenges of Modern DNS: A Comprehensive Tutorial” (2022), DOI: https://doi.org/10.1016/j.cosrev.2022.100469
+- [Lan17] A. Langley et al., “The QUIC Transport Protocol: Design and Internet-Scale Deployment” (2017), DOI: https://doi.org/10.1145/3098822.3098842
+- [Pol18] “A Survey on Recent Advances in Transport Layer Protocols” (2018), DOI: https://doi.org/10.1109/COMST.2019.2932905
+- [Dus16] A. Dusia and A. Sethi, “Recent Advances in Fault Localization in Computer Networks” (2016), DOI: https://doi.org/10.1109/COMST.2016.2570599
+- [Mit18] A. Mitseva et al., “The State of Affairs in BGP Security: A Survey of Attacks and Defenses” (2018), DOI: https://doi.org/10.1016/J.COMCOM.2018.04.013
+- [Eng20] T. Enghardt et al., “A Survey of the Interaction between Security Protocols and Transport Services” (RFC 8922, 2020), DOI: https://doi.org/10.17487/RFC8922
+- [Rod24] N. Rodday et al., “The Resource Public Key Infrastructure (RPKI): A Survey on Measurements and Future Prospects” (2024), DOI: https://doi.org/10.1109/TNSM.2023.3327455
+
+Undermind research workspace: https://app.undermind.ai/projects/76efa39c-3a4c-48b2-8ecf-95b9b98c4340?path=/Network%20Protocol%20Architecture%20and%20Operations
