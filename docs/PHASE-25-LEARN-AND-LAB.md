@@ -34,6 +34,7 @@ Each expanded lesson now presents:
 - Added context-aware tutorial and troubleshooting guidance for key lessons.
 - Added standards/further-reading links for core protocols.
 - Added new catalog entries for DNS fundamentals, HTTP request/response, and network security/privacy.
+- Added a short comprehension check with immediate feedback to each simulation.
 - Added deterministic local learning panels:
   - DNS resolution stages using `portal.example.com` and `192.0.2.25`.
   - IPv4 prefix calculator for documentation-only `192.0.2.0/24` through `/30`.
@@ -41,6 +42,7 @@ Each expanded lesson now presents:
   - TCP vs UDP conceptual timeline.
   - Longest-prefix route selection using documentation-only address ranges.
   - HTTP request/response stages using a synthetic GET and 200 OK fixture.
+- Each lab includes a resettable local interaction and a short comprehension check; the question does not submit data anywhere.
 - Every simulation carries a visible notice: **SIMULATED — No packets sent — No network inspected**.
 - Simulations use local state only. They do not create sockets, inspect device traffic, send DNS queries, scan hosts, or accept credentials.
 - Existing read-only command examples remain read-only and are not executed.
