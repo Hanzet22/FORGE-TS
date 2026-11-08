@@ -49,7 +49,7 @@ class CrashRecoveryActivity : Activity() {
         val continueButton = Button(this).apply {
             text = "Continue to FORGE-TS"
             setOnClickListener {
-                CrashReportStore.clear(this@CrashRecoveryActivity)
+                CrashReportStore.markRecoveryAcknowledged(this@CrashRecoveryActivity)
                 startActivity(Intent(this@CrashRecoveryActivity, MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
