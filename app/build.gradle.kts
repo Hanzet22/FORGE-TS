@@ -15,7 +15,8 @@ android {
  }
  buildFeatures { compose = true; buildConfig = true }
  buildTypes {
-  getByName("debug") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "true") }
+  // Diagnostics remain local. Do not auto-upload events from debug builds.
+  getByName("debug") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "false") }
   getByName("release") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "false") }
  }
  compileOptions {
@@ -27,6 +28,7 @@ android {
 dependencies {
  implementation(platform("androidx.compose:compose-bom:2025.10.00"))
  implementation("androidx.activity:activity-compose:1.11.0")
+ implementation("androidx.core:core-ktx:1.17.0")
  implementation("androidx.compose.ui:ui")
  implementation("androidx.compose.ui:ui-tooling-preview")
  implementation("androidx.compose.foundation:foundation")
