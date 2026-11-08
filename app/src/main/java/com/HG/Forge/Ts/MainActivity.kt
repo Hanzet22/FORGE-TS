@@ -19,7 +19,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Route to a platform-View-only recovery screen before Compose or app UI starts.
-        if (CrashReportStore.read(this) != null) {
+        val pendingCrash = CrashReportStore.read(this)
+        if (pendingCrash != null && !pendingCrash.optBoolean("recoveryAcknowledged")) {
             startActivity(Intent(this, CrashRecoveryActivity::class.java))
             finish()
             return
