@@ -35,7 +35,7 @@ private const val FORGE_SUPABASE_URL = "https://hzwyxvdeeetkxhijgxwy.supabase.co
 private const val FORGE_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_5rbPwWvKvIo7i4mDs9x7Ww_SNw1VFNO"
 
 @Composable
-fun RemoteAccessPanel() {
+fun RemoteAccessPanel(internetAvailable: Boolean) {
     val scope = rememberCoroutineScope()
     val httpClient = HttpClientProvider.client
     val authClient = remember { SupabaseAuthClient(FORGE_SUPABASE_URL, FORGE_SUPABASE_PUBLISHABLE_KEY, httpClient) }
@@ -50,11 +50,12 @@ fun RemoteAccessPanel() {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("REMOTE ACCESS • SUPABASE AUTH", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            if (!internetAvailable) Text("OFFLINE • remote requests are paused; local simulation remains available.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             if (session == null) {
                 OutlinedTextField(email, { email = it }, Modifier.fillMaxWidth(), label = { Text("Email") }, singleLine = true)
                 OutlinedTextField(password, { password = it }, Modifier.fillMaxWidth(), label = { Text("Password") }, singleLine = true)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(enabled = !busy, onClick = {
+                    Button(enabled = internetAvailable && !busy, onClick = {
                         scope.launch {
                             busy = true
                             output = "Signing in..."
