@@ -16,8 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,10 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.data.preferences.AppPreferencesRepository
-import com.HG.Forge.Ts.data.sync.CrashReportConsent
-import com.HG.Forge.Ts.data.sync.CrashReportUploadScheduler
-import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsConsent
-import com.HG.Forge.Ts.BuildConfig
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,8 +41,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
-    var crashReportingEnabled by remember { mutableStateOf(CrashReportConsent.isEnabled(context)) }
-    var diagnosticUploadEnabled by remember { mutableStateOf(ForgeDiagnosticsConsent.isEnabled(context)) }
 
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),
@@ -67,31 +59,12 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             }
         }
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        if (BuildConfig.DEBUG) {
-            Text("Debug diagnostic logging", style = MaterialTheme.typography.titleMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Share INFO, WARNING, ERROR and DEBUG events")
-                    Text("Debug APKs can upload sanitized startup and component events to the FORGE-TS Supabase diagnostic endpoint. Events include app/Android versions, event labels and exception stack frames; no passwords, tokens, email addresses or message contents are intentionally collected. This is enabled for debug builds only.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = diagnosticUploadEnabled, onCheckedChange = { enabled ->
-                    diagnosticUploadEnabled = enabled
-                    ForgeDiagnosticsConsent.setEnabled(context, enabled)
-                })
-            }
-        }
-        Text("Crash diagnostics", style = MaterialTheme.typography.titleMedium)
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Share sanitized crash reports")
-                Text("Crash details are kept locally on this device so startup failures can be diagnosed. When enabled, the latest saved report may be uploaded anonymously and linked after sign-in. No email, password, tokens, or message contents are collected.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Switch(checked = crashReportingEnabled, onCheckedChange = { enabled ->
-                crashReportingEnabled = enabled
-                CrashReportConsent.setEnabled(context, enabled)
-                if (enabled) CrashReportUploadScheduler.enqueue(context)
-            })
-        }
+        Text("Crash recovery & diagnostics", style = MaterialTheme.typography.titleMedium)
+        Text(
+            "FORGE-TS keeps crash reports and INFO, WARNING, ERROR and DEBUG events locally. If startup fails, the next launch opens a lightweight recovery screen where you can share a diagnostic report through Android Sharesheet. Reports are not automatically uploaded to Supabase.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         OutlinedButton(onClick = { showAboutApps = true }) {
             Text("About Apps")
         }
