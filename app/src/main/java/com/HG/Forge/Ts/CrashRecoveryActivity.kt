@@ -12,6 +12,8 @@ import android.widget.TextView
 import androidx.core.content.FileProvider
 import com.HG.Forge.Ts.data.sync.CrashReportStore
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
+import com.HG.Forge.Ts.data.sync.CrashReportUploadScheduler
+import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsUploadScheduler
 import java.io.File
 
 /**
@@ -21,6 +23,10 @@ import java.io.File
 class CrashRecoveryActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Persist in the crash handler; schedule network work on the next safe launch.
+        runCatching { CrashReportUploadScheduler.enqueue(this) }
+        runCatching { ForgeDiagnosticsUploadScheduler.enqueue(this) }
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
