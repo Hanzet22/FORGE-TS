@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.view.Surface
 import android.view.TextureView
 import androidx.annotation.RawRes
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 
 /**
  * TextureView-backed intro player. Unlike VideoView, this lets us apply a
@@ -31,12 +32,14 @@ internal class IntroVideoTextureView(
     }
 
     override fun onSurfaceTextureAvailable(surfaceTexture: android.graphics.SurfaceTexture, width: Int, height: Int) {
+        ForgeDiagnostics.log(context, "DEBUG", "IntroVideo", "intro.surface.available")
         videoSurface = Surface(surfaceTexture)
         preparePlayer()
     }
 
     private fun preparePlayer() {
         if (mediaPlayer != null || videoSurface == null) return
+        ForgeDiagnostics.log(context, "INFO", "IntroVideo", "intro.prepare.started")
 
         val player = MediaPlayer()
         mediaPlayer = player
@@ -56,17 +59,20 @@ internal class IntroVideoTextureView(
                 applyCenterCrop()
             }
             player.setOnPreparedListener {
+                ForgeDiagnostics.log(context, "INFO", "IntroVideo", "intro.player.prepared")
                 applyCenterCrop()
                 it.isLooping = false
                 it.start()
             }
             player.setOnCompletionListener { finishOnce() }
-            player.setOnErrorListener { _, _, _ ->
+            player.setOnErrorListener { _, what, extra ->
+                ForgeDiagnostics.log(context, "ERROR", "IntroVideo", "intro.player.error_$what_$extra")
                 finishOnce()
                 true
             }
             player.prepareAsync()
-        } catch (_: Exception) {
+        } catch (error: Exception) {
+            ForgeDiagnostics.log(context, "ERROR", "IntroVideo", "intro.prepare.exception", error)
             releasePlayer()
             finishOnce()
         }
