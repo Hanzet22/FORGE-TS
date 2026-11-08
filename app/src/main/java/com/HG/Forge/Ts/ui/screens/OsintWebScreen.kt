@@ -215,8 +215,11 @@ fun OsintWebScreen(
                     Text("Handle: ${report.handle ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
                     Text("Range: ${report.startAddress ?: "?"} – ${report.endAddress ?: "?"}", style = MaterialTheme.typography.bodySmall)
                     Text("Country/region code: ${report.country ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
+                    Text("Origin ASN: ${report.asn?.let { "AS$it" } ?: "Not returned"}")
+                    report.asnHolder?.let { Text("Network holder: $it", style = MaterialTheme.typography.bodySmall) }
+                    report.announcedPrefix?.let { Text("Announced prefix: $it", style = MaterialTheme.typography.bodySmall) }
                     Text("Registry source: ${report.source}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("ASN is not guaranteed by every IP RDAP response. Network attribution is registry metadata, not proof of physical server location or ownership.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("ASN enrichment uses RIPEstat and is best-effort. Registry metadata is not proof of physical server location or operational ownership.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
