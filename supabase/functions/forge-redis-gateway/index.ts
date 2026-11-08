@@ -24,7 +24,7 @@ export default {
       return json({ ok: false, error: "method_not_allowed" }, 405);
     }
 
-    const userId = ctx.userClaims?.sub;
+    const userId = ctx.userClaims?.id;
     if (!userId) {
       return json({ ok: false, error: "authenticated_user_required" }, 401);
     }
