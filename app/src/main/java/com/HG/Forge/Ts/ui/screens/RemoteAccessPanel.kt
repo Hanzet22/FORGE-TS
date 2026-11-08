@@ -13,6 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.HG.Forge.Ts.AuthDeepLinkBus
 import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.remote.RedisGatewayClient
 import com.HG.Forge.Ts.data.remote.RedisGatewayOperation
@@ -47,6 +49,23 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
     var session by remember { mutableStateOf<SupabaseAuthSession?>(null) }
     var busy by remember { mutableStateOf(false) }
     var output by remember { mutableStateOf("Sign in to test the real Supabase and Redis connections.") }
+
+    LaunchedEffect(authClient) {
+        AuthDeepLinkBus.callbacks.collect { callbackUrl ->
+            busy = true
+            output = "Processing Supabase email verification callback..."
+            val result = withContext(Dispatchers.IO) {
+                runCatching { authClient.sessionFromCallback(callbackUrl) }
+            }
+            result.onSuccess {
+                session = it
+                output = "EMAIL VERIFIED • AUTHENTICATED • ${it.email ?: it.userId}"
+            }.onFailure {
+                output = "AUTH CALLBACK FAILED • ${it.message ?: "unknown error"}"
+            }
+            busy = false
+        }
+    }
 
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -84,7 +103,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                     session = created
                                     output = "ACCOUNT CREATED • authenticated"
                                 } else {
-                                    output = "SIGNUP SUBMITTED • check your email for confirmation, then sign in."
+                                    output = "SIGNUP SUBMITTED • open the confirmation email; FORGE-TS should receive the callback automatically."
                                 }
                             }.onFailure {
                                 output = it.message ?: "Sign-up failed."
