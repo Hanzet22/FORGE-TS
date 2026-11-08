@@ -12,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,7 +31,6 @@ fun OsintWebScreen(
     viewModel: OsintWebViewModel = viewModel()
 ) {
     var domain by remember { mutableStateOf("") }
-    var includeCarbon by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -55,20 +53,13 @@ fun OsintWebScreen(
             singleLine = true
         )
         Button(
-            onClick = { viewModel.inspect(domain, includeCarbon) },
+            onClick = { viewModel.inspect(domain) },
             enabled = domain.isNotBlank() && !viewModel.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Run native inspection")
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = includeCarbon, onCheckedChange = { includeCarbon = it })
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Optional Website Carbon estimate", style = MaterialTheme.typography.bodyMedium)
-                Text("When enabled, the page URL is sent to Website Carbon, a third-party estimator. Off by default.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
 
         if (viewModel.isLoading) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -230,23 +221,6 @@ fun OsintWebScreen(
             }
         }
 
-        if (includeCarbon) {
-            Text("Website Carbon Intelligence", style = MaterialTheme.typography.headlineSmall)
-            viewModel.carbonError?.let { Text("Estimate unavailable: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            viewModel.carbonReport?.let { report ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(report.rating ?: "Provider rating unavailable", style = MaterialTheme.typography.titleMedium)
-                        report.gridCo2Grams?.let { Text("Estimated grid CO₂ per page view: ${"%.4f".format(it)} g") }
-                        report.renewableCo2Grams?.let { Text("Estimated renewable-hosting CO₂: ${"%.4f".format(it)} g") }
-                        report.bytes?.let { Text("Provider-measured transfer: $it bytes") }
-                        report.cleanerThanPercent?.let { Text("Cleaner than: ${"%.1f".format(it)}% of tested pages") }
-                        Text("Green hosting signal: ${report.greenHosting?.toString() ?: "Not reported"}")
-                        Text("Provider: ${report.provider}. Estimates depend on the provider's model and assumptions; they are not direct energy measurements.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-            }
-        }
 
         viewModel.nativeReport?.let { report ->
             Text("Native Web-Check report", style = MaterialTheme.typography.headlineSmall)
