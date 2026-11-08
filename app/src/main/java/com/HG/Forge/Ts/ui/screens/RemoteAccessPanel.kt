@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.AuthDeepLinkBus
@@ -30,25 +31,35 @@ import com.HG.Forge.Ts.data.remote.RedisGatewayRequest
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
 import com.HG.Forge.Ts.data.remote.SupabaseAuthSession
 import com.HG.Forge.Ts.data.remote.SupabaseLabRecordsClient
+import com.HG.Forge.Ts.data.sync.CrashReportUploader
+import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val FORGE_SUPABASE_URL = "https://hzwyxvdeeetkxhijgxwy.supabase.co"
-private const val FORGE_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_5rbPwWvKvIo7i4mDs9x7Ww_SNw1VFNO"
-
 @Composable
 fun RemoteAccessPanel(internetAvailable: Boolean) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val httpClient = HttpClientProvider.client
-    val authClient = remember { SupabaseAuthClient(FORGE_SUPABASE_URL, FORGE_SUPABASE_PUBLISHABLE_KEY, httpClient) }
-    val redisClient = remember { RedisGatewayClient(FORGE_SUPABASE_URL, FORGE_SUPABASE_PUBLISHABLE_KEY, httpClient) }
-    val recordsClient = remember { SupabaseLabRecordsClient(FORGE_SUPABASE_URL, FORGE_SUPABASE_PUBLISHABLE_KEY, httpClient) }
+    val authClient = remember { SupabaseAuthClient(ForgeCrashBackendConfig.SUPABASE_URL, ForgeCrashBackendConfig.PUBLISHABLE_KEY, httpClient) }
+    val redisClient = remember { RedisGatewayClient(ForgeCrashBackendConfig.SUPABASE_URL, ForgeCrashBackendConfig.PUBLISHABLE_KEY, httpClient) }
+    val recordsClient = remember { SupabaseLabRecordsClient(ForgeCrashBackendConfig.SUPABASE_URL, ForgeCrashBackendConfig.PUBLISHABLE_KEY, httpClient) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var session by remember { mutableStateOf<SupabaseAuthSession?>(null) }
     var busy by remember { mutableStateOf(false) }
     var output by remember { mutableStateOf("Sign in to test the real Supabase and Redis connections.") }
+
+    LaunchedEffect(session?.accessToken) {
+        val accessToken = session?.accessToken ?: return@LaunchedEffect
+        val result = withContext(Dispatchers.IO) {
+            runCatching { CrashReportUploader.uploadPending(context, accessToken) }
+        }
+        result.onSuccess { status ->
+            if (status != null) output = "CRASH REPORT SYNCED • $status"
+        }
+    }
 
     LaunchedEffect(authClient) {
         AuthDeepLinkBus.callbacks.collect { callbackUrl ->

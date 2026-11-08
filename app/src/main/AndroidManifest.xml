@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".ForgeApplication"
         android:allowBackup="false"
         android:icon="@mipmap/forge_ts_logo"
         android:roundIcon="@mipmap/forge_ts_logo"

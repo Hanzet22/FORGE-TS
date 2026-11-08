@@ -17,6 +17,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.data.preferences.AppPreferencesRepository
+import com.HG.Forge.Ts.data.sync.CrashReportConsent
+import com.HG.Forge.Ts.data.sync.CrashReportUploadScheduler
 import kotlinx.coroutines.launch
 
 @Composable
@@ -42,6 +45,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
+    var crashReportingEnabled by remember { mutableStateOf(CrashReportConsent.isEnabled(context)) }
 
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),
@@ -60,6 +64,18 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             }
         }
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Crash diagnostics", style = MaterialTheme.typography.titleMedium)
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Share sanitized crash reports")
+                Text("Optional. Sends exception type and stack frames, app version, and Android version. No email, password, tokens, or message contents. Reports upload anonymously first and can be linked after sign-in.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = crashReportingEnabled, onCheckedChange = { enabled ->
+                crashReportingEnabled = enabled
+                CrashReportConsent.setEnabled(context, enabled)
+                if (enabled) CrashReportUploadScheduler.enqueue(context)
+            })
+        }
         OutlinedButton(onClick = { showAboutApps = true }) {
             Text("About Apps")
         }
