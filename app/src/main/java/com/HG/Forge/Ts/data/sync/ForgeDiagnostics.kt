@@ -18,14 +18,14 @@ object ForgeDiagnosticsConsent {
     private const val ENABLED = "diagnostic_upload_enabled"
 
     fun isEnabled(context: Context): Boolean {
-        if (!BuildConfig.DEBUG || !BuildConfig.DIAGNOSTICS_UPLOAD_ENABLED) return false
+        if (!BuildConfig.DIAGNOSTICS_UPLOAD_ENABLED) return false
         return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getBoolean(ENABLED, true)
     }
 
     fun setEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putBoolean(ENABLED, enabled && BuildConfig.DEBUG).apply()
+            .edit().putBoolean(ENABLED, enabled).apply()
         if (enabled) ForgeDiagnosticsUploadScheduler.enqueue(context)
     }
 }
