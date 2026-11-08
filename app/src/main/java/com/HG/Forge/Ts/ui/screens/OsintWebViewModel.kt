@@ -12,6 +12,8 @@ import com.HG.Forge.Ts.data.network.DnsLookupResult
 import com.HG.Forge.Ts.data.network.DnsResolver
 import com.HG.Forge.Ts.data.network.RdapDomainRepository
 import com.HG.Forge.Ts.data.network.RdapDomainReport
+import com.HG.Forge.Ts.data.network.RdapIpRepository
+import com.HG.Forge.Ts.data.network.RdapIpReport
 import com.HG.Forge.Ts.data.network.WebsiteCarbonRepository
 import com.HG.Forge.Ts.data.network.WebsiteCarbonReport
 import kotlinx.coroutines.launch
@@ -40,6 +42,7 @@ class OsintWebViewModel : ViewModel() {
     private val repository = DnsLookupRepository()
     private val nativeRepository = NativeWebCheckRepository()
     private val rdapRepository = RdapDomainRepository()
+    private val rdapIpRepository = RdapIpRepository()
     private val carbonRepository = WebsiteCarbonRepository()
     private val recordTypes = listOf("A", "AAAA", "NS", "MX", "TXT", "CAA", "SOA", "CNAME", "SRV", "DS", "DNSKEY", "RRSIG", "NSEC", "TLSA", "HTTPS", "SVCB")
 
@@ -58,6 +61,10 @@ class OsintWebViewModel : ViewModel() {
     var rdapReport by mutableStateOf<RdapDomainReport?>(null)
         private set
     var rdapError by mutableStateOf<String?>(null)
+        private set
+    var ipNetworkReport by mutableStateOf<RdapIpReport?>(null)
+        private set
+    var ipNetworkError by mutableStateOf<String?>(null)
         private set
     var carbonReport by mutableStateOf<WebsiteCarbonReport?>(null)
         private set
@@ -205,6 +212,8 @@ class OsintWebViewModel : ViewModel() {
             nativeError = null
             rdapReport = null
             rdapError = null
+            ipNetworkReport = null
+            ipNetworkError = null
             carbonReport = null
             carbonError = null
             target = domain
@@ -240,6 +249,21 @@ class OsintWebViewModel : ViewModel() {
                 rdapReport = rdapRepository.lookup(domain)
             } catch (exception: Exception) {
                 rdapError = exception.message?.take(400) ?: "RDAP lookup unavailable."
+            }
+            val resolvedAddress = collected
+                .filter { it.recordType == "A" || it.recordType == "AAAA" }
+                .flatMap { it.result?.answers.orEmpty() }
+                .firstNotNullOfOrNull { answer ->
+                    answer.data.trim().takeIf { it.matches(Regex("""[0-9a-fA-F:.]+""")) }
+                }
+            if (resolvedAddress != null) {
+                try {
+                    ipNetworkReport = rdapIpRepository.lookup(resolvedAddress)
+                } catch (exception: Exception) {
+                    ipNetworkError = exception.message?.take(350) ?: "IP network RDAP lookup unavailable."
+                }
+            } else {
+                ipNetworkError = "No public A/AAAA address was available for network attribution."
             }
             if (includeCarbon) {
                 try {
