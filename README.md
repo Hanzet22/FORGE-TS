@@ -69,3 +69,13 @@ The command area is a reference guide, not an unrestricted remote shell. Host ch
 
 ## Build
 Run the Android Debug APK workflow from the GitHub Actions tab. The workflow uses JDK 17 and Gradle 8.13.
+
+
+## Phase 23 — IP & Network Registry Intelligence
+
+- Resolves the first available public A/AAAA answer and performs at most one read-only IP RDAP lookup.
+- Displays registry network name, handle, address range, IP version and country code when supplied.
+- Blocks private/reserved destinations, requires HTTPS, bounds redirects/timeouts and caps response size.
+- Does not collect registrant contact data or claim physical hosting location.
+- ASN enrichment is not claimed where IP RDAP does not return an ASN; a dedicated ASN provider integration remains separate.
+- See [Phase 23 technical scope](docs/PHASE-23-IP-NETWORK-RDAP-INTELLIGENCE.md).
