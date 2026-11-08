@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.data.simulation.LoopbackLabServer
 import com.HG.Forge.Ts.data.simulation.RedisOfflineEngine
 import com.HG.Forge.Ts.data.simulation.SupabaseOfflineEngine
+import com.HG.Forge.Ts.ui.screens.RemoteAccessPanel
 
 private enum class SimulationModule(val title: String) {
     REDIS("Redis"), SUPABASE("Supabase"), LOOPBACK("Loopback")
@@ -103,9 +104,10 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                     else "Automatic fallback: all modules use local simulation. No remote request is attempted.",
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text("Redis gateway: deployed • Supabase: ACTIVE_HEALTHY • user auth/secrets: pending", style = MaterialTheme.typography.labelSmall)
+                Text("Supabase Auth: integrated • Redis gateway: deployed • each remote service requires a successful live check.", style = MaterialTheme.typography.labelSmall)
             }
         }
+        RemoteAccessPanel(internetAvailable = internetValidated)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SimulationModule.entries.forEach { module ->
                 FilterChip(selected = selectedModule == module, onClick = { selectedModule = module }, label = { Text(module.title) })
@@ -130,7 +132,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 }
                 Button(onClick = { redisOutput = RedisOfflineEngine.snapshot().entries.joinToString("\n") { "${it.key} = ${it.value}" }.ifBlank { "(empty database)" } }, modifier = Modifier.fillMaxWidth()) { Text("Browse keys") }
                 ResultPanel(redisOutput)
-                Text("Online connector: gateway deployed. Waiting for Edge Function secrets and a signed-in user session; local Redis simulator remains available.", style = MaterialTheme.typography.bodySmall)
+                Text("Online connector: use Remote Access above to sign in and run a live Redis PING; local Redis simulator remains available.", style = MaterialTheme.typography.bodySmall)
             }
             SimulationModule.SUPABASE -> {
                 Text("Supabase Lab", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -152,7 +154,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                     }
                 }
                 ResultPanel(statusMessage)
-                Text("Online connector: project and RLS table are ready. Waiting for Supabase Auth session wiring in the app.", style = MaterialTheme.typography.bodySmall)
+                Text("Online connector: use Remote Access above to sign in and run an RLS-protected SELECT; local sample table remains separate.", style = MaterialTheme.typography.bodySmall)
             }
             SimulationModule.LOOPBACK -> {
                 Text("Loopback Lab", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
