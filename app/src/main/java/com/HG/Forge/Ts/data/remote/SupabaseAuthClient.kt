@@ -1,6 +1,8 @@
 package com.HG.Forge.Ts.data.remote
 
+import android.net.Uri
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -8,6 +10,9 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import org.json.JSONObject
+import java.net.URLEncoder
+
+const val FORGE_AUTH_REDIRECT_URI = "com.hg.forgets://auth/callback"
 
 data class SupabaseAuthSession(
     val accessToken: String,
@@ -28,7 +33,8 @@ class SupabaseAuthClient(
 ) {
     suspend fun signUp(email: String, password: String): SupabaseAuthSession? {
         requireValidInput(email, password)
-        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/signup") {
+        val redirect = URLEncoder.encode(FORGE_AUTH_REDIRECT_URI, "UTF-8")
+        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/signup?redirect_to=$redirect") {
             header("apikey", publishableKey)
             contentType(ContentType.Application.Json)
             setBody(JSONObject().put("email", email.trim()).put("password", password).toString())
@@ -37,6 +43,44 @@ class SupabaseAuthClient(
         ensureSuccess(response.status.value, body)
         val json = JSONObject(body)
         return json.takeIf { it.has("access_token") }?.toSession()
+    }
+
+    /**
+     * Exchanges the access/refresh tokens returned by Supabase's email verification
+     * redirect for a verified user profile. Callback URLs must only be accepted from
+     * the app's registered custom scheme and exact callback host/path.
+     */
+    suspend fun sessionFromCallback(callbackUrl: String): SupabaseAuthSession {
+        val uri = Uri.parse(callbackUrl)
+        require(uri.scheme == "com.hg.forgets" && uri.host == "auth" && uri.path == "/callback") {
+            "Unrecognized authentication callback."
+        }
+        val params = Uri.parse("https://callback.invalid/?${uri.encodedFragment.orEmpty()}")
+        val accessToken = params.getQueryParameter("access_token")
+            ?: uri.getQueryParameter("access_token")
+            ?: throw IllegalStateException(
+                uri.getQueryParameter("error_description") ?: "Verification callback did not contain an access token."
+            )
+        val refreshToken = params.getQueryParameter("refresh_token")
+            ?: uri.getQueryParameter("refresh_token")
+            ?: throw IllegalStateException("Verification callback did not contain a refresh token.")
+        val expiresIn = (params.getQueryParameter("expires_in") ?: uri.getQueryParameter("expires_in"))
+            ?.toLongOrNull() ?: 3600L
+
+        val response = httpClient.get("${supabaseUrl.trimEnd('/')}/auth/v1/user") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer $accessToken")
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        val user = JSONObject(body)
+        return SupabaseAuthSession(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            userId = user.optString("id"),
+            email = user.optString("email").takeIf { it.isNotBlank() },
+            expiresAtEpochSeconds = System.currentTimeMillis() / 1000L + expiresIn
+        )
     }
 
     suspend fun signIn(email: String, password: String): SupabaseAuthSession {
