@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.HG.Forge.Ts.ui.theme.ForgeScript
 
 private data class ToolItem(
     val title: String,
@@ -46,7 +47,13 @@ fun HomeScreen(
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text("FORGE-TS", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "FORGE-TS",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontFamily = ForgeScript,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Text("NETWORK & SYSTEMS TOOLKIT", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

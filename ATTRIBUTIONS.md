@@ -1,11 +1,26 @@
 # Attributions
-Third-party libraries, icons, fonts, datasets, documentation sources and their applicable licenses will be listed here before distribution.
+
+Third-party libraries, fonts, datasets, documentation sources and their applicable licenses are listed here before distribution.
 
 ## Initial dependencies
 - Kotlin — Apache License 2.0
 - AndroidX, Jetpack Compose and Material 3 — Apache License 2.0
 - Ktor — Apache License 2.0
 - Room, DataStore and WorkManager — Apache License 2.0
+
+## Fonts
+
+### DejaVu Sans
+- Copyright: Bitstream, Inc. (Bitstream Vera); DejaVu modifications are in the public domain; imported Arev glyphs are copyright Tavmjong Bah.
+- Used in the Android app as the primary UI typography, including regular, bold, oblique and bold-oblique styles.
+- License: Bitstream Vera / Arev permissive license notices, included at `third_party/licenses/DEJAVU-FONTS-BITSTREAM-VERA.txt` and the original `assets/fonts/LICENSE.txt`.
+- Original font files and accompanying project documentation are retained in `assets/fonts/`.
+
+### Kaushan Script
+- Copyright (c) 2011 Pablo Impallari and Igino Marini.
+- Used for the FORGE-TS wordmark on the Home screen.
+- License: SIL Open Font License 1.1, including the Reserved Font Name “Kaushan Script”; included at `third_party/licenses/KAUSHAN-SCRIPT-OFL.txt` and the original `assets/fonts/OFL.txt`.
+- The font is bundled unmodified.
 
 ## OSINT Web reference
 - Web-Check — Copyright (c) 2023 Alicia Sykes; MIT License.
