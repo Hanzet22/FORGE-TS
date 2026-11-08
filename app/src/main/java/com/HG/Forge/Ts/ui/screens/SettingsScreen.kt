@@ -68,7 +68,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text("Share sanitized crash reports")
-                Text("Optional. Sends exception type and stack frames, app version, and Android version. No email, password, tokens, or message contents. Reports upload anonymously first and can be linked after sign-in.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Crash details are kept locally on this device so startup failures can be diagnosed. When enabled, the latest saved report may be uploaded anonymously and linked after sign-in. No email, password, tokens, or message contents are collected.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Switch(checked = crashReportingEnabled, onCheckedChange = { enabled ->
                 crashReportingEnabled = enabled
