@@ -33,12 +33,14 @@ Each expanded lesson now presents:
 - Added a structured lesson detail presentation while retaining existing lesson IDs and source entries.
 - Added context-aware tutorial and troubleshooting guidance for key lessons.
 - Added standards/further-reading links for core protocols.
+- Added new catalog entries for DNS fundamentals, HTTP request/response, and network security/privacy.
 - Added deterministic local learning panels:
   - DNS resolution stages using `portal.example.com` and `192.0.2.25`.
   - IPv4 prefix calculator for documentation-only `192.0.2.0/24` through `/30`.
   - DHCPv4 DORA walkthrough using a synthetic lease.
   - TCP vs UDP conceptual timeline.
   - Longest-prefix route selection using documentation-only address ranges.
+  - HTTP request/response stages using a synthetic GET and 200 OK fixture.
 - Every simulation carries a visible notice: **SIMULATED — No packets sent — No network inspected**.
 - Simulations use local state only. They do not create sockets, inspect device traffic, send DNS queries, scan hosts, or accept credentials.
 - Existing read-only command examples remain read-only and are not executed.
@@ -59,7 +61,8 @@ Important content checks:
 - HTTP semantics should follow RFC 9110 and the relevant HTTP version RFCs.
 - SSH architecture should follow RFC 4251 and related SSH RFCs.
 - QUIC should follow RFC 9000 and RFC 9001.
-- TLS 1.3 material must be checked against the current RFC Editor record; do not copy old RFC references blindly.
+- TLS 1.3 material must follow RFC 9846, which the RFC Editor record identifies as obsoleting RFC 8446; do not copy old references blindly.
+- HTTP semantics should follow RFC 9110; HTTP/1.1 and HTTP/3 wire mappings are specified separately (RFC 9112 and RFC 9114).
 
 ### Learning design
 
