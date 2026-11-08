@@ -25,8 +25,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,6 +48,7 @@ private enum class SimulationModule(val title: String) {
 @Composable
 fun SimulationScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var internetValidated by remember { mutableStateOf(false) }
     var selectedModule by remember { mutableStateOf(SimulationModule.REDIS) }
     var statusMessage by remember { mutableStateOf("Ready. Offline engines are available.") }
@@ -155,14 +159,29 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 Text("LOCAL DEVICE TEST • server binds only to 127.0.0.1 on an ephemeral port.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
-                        try { val port = loopbackServer.start(); loopbackRunning = true; loopbackOutput = "Listening on 127.0.0.1:$port\nGET /health" }
-                        catch (e: Exception) { loopbackOutput = e.message ?: "Could not start localhost server." }
+                        scope.launch {
+                            loopbackOutput = "Starting local server..."
+                            val result = withContext(Dispatchers.IO) {
+                                runCatching { loopbackServer.start() }
+                            }
+                            result.onSuccess { port ->
+                                loopbackRunning = true
+                                loopbackOutput = "Listening on 127.0.0.1:$port\nGET /health"
+                            }.onFailure { error ->
+                                loopbackOutput = error.message ?: "Could not start localhost server."
+                            }
+                        }
                     }, enabled = !loopbackRunning) { Text("Start localhost") }
                     OutlinedButton(onClick = { loopbackServer.stop(); loopbackRunning = false; loopbackOutput = "Local server stopped." }, enabled = loopbackRunning) { Text("Stop") }
                 }
                 Button(onClick = {
-                    try { loopbackOutput = loopbackServer.requestHealth() }
-                    catch (e: Exception) { loopbackOutput = e.message ?: "Local request failed." }
+                    scope.launch {
+                        loopbackOutput = "Sending local GET /health..."
+                        loopbackOutput = withContext(Dispatchers.IO) {
+                            runCatching { loopbackServer.requestHealth() }
+                                .getOrElse { it.message ?: "Local request failed." }
+                        }
+                    }
                 }, enabled = loopbackRunning, modifier = Modifier.fillMaxWidth()) { Text("Send local GET /health") }
                 ResultPanel(loopbackOutput)
                 Text("Simulator mode: deterministic sample response, no socket opened.", style = MaterialTheme.typography.bodySmall)
