@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Calculate
@@ -57,7 +58,7 @@ fun ForgeApp() {
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
         Scaffold(
             bottomBar = {
                 NavigationBar {
