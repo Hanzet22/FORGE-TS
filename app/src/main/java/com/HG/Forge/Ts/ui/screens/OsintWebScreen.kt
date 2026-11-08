@@ -202,6 +202,25 @@ fun OsintWebScreen(
             }
         }
 
+        Text("IP & ASN Network Intelligence", style = MaterialTheme.typography.headlineSmall)
+        viewModel.ipNetworkError?.let { message ->
+            Text("Network attribution unavailable: $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        viewModel.ipNetworkReport?.let { report ->
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(report.address, style = MaterialTheme.typography.titleMedium)
+                    Text("IP version: ${report.ipVersion ?: "Not reported"}")
+                    Text("Network: ${report.networkName ?: "Not reported"}")
+                    Text("Handle: ${report.handle ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
+                    Text("Range: ${report.startAddress ?: "?"} – ${report.endAddress ?: "?"}", style = MaterialTheme.typography.bodySmall)
+                    Text("Country/region code: ${report.country ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
+                    Text("Registry source: ${report.source}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("ASN is not guaranteed by every IP RDAP response. Network attribution is registry metadata, not proof of physical server location or ownership.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+
         viewModel.nativeError?.let { message ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
                 Text("Website inspection: $message", modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
