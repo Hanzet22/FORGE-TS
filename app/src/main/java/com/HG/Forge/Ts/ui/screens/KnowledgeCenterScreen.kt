@@ -37,15 +37,7 @@ private data class KnowledgeEntry(
     val title: String,
     val summary: String,
     val explanation: String,
-    val example: String,
-    val definition: String = summary,
-    val function: String = explanation,
-    val advantages: List<String> = emptyList(),
-    val limitations: List<String> = emptyList(),
-    val environments: List<String> = emptyList(),
-    val tutorial: List<String> = emptyList(),
-    val troubleshooting: List<String> = emptyList(),
-    val standards: List<String> = emptyList()
+    val example: String
 )
 
 private val knowledgeEntries = listOf(
@@ -244,6 +236,7 @@ private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
         "proto-tcp", "proto-udp" -> listOf("Choose a fictional application message.", "Compare connection setup and delivery expectations.", "Advance through the local event timeline.", "Explain what the application must do if a datagram is missing.")
         "mt-route" -> listOf("Read the fictional destination address.", "List every route whose prefix matches the destination.", "Select the most specific matching prefix.", "Explain the selected next hop or why no route exists.")
         "tls-basics" -> listOf("Identify the fictional hostname the client expects.", "Review the simulated certificate identity and validity.", "Follow the TLS handshake stages in order.", "Explain why a failed identity check must not be bypassed.")
+        "http-basics" -> listOf("Choose the fictional GET /status request.", "Identify the method, target and host field.", "Advance through the local 200 OK response.", "Explain what the status code and response body tell the client.")
         "ssh-basics", "ssh-keys" -> listOf("Review the fictional server identity shown by the lesson.", "Compare its host-key fingerprint with the trusted example.", "Choose the simulated authentication outcome.", "Explain the difference between server identity and user authorization.")
         else -> commonTutorial
     }
@@ -254,6 +247,7 @@ private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
         "proto-tcp", "proto-udp" -> listOf("Connection refused and timeout are different symptoms.", "Check the fictional destination port and transport selection.", "A missing UDP datagram is not automatically retransmitted by UDP itself.", "Transport success does not prove the application is healthy.")
         "mt-route" -> listOf("No matching route.", "A less-specific route selected when a more-specific route was expected.", "Incorrect next hop in the fictional table.", "A route exists but the destination service is still unavailable.")
         "tls-basics", "tls-certificates" -> listOf("Hostname does not match the certificate identity.", "Certificate is outside its validity period.", "Issuer is not trusted by the example trust store.", "Do not disable verification to hide a validation failure.")
+        "http-basics" -> listOf("Malformed request line or target.", "Unexpected status code: distinguish client, server and redirection classes.", "A missing response body is not always a transport failure.", "Separate HTTP response errors from DNS, TCP/QUIC and TLS failures.")
         "ssh-basics", "ssh-keys" -> listOf("Host-key mismatch: stop and verify identity through a trusted channel.", "Authentication failure is different from authorization failure.", "Timeout, refusal and no-route symptoms indicate different layers.", "Never share private keys or bypass host-key warnings.")
         else -> commonTroubleshooting
     }
@@ -266,6 +260,8 @@ private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
         "proto-tcp" -> listOf("RFC 9293 — https://www.rfc-editor.org/rfc/rfc9293")
         "proto-udp" -> listOf("RFC 768 — https://www.rfc-editor.org/rfc/rfc768")
         "tls-basics", "tls-certificates" -> listOf("RFC 9846 — https://www.rfc-editor.org/rfc/rfc9846")
+        "http-basics" -> listOf("RFC 9110 — https://www.rfc-editor.org/rfc/rfc9110", "RFC 9112 — https://www.rfc-editor.org/rfc/rfc9112", "RFC 9114 — https://www.rfc-editor.org/rfc/rfc9114")
+        "security-basics" -> listOf("NIST SP 800-207 — https://csrc.nist.gov/pubs/sp/800/207/final", "NIST SP 800-61r3 — https://csrc.nist.gov/pubs/sp/800/61/r3/final")
         "ssh-basics", "ssh-keys" -> listOf("RFC 4251 — https://www.rfc-editor.org/rfc/rfc4251")
         "proto-quic" -> listOf("RFC 9000 — https://www.rfc-editor.org/rfc/rfc9000", "RFC 9001 — https://www.rfc-editor.org/rfc/rfc9001")
         "proto-osi" -> listOf("ITU-T X.200 — https://www.itu.int/rec/T-REC-X.200")
