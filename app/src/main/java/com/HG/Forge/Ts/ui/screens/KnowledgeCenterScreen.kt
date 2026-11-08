@@ -15,6 +15,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.Slider
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -35,7 +37,15 @@ private data class KnowledgeEntry(
     val title: String,
     val summary: String,
     val explanation: String,
-    val example: String
+    val example: String,
+    val definition: String = summary,
+    val function: String = explanation,
+    val advantages: List<String> = emptyList(),
+    val limitations: List<String> = emptyList(),
+    val environments: List<String> = emptyList(),
+    val tutorial: List<String> = emptyList(),
+    val troubleshooting: List<String> = emptyList(),
+    val standards: List<String> = emptyList()
 )
 
 private val knowledgeEntries = listOf(
@@ -173,6 +183,200 @@ private val knowledgeEntries = listOf(
     KnowledgeEntry("proto-l2tp", "VPN & Tunneling", "L2TP", "A Layer 2 tunneling protocol that carries PPP frames.", "L2TP tunnels PPP traffic across an IP network. L2TP by itself does not provide strong encryption; L2TP/IPsec combines tunneling with IPsec security.", "L2TP: RFC 2661; securing L2TP with IPsec: RFC 3193")
 )
 
+
+private data class LessonGuidance(
+    val definition: String,
+    val function: String,
+    val advantages: List<String>,
+    val limitations: List<String>,
+    val environments: List<String>,
+    val tutorial: List<String>,
+    val troubleshooting: List<String>,
+    val standards: List<String>
+)
+
+private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
+    val commonTutorial = listOf(
+        "Read the definition and identify the problem this technology solves.",
+        "Trace the example from input to output; note each device or protocol involved.",
+        "Change one variable at a time and predict what should happen.",
+        "Compare the result with the expected behavior, then explain why."
+    )
+    val commonTroubleshooting = listOf(
+        "Confirm the configuration and assumptions before changing anything.",
+        "Separate name-resolution, addressing, routing, transport and application symptoms.",
+        "Record the exact symptom and the last known-good state.",
+        "Change one item at a time and verify the result in an authorized lab."
+    )
+    val advantages = when (entry.section) {
+        "Addressing" -> listOf("Makes network boundaries and address allocation explicit.", "Supports structured planning and easier troubleshooting.")
+        "Core Protocols" -> listOf("Defines interoperable behavior between different systems.", "Can automate or standardize a recurring network function.")
+        "SSH & TLS" -> listOf("Protects data in transit when configured and validated correctly.", "Provides a standard model for secure communication.")
+        "Network Types" -> listOf("Helps organize devices and traffic by scope or purpose.", "Can improve manageability when the design is documented.")
+        "MikroTik", "OS Commands" -> listOf("Provides direct visibility into configuration or system state.", "Useful as a repeatable first diagnostic step.")
+        "VPN & Tunneling", "Transport & Tunneling", "Proxy Protocols", "Remote Access" -> listOf("Can connect or relay traffic across different network environments.", "Supports specific connectivity and deployment requirements.")
+        else -> listOf("Provides a shared model for understanding network behavior.", "Makes common designs and failure modes easier to explain.")
+    }
+    val limitations = when (entry.section) {
+        "Addressing" -> listOf("Incorrect prefixes or overlapping ranges can break communication.", "A mathematically valid plan can still conflict with an organization's existing routes.")
+        "Core Protocols" -> listOf("A protocol does not guarantee that every surrounding device is configured correctly.", "Compatibility, security and performance depend on the implementation and environment.")
+        "SSH & TLS" -> listOf("Encryption does not make an untrusted endpoint trustworthy.", "Certificate, key and identity checks still matter.")
+        "MikroTik", "OS Commands" -> listOf("Output can differ by operating-system version and device configuration.", "A diagnostic command does not prove that every network layer is healthy.")
+        "VPN & Tunneling", "Transport & Tunneling", "Proxy Protocols", "Remote Access" -> listOf("Adds operational complexity and may affect latency or compatibility.", "Security depends on endpoint identity, configuration and maintained software.")
+        else -> listOf("The concept solves a specific problem, not every connectivity problem.", "Real deployments need validation against topology, policy and vendor behavior.")
+    }
+    val environments = when (entry.section) {
+        "Addressing" -> listOf("IP planning for home, school, office and routed networks.", "Use documentation-only example ranges while learning.")
+        "MikroTik" -> listOf("A router you administer or a controlled RouterOS lab.", "Read-only review before any approved configuration change.")
+        "OS Commands" -> listOf("A device and network you own or are explicitly allowed to troubleshoot.", "Use local examples when practicing command syntax.")
+        "SSH & TLS" -> listOf("Maintained services where endpoint identity and encrypted transport are required.", "Use fictional certificates and host keys in this learning module.")
+        "Network Types" -> listOf("Campus, school, home, enterprise and managed wireless networks.", "Plan segmentation before deploying it.")
+        "Core Protocols" -> listOf("Networks and applications that implement the relevant protocol standard.", "Use local simulations to understand protocol state.")
+        else -> listOf("A documented, authorized environment that supports the relevant protocol.", "Use the local simulation for first-time practice.")
+    }
+    val tutorial = when (entry.id) {
+        "ip-cidr", "ip-vlsm" -> listOf("Choose a documentation-only IPv4 network, such as 192.0.2.0/24.", "Select a prefix and calculate the total address block.", "Identify network and broadcast addresses for ordinary subnet sizes.", "Check that planned subnets do not overlap and fit inside the parent block.")
+        "os-dns" -> listOf("Start with the fictional hostname portal.example.com.", "Check whether a local cache entry exists.", "Follow the resolver to the authoritative example record.", "Compare the returned record type and TTL with the expected answer.")
+        "proto-dhcp" -> listOf("Begin with a fictional client that has no lease.", "Observe Discover and Offer in the local sequence.", "Observe Request and Acknowledge, then inspect the lease.", "Reset the scenario and explain what changes when the pool is empty.")
+        "proto-tcp", "proto-udp" -> listOf("Choose a fictional application message.", "Compare connection setup and delivery expectations.", "Advance through the local event timeline.", "Explain what the application must do if a datagram is missing.")
+        "mt-route" -> listOf("Read the fictional destination address.", "List every route whose prefix matches the destination.", "Select the most specific matching prefix.", "Explain the selected next hop or why no route exists.")
+        "tls-basics" -> listOf("Identify the fictional hostname the client expects.", "Review the simulated certificate identity and validity.", "Follow the TLS handshake stages in order.", "Explain why a failed identity check must not be bypassed.")
+        "ssh-basics", "ssh-keys" -> listOf("Review the fictional server identity shown by the lesson.", "Compare its host-key fingerprint with the trusted example.", "Choose the simulated authentication outcome.", "Explain the difference between server identity and user authorization.")
+        else -> commonTutorial
+    }
+    val troubleshooting = when (entry.id) {
+        "os-dns" -> listOf("Hostname typo or malformed query.", "Missing or incorrect record in the authoritative example zone.", "Stale cached answer or expired TTL.", "Wrong resolver selected; separate DNS failure from general connectivity.")
+        "ip-cidr", "ip-vlsm" -> listOf("Wrong prefix length or subnet mask.", "Network and broadcast boundary counted as ordinary hosts.", "Overlapping subnet allocations.", "Address or default gateway outside the intended subnet.")
+        "proto-dhcp" -> listOf("No offer: inspect the simulated pool and server state.", "Pool exhausted: compare available leases with requested clients.", "Wrong scope: compare subnet, gateway and DNS options.", "VLAN or relay mismatch: check whether the client and DHCP scope belong together.")
+        "proto-tcp", "proto-udp" -> listOf("Connection refused and timeout are different symptoms.", "Check the fictional destination port and transport selection.", "A missing UDP datagram is not automatically retransmitted by UDP itself.", "Transport success does not prove the application is healthy.")
+        "mt-route" -> listOf("No matching route.", "A less-specific route selected when a more-specific route was expected.", "Incorrect next hop in the fictional table.", "A route exists but the destination service is still unavailable.")
+        "tls-basics", "tls-certificates" -> listOf("Hostname does not match the certificate identity.", "Certificate is outside its validity period.", "Issuer is not trusted by the example trust store.", "Do not disable verification to hide a validation failure.")
+        "ssh-basics", "ssh-keys" -> listOf("Host-key mismatch: stop and verify identity through a trusted channel.", "Authentication failure is different from authorization failure.", "Timeout, refusal and no-route symptoms indicate different layers.", "Never share private keys or bypass host-key warnings.")
+        else -> commonTroubleshooting
+    }
+    val standards = when (entry.id) {
+        "os-dns" -> listOf("RFC 1034 — https://www.rfc-editor.org/rfc/rfc1034", "RFC 1035 — https://www.rfc-editor.org/rfc/rfc1035")
+        "ip-v4" -> listOf("RFC 791 — https://www.rfc-editor.org/rfc/rfc791", "RFC 1918 — https://www.rfc-editor.org/rfc/rfc1918")
+        "ip-v6" -> listOf("RFC 8200 — https://www.rfc-editor.org/rfc/rfc8200", "RFC 4291 — https://www.rfc-editor.org/rfc/rfc4291")
+        "ip-cidr", "ip-vlsm" -> listOf("RFC 4632 — https://www.rfc-editor.org/rfc/rfc4632")
+        "proto-dhcp" -> listOf("RFC 2131 — https://www.rfc-editor.org/rfc/rfc2131", "RFC 8415 — https://www.rfc-editor.org/rfc/rfc8415")
+        "proto-tcp" -> listOf("RFC 9293 — https://www.rfc-editor.org/rfc/rfc9293")
+        "proto-udp" -> listOf("RFC 768 — https://www.rfc-editor.org/rfc/rfc768")
+        "tls-basics", "tls-certificates" -> listOf("RFC 9846 — https://www.rfc-editor.org/rfc/rfc9846")
+        "ssh-basics", "ssh-keys" -> listOf("RFC 4251 — https://www.rfc-editor.org/rfc/rfc4251")
+        "proto-quic" -> listOf("RFC 9000 — https://www.rfc-editor.org/rfc/rfc9000", "RFC 9001 — https://www.rfc-editor.org/rfc/rfc9001")
+        "proto-osi" -> listOf("ITU-T X.200 — https://www.itu.int/rec/T-REC-X.200")
+        "net-vlan" -> listOf("IEEE 802.1Q — https://standards.ieee.org/standard/802_1Q-2022.html")
+        else -> listOf("Use the linked official project documentation and verify the protocol version before applying it.")
+    }
+    return LessonGuidance(
+        definition = entry.summary,
+        function = entry.explanation,
+        advantages = advantages,
+        limitations = limitations,
+        environments = environments,
+        tutorial = tutorial,
+        troubleshooting = troubleshooting,
+        standards = standards
+    )
+}
+
+@Composable
+private fun LessonSection(title: String, lines: List<String>) {
+    if (lines.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+        lines.forEach { line ->
+            Text("• " + line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun SimulationPanel(entryId: String) {
+    val dnsStages = listOf(
+        "1 · Local cache: no matching entry is stored.",
+        "2 · Recursive resolver: receives the fictional lookup request.",
+        "3 · Root and TLD referrals: the resolver follows the example delegation path.",
+        "4 · Authoritative answer: portal.example.com resolves to 192.0.2.25.",
+        "5 · Cache result: the answer is stored for its displayed TTL."
+    )
+    var stage by remember(entryId) { mutableStateOf(0) }
+    var prefix by remember(entryId) { mutableStateOf(24f) }
+    var dhcpStage by remember(entryId) { mutableStateOf(0) }
+    var transport by remember(entryId) { mutableStateOf("TCP") }
+    var destination by remember(entryId) { mutableStateOf("192.0.2.77") }
+
+    if (entryId !in setOf("os-dns", "ip-cidr", "ip-vlsm", "proto-dhcp", "proto-tcp", "proto-udp", "mt-route")) return
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(9.dp)
+        ) {
+            Text("LOCAL LEARNING LAB", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text("SIMULATED · No packets sent · No network inspected", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            when (entryId) {
+                "os-dns" -> {
+                    Text("DNS resolution walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(dnsStages[stage], style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { stage = 0 }) { Text("Reset") }
+                        Button(onClick = { stage = (stage + 1) % dnsStages.size }) { Text("Next step") }
+                    }
+                    Text("Fixture: portal.example.com → 192.0.2.25", style = MaterialTheme.typography.bodySmall)
+                }
+                "ip-cidr", "ip-vlsm" -> {
+                    val p = prefix.toInt()
+                    val total = 1 shl (32 - p)
+                    Text("IPv4 prefix calculator", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text("Example network: 192.0.2.0/" + p, style = MaterialTheme.typography.bodyMedium)
+                    Slider(value = prefix, onValueChange = { prefix = it }, valueRange = 24f..30f, steps = 5)
+                    Text("Prefix /" + p + " · " + total + " total addresses · " + (total - 2) + " conventional usable host addresses", style = MaterialTheme.typography.bodyMedium)
+                    Text("Educational fixture only. /31 and /32 have different use cases and are not included in this simple host-count exercise.", style = MaterialTheme.typography.bodySmall)
+                }
+                "proto-dhcp" -> {
+                    val stages = listOf("DISCOVER · fictional client asks for configuration.", "OFFER · fictional server proposes 192.0.2.40/24.", "REQUEST · client indicates the offered configuration.", "ACKNOWLEDGE · server confirms the example lease.")
+                    Text("DHCPv4 DORA walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(stages[dhcpStage], style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { dhcpStage = 0 }) { Text("Reset") }
+                        Button(onClick = { dhcpStage = (dhcpStage + 1) % stages.size }) { Text("Next step") }
+                    }
+                }
+                "proto-tcp", "proto-udp" -> {
+                    Text("Transport behavior comparison", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { transport = "TCP" }) { Text("TCP") }
+                        Button(onClick = { transport = "UDP" }) { Text("UDP") }
+                    }
+                    if (transport == "TCP") {
+                        Text("SYN → SYN-ACK → ACK → application bytes → acknowledgements/retransmission as needed.", style = MaterialTheme.typography.bodyMedium)
+                        Text("TCP provides an ordered reliable byte stream.", style = MaterialTheme.typography.bodySmall)
+                    } else {
+                        Text("Datagram A → Datagram B → Datagram C. A missing datagram is not retransmitted by UDP itself.", style = MaterialTheme.typography.bodyMedium)
+                        Text("UDP provides datagrams without delivery or ordering guarantees.", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                "mt-route" -> {
+                    Text("Longest-prefix route selection", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { destination = "192.0.2.77" }) { Text("Host A") }
+                        Button(onClick = { destination = "198.51.100.9" }) { Text("Host B") }
+                    }
+                    Text("Destination: " + destination, style = MaterialTheme.typography.bodyMedium)
+                    val route = if (destination == "192.0.2.77") "192.0.2.0/24 → Lab gateway (most specific match)" else "198.51.100.0/24 → Office gateway (most specific match)"
+                    Text("Selected route: " + route, style = MaterialTheme.typography.bodyMedium)
+                    Text("The simulator uses fixed documentation-only routes.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
@@ -181,7 +385,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
     val sections = listOf("All", "MikroTik", "OS Commands", "SSH & TLS", "Addressing", "Network Types", "Core Protocols", "Remote Access", "Transport & Tunneling", "VPN & Tunneling", "Proxy Protocols")
     val filtered = knowledgeEntries.filter { entry ->
         (selectedSection == "All" || entry.section == selectedSection) &&
-            (query.isBlank() || listOf(entry.title, entry.summary, entry.explanation, entry.example)
+            (query.isBlank() || listOf(entry.title, entry.summary, entry.explanation, entry.example, entry.section)
                 .any { it.contains(query, ignoreCase = true) })
     }
 
@@ -259,7 +463,14 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                     Text(entry.summary, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (expanded) {
                         Spacer(Modifier.height(2.dp))
-                        Text(entry.explanation, style = MaterialTheme.typography.bodyMedium)
+                        val guidance = guidanceFor(entry)
+                        LessonSection("1 · WHAT IS IT?", listOf(guidance.definition))
+                        LessonSection("2 · EXPLANATION", listOf(entry.explanation))
+                        LessonSection("3 · FUNCTION", listOf(guidance.function))
+                        LessonSection("4 · ADVANTAGES", guidance.advantages)
+                        LessonSection("5 · LIMITATIONS & TRADE-OFFS", guidance.limitations)
+                        LessonSection("6 · SUITABLE ENVIRONMENTS", guidance.environments)
+                        LessonSection("7 · STEP-BY-STEP TUTORIAL", guidance.tutorial.mapIndexed { index, value -> (index + 1).toString() + ". " + value })
                         Surface(
                             color = MaterialTheme.colorScheme.surfaceVariant,
                             shape = MaterialTheme.shapes.medium
@@ -270,8 +481,11 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
+                        SimulationPanel(entry.id)
+                        LessonSection("8 · BUGS & TROUBLESHOOTING", guidance.troubleshooting)
+                        LessonSection("STANDARDS & FURTHER READING", guidance.standards)
                         Text(
-                            "Reference only • No commands are executed",
+                            "Reference examples are read-only. The learning lab uses synthetic local data only; no commands or network requests are executed.",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
