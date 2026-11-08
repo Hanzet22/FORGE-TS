@@ -99,11 +99,11 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(if (internetValidated) "INTERNET AVAILABLE" else "INTERNET UNAVAILABLE", fontWeight = FontWeight.Bold)
                 Text(
-                    if (internetValidated) "Online path may be used when a service is configured and healthy. Unconfigured services stay on the local engine."
+                    if (internetValidated) "Internet is validated. Each remote service still needs its own successful health check and authenticated client; otherwise the local simulator remains active."
                     else "Automatic fallback: all modules use local simulation. No remote request is attempted.",
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text("Redis Gateway: not provisioned • Supabase project: pending setup", style = MaterialTheme.typography.labelSmall)
+                Text("Redis gateway: deployed • Supabase: ACTIVE_HEALTHY • user auth/secrets: pending", style = MaterialTheme.typography.labelSmall)
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -130,7 +130,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 }
                 Button(onClick = { redisOutput = RedisOfflineEngine.snapshot().entries.joinToString("\n") { "${it.key} = ${it.value}" }.ifBlank { "(empty database)" } }, modifier = Modifier.fillMaxWidth()) { Text("Browse keys") }
                 ResultPanel(redisOutput)
-                Text("Online connector: waiting for a dedicated FORGE-TS Redis database and protected gateway endpoint.", style = MaterialTheme.typography.bodySmall)
+                Text("Online connector: gateway deployed. Waiting for Edge Function secrets and a signed-in user session; local Redis simulator remains available.", style = MaterialTheme.typography.bodySmall)
             }
             SimulationModule.SUPABASE -> {
                 Text("Supabase Lab", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -152,7 +152,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                     }
                 }
                 ResultPanel(statusMessage)
-                Text("Online connector: pending dedicated project, Auth/RLS policy and publishable-key configuration.", style = MaterialTheme.typography.bodySmall)
+                Text("Online connector: project and RLS table are ready. Waiting for Supabase Auth session wiring in the app.", style = MaterialTheme.typography.bodySmall)
             }
             SimulationModule.LOOPBACK -> {
                 Text("Loopback Lab", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -188,7 +188,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 OutlinedButton(onClick = { loopbackOutput = "SIMULATED • 127.0.0.1\nHTTP/1.1 200 OK\n{ \"status\": \"healthy\", \"source\": \"simulator\" }" }, modifier = Modifier.fillMaxWidth()) { Text("Run simulated response") }
             }
         }
-        Text("IMPORTANT: Real localhost tests use only this app's 127.0.0.1 listener. Redis/Supabase offline data is local and temporary. Online integrations are not active until their dedicated services are provisioned and configured.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("IMPORTANT: Local Redis/Supabase simulation data is temporary and never auto-syncs to production. Remote adapters require a valid Supabase user session. Redis additionally requires the two Edge Function secrets; no privileged token belongs in the APK.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
