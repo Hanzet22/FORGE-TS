@@ -15,9 +15,9 @@ android {
  }
  buildFeatures { compose = true; buildConfig = true }
  buildTypes {
-  // Diagnostics remain local. Do not auto-upload events from debug builds.
-  getByName("debug") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "false") }
-  getByName("release") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "false") }
+  // Diagnostic telemetry is enabled in debug and release builds for crash mitigation.
+  getByName("debug") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "true") }
+  getByName("release") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "true") }
  }
  compileOptions {
   sourceCompatibility = JavaVersion.VERSION_17
