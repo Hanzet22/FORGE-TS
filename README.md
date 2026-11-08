@@ -79,3 +79,6 @@ Run the Android Debug APK workflow from the GitHub Actions tab. The workflow use
 - Does not collect registrant contact data or claim physical hosting location.
 - Adds best-effort ASN, holder and announced-prefix enrichment through RIPEstat; failure is non-fatal and the provider disclosure is documented.
 - See [Phase 23 technical scope](docs/PHASE-23-IP-NETWORK-RDAP-INTELLIGENCE.md).
+
+### Phase 24 — Passive WAF Fingerprint Intelligence
+Expands the existing edge hints into evidence-based passive WAF fingerprinting using the ordinary HTTP response headers and cookie names already collected. Includes initial signatures for Cloudflare, Imperva/Incapsula, Akamai, F5 BIG-IP, Sucuri, Barracuda and explicitly identified ModSecurity. No additional requests, attack payloads, WAF bypass attempts or cookie-value retention are used. A fingerprint is heuristic evidence, not proof of enforcement or absence. See [Phase 24 technical scope](docs/PHASE-24-PASSIVE-WAF-FINGERPRINT-INTELLIGENCE.md).
