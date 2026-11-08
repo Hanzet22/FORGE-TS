@@ -56,6 +56,14 @@ internal object CrashReportStore {
         }
     }
 
+    fun markRecoveryAcknowledged(context: Context) {
+        runCatching {
+            val report = read(context) ?: return
+            report.put("recoveryAcknowledged", true)
+            writeAtomically(File(context.filesDir, REPORT_FILE), report.toString())
+        }
+    }
+
     fun clear(context: Context) {
         runCatching { File(context.filesDir, REPORT_FILE).delete() }
     }
