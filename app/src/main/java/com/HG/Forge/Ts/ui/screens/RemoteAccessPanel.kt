@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +54,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
             if (!internetAvailable) Text("OFFLINE • remote requests are paused; local simulation remains available.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             if (session == null) {
                 OutlinedTextField(email, { email = it }, Modifier.fillMaxWidth(), label = { Text("Email") }, singleLine = true)
-                OutlinedTextField(password, { password = it }, Modifier.fillMaxWidth(), label = { Text("Password") }, singleLine = true)
+                OutlinedTextField(password, { password = it }, Modifier.fillMaxWidth(), label = { Text("Password") }, singleLine = true, visualTransformation = PasswordVisualTransformation())
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = internetAvailable && !busy, onClick = {
                         scope.launch {
@@ -71,7 +72,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                             busy = false
                         }
                     }) { Text("Sign in") }
-                    OutlinedButton(enabled = !busy, onClick = {
+                    OutlinedButton(enabled = internetAvailable && !busy, onClick = {
                         scope.launch {
                             busy = true
                             output = "Creating account..."
