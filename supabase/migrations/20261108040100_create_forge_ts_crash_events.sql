@@ -19,6 +19,6 @@ create index if not exists forge_ts_crash_events_user_created_idx
   where user_id is not null;
 alter table public.forge_ts_crash_events enable row level security;
 revoke all on table public.forge_ts_crash_events from public, anon, authenticated;
-grant insert on table public.forge_ts_crash_events to service_role;
+grant insert, update on table public.forge_ts_crash_events to service_role;
 comment on table public.forge_ts_crash_events is
   'Sanitized FORGE-TS crash telemetry. Ingestion only through the rate-limited forge-crash-ingest Edge Function; no direct client access.';
