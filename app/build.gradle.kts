@@ -13,7 +13,11 @@ android {
   versionCode = 1
   versionName = "0.1.0"
  }
- buildFeatures { compose = true }
+ buildFeatures { compose = true; buildConfig = true }
+ buildTypes {
+  getByName("debug") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "true") }
+  getByName("release") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "false") }
+ }
  compileOptions {
   sourceCompatibility = JavaVersion.VERSION_17
   targetCompatibility = JavaVersion.VERSION_17
