@@ -18,6 +18,7 @@ class ForgeApplication : Application() {
         ForgeDiagnostics.log(this, "INFO", "Application", "application.on_create")
         // Scheduling must never prevent the app from reaching its first Activity.
         runCatching { CrashReportUploadScheduler.enqueue(this) }
+            .onFailure { ForgeDiagnostics.log(this, "WARNING", "Application", "crash_upload_schedule.failed", it) }
     }
 
     private fun installEarlyCrashHandler() {
