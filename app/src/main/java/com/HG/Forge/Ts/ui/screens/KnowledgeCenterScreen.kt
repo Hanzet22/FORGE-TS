@@ -180,7 +180,10 @@ private val knowledgeEntries = listOf(
     KnowledgeEntry("proto-wireguard", "VPN & Tunneling", "WireGuard", "A modern VPN tunnel that encapsulates IP packets over UDP.", "WireGuard uses public-key-based peer authentication and a compact cryptographic protocol. It creates a virtual network interface and uses allowed IP prefixes for cryptokey routing. Protect private keys and review peer permissions.", "Official reference: wireguard.com/protocol"),
     KnowledgeEntry("proto-openvpn", "VPN & Tunneling", "OpenVPN", "VPN software supporting secure tunnels over TCP or UDP.", "OpenVPN uses TLS-based control-channel security and can transport network traffic through a tunnel. Configuration choices affect performance and security; use official documentation and current supported versions.", "Official reference: OpenVPN protocol documentation"),
     KnowledgeEntry("proto-ipsec", "VPN & Tunneling", "IPsec", "A suite for protecting IP-layer communications.", "IPsec provides security services such as confidentiality, integrity and peer authentication at the IP layer. ESP is commonly used for encryption and integrity; IKE negotiates security associations in many deployments.", "Architecture: RFC 4301"),
-    KnowledgeEntry("proto-l2tp", "VPN & Tunneling", "L2TP", "A Layer 2 tunneling protocol that carries PPP frames.", "L2TP tunnels PPP traffic across an IP network. L2TP by itself does not provide strong encryption; L2TP/IPsec combines tunneling with IPsec security.", "L2TP: RFC 2661; securing L2TP with IPsec: RFC 3193")
+    KnowledgeEntry("proto-l2tp", "VPN & Tunneling", "L2TP", "A Layer 2 tunneling protocol that carries PPP frames.", "L2TP tunnels PPP traffic across an IP network. L2TP by itself does not provide strong encryption; L2TP/IPsec combines tunneling with IPsec security.", "L2TP: RFC 2661; securing L2TP with IPsec: RFC 3193"),
+    KnowledgeEntry("dns-fundamentals", "DNS", "DNS fundamentals and record types", "Understand names, resolvers, authoritative servers, caching and common DNS records.", "The Domain Name System is a distributed naming system. A stub resolver asks a recursive resolver, which can use cached data or follow delegation to authoritative servers. A, AAAA, CNAME, MX, NS and TXT records answer different kinds of questions. DNS resolution is not proof that the destination service is reachable.", "Example: portal.example.com A 192.0.2.25"),
+    KnowledgeEntry("http-basics", "Web Technology", "HTTP request and response", "Understand methods, status codes, headers and response bodies.", "HTTP is an application-layer request/response protocol. A client sends a method, target and fields; a server returns a status code, fields and possibly a representation. HTTPS is HTTP protected by TLS. HTTP/3 uses QUIC rather than TCP as its transport.", "GET /status HTTP/1.1\\nHost: example.com\\n\\nHTTP/1.1 200 OK"),
+    KnowledgeEntry("security-basics", "Security & Privacy", "Network security and privacy basics", "Understand confidentiality, integrity, availability, identity and least privilege.", "Network security combines technical controls and operating practices. Encryption protects data in transit, authentication helps establish identity, authorization limits actions, segmentation separates trust zones, and careful logging reduces unnecessary exposure. No single control replaces the others.", "Principles: confidentiality · integrity · availability · least privilege")
 )
 
 
@@ -236,7 +239,7 @@ private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
     }
     val tutorial = when (entry.id) {
         "ip-cidr", "ip-vlsm" -> listOf("Choose a documentation-only IPv4 network, such as 192.0.2.0/24.", "Select a prefix and calculate the total address block.", "Identify network and broadcast addresses for ordinary subnet sizes.", "Check that planned subnets do not overlap and fit inside the parent block.")
-        "os-dns" -> listOf("Start with the fictional hostname portal.example.com.", "Check whether a local cache entry exists.", "Follow the resolver to the authoritative example record.", "Compare the returned record type and TTL with the expected answer.")
+        "os-dns", "dns-fundamentals" -> listOf("Start with the fictional hostname portal.example.com.", "Check whether a local cache entry exists.", "Follow the resolver to the authoritative example record.", "Compare the returned record type and TTL with the expected answer.")
         "proto-dhcp" -> listOf("Begin with a fictional client that has no lease.", "Observe Discover and Offer in the local sequence.", "Observe Request and Acknowledge, then inspect the lease.", "Reset the scenario and explain what changes when the pool is empty.")
         "proto-tcp", "proto-udp" -> listOf("Choose a fictional application message.", "Compare connection setup and delivery expectations.", "Advance through the local event timeline.", "Explain what the application must do if a datagram is missing.")
         "mt-route" -> listOf("Read the fictional destination address.", "List every route whose prefix matches the destination.", "Select the most specific matching prefix.", "Explain the selected next hop or why no route exists.")
@@ -245,7 +248,7 @@ private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
         else -> commonTutorial
     }
     val troubleshooting = when (entry.id) {
-        "os-dns" -> listOf("Hostname typo or malformed query.", "Missing or incorrect record in the authoritative example zone.", "Stale cached answer or expired TTL.", "Wrong resolver selected; separate DNS failure from general connectivity.")
+        "os-dns", "dns-fundamentals" -> listOf("Hostname typo or malformed query.", "Missing or incorrect record in the authoritative example zone.", "Stale cached answer or expired TTL.", "Wrong resolver selected; separate DNS failure from general connectivity.")
         "ip-cidr", "ip-vlsm" -> listOf("Wrong prefix length or subnet mask.", "Network and broadcast boundary counted as ordinary hosts.", "Overlapping subnet allocations.", "Address or default gateway outside the intended subnet.")
         "proto-dhcp" -> listOf("No offer: inspect the simulated pool and server state.", "Pool exhausted: compare available leases with requested clients.", "Wrong scope: compare subnet, gateway and DNS options.", "VLAN or relay mismatch: check whether the client and DHCP scope belong together.")
         "proto-tcp", "proto-udp" -> listOf("Connection refused and timeout are different symptoms.", "Check the fictional destination port and transport selection.", "A missing UDP datagram is not automatically retransmitted by UDP itself.", "Transport success does not prove the application is healthy.")
@@ -255,7 +258,7 @@ private fun guidanceFor(entry: KnowledgeEntry): LessonGuidance {
         else -> commonTroubleshooting
     }
     val standards = when (entry.id) {
-        "os-dns" -> listOf("RFC 1034 — https://www.rfc-editor.org/rfc/rfc1034", "RFC 1035 — https://www.rfc-editor.org/rfc/rfc1035")
+        "os-dns", "dns-fundamentals" -> listOf("RFC 1034 — https://www.rfc-editor.org/rfc/rfc1034", "RFC 1035 — https://www.rfc-editor.org/rfc/rfc1035")
         "ip-v4" -> listOf("RFC 791 — https://www.rfc-editor.org/rfc/rfc791", "RFC 1918 — https://www.rfc-editor.org/rfc/rfc1918")
         "ip-v6" -> listOf("RFC 8200 — https://www.rfc-editor.org/rfc/rfc8200", "RFC 4291 — https://www.rfc-editor.org/rfc/rfc4291")
         "ip-cidr", "ip-vlsm" -> listOf("RFC 4632 — https://www.rfc-editor.org/rfc/rfc4632")
@@ -305,9 +308,10 @@ private fun SimulationPanel(entryId: String) {
     var prefix by remember(entryId) { mutableStateOf(24f) }
     var dhcpStage by remember(entryId) { mutableStateOf(0) }
     var transport by remember(entryId) { mutableStateOf("TCP") }
+    var httpStage by remember(entryId) { mutableStateOf(0) }
     var destination by remember(entryId) { mutableStateOf("192.0.2.77") }
 
-    if (entryId !in setOf("os-dns", "ip-cidr", "ip-vlsm", "proto-dhcp", "proto-tcp", "proto-udp", "mt-route")) return
+    if (entryId !in setOf("os-dns", "dns-fundamentals", "http-basics", "ip-cidr", "ip-vlsm", "proto-dhcp", "proto-tcp", "proto-udp", "mt-route")) return
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -320,7 +324,7 @@ private fun SimulationPanel(entryId: String) {
             Text("LOCAL LEARNING LAB", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             Text("SIMULATED · No packets sent · No network inspected", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
             when (entryId) {
-                "os-dns" -> {
+                "os-dns", "dns-fundamentals" -> {
                     Text("DNS resolution walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Text(dnsStages[stage], style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -337,6 +341,16 @@ private fun SimulationPanel(entryId: String) {
                     Slider(value = prefix, onValueChange = { prefix = it }, valueRange = 24f..30f, steps = 5)
                     Text("Prefix /" + p + " · " + total + " total addresses · " + (total - 2) + " conventional usable host addresses", style = MaterialTheme.typography.bodyMedium)
                     Text("Educational fixture only. /31 and /32 have different use cases and are not included in this simple host-count exercise.", style = MaterialTheme.typography.bodySmall)
+                }
+                "http-basics" -> {
+                    val stages = listOf("1 · Client prepares GET /status for example.com.", "2 · Request fields describe the method, target and host.", "3 · Fictional server returns status 200 OK.", "4 · Client interprets the response body and status.")
+                    Text("HTTP request/response walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(stages[httpStage], style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { httpStage = 0 }) { Text("Reset") }
+                        Button(onClick = { httpStage = (httpStage + 1) % stages.size }) { Text("Next step") }
+                    }
+                    Text("Fixture only: no HTTP request is sent.", style = MaterialTheme.typography.bodySmall)
                 }
                 "proto-dhcp" -> {
                     val stages = listOf("DISCOVER · fictional client asks for configuration.", "OFFER · fictional server proposes 192.0.2.40/24.", "REQUEST · client indicates the offered configuration.", "ACKNOWLEDGE · server confirms the example lease.")
@@ -382,7 +396,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
     var selectedSection by remember { mutableStateOf("All") }
     var expandedId by remember { mutableStateOf<String?>(null) }
-    val sections = listOf("All", "MikroTik", "OS Commands", "SSH & TLS", "Addressing", "Network Types", "Core Protocols", "Remote Access", "Transport & Tunneling", "VPN & Tunneling", "Proxy Protocols")
+    val sections = listOf("All", "MikroTik", "OS Commands", "DNS", "Web Technology", "Security & Privacy", "SSH & TLS", "Addressing", "Network Types", "Core Protocols", "Remote Access", "Transport & Tunneling", "VPN & Tunneling", "Proxy Protocols")
     val filtered = knowledgeEntries.filter { entry ->
         (selectedSection == "All" || entry.section == selectedSection) &&
             (query.isBlank() || listOf(entry.title, entry.summary, entry.explanation, entry.example, entry.section)
