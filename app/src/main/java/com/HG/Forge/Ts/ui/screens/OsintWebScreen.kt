@@ -202,7 +202,7 @@ fun OsintWebScreen(
             }
         }
 
-        Text("IP & ASN Network Intelligence", style = MaterialTheme.typography.headlineSmall)
+        Text("IP & Network Registry Intelligence", style = MaterialTheme.typography.headlineSmall)
         viewModel.ipNetworkError?.let { message ->
             Text("Network attribution unavailable: $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
