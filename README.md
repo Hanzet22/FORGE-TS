@@ -77,5 +77,5 @@ Run the Android Debug APK workflow from the GitHub Actions tab. The workflow use
 - Displays registry network name, handle, address range, IP version and country code when supplied.
 - Blocks private/reserved destinations, requires HTTPS, bounds redirects/timeouts and caps response size.
 - Does not collect registrant contact data or claim physical hosting location.
-- ASN enrichment is not claimed where IP RDAP does not return an ASN; a dedicated ASN provider integration remains separate.
+- Adds best-effort ASN, holder and announced-prefix enrichment through RIPEstat; failure is non-fatal and the provider disclosure is documented.
 - See [Phase 23 technical scope](docs/PHASE-23-IP-NETWORK-RDAP-INTELLIGENCE.md).
