@@ -15,9 +15,9 @@ FORGE-TS resolves the target's ordinary A/AAAA DNS answers and performs at most 
 - HTTPS only; redirects are bounded and must remain HTTPS.
 - Connect/read timeouts are bounded and the response body is capped at 128 KiB.
 - Registrant contact/vCard data is not collected.
-- The public IP address is sent to rdap.org and may be redirected to an authoritative regional registry. This is a third-party request.
+- The public IP address is sent to rdap.org (and may be redirected to an authoritative regional registry) and stat.ripe.net for ASN enrichment. These are third-party requests.
 - Registry allocation metadata does not prove physical server location, current hosting provider, or operational ownership.
-- IP RDAP does not consistently return an ASN. FORGE-TS does not invent an ASN when the registry response omits one. Dedicated ASN enrichment is a separate future integration.
+- IP RDAP does not consistently return an ASN. FORGE-TS performs a best-effort, read-only RIPEstat Network Info lookup for ASN, holder and announced prefix. The IP address is also sent to stat.ripe.net; failure is non-fatal and no ASN is invented.
 
 ## Relationship to existing signals
 This complements DNS A/AAAA answers and passive HTTP server-identification and CDN/WAF response-header hints. It does not perform port scanning, traceroute, reverse-IP enumeration, or active service fingerprinting.
