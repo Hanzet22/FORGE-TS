@@ -83,7 +83,7 @@ class RdapIpRepository {
                     asn = ripe?.optJSONArray("asns")?.optLong(0)?.takeIf { it > 0 }?.toString(),
                     asnHolder = ripe?.optString("holder")?.takeIf(String::isNotBlank),
                     announcedPrefix = ripe?.optString("prefix")?.takeIf(String::isNotBlank),
-                    source = "${current.host} + stat.ripe.net (ASN enrichment)"
+                    source = if (ripe != null) "${current.host} + stat.ripe.net (ASN enrichment)" else current.host
                 )
             } finally {
                 connection.disconnect()
