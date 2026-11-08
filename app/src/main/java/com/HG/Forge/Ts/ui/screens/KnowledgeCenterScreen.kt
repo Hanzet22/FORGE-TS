@@ -305,6 +305,7 @@ private fun SimulationPanel(entryId: String) {
     var dhcpStage by remember(entryId) { mutableStateOf(0) }
     var transport by remember(entryId) { mutableStateOf("TCP") }
     var httpStage by remember(entryId) { mutableStateOf(0) }
+    var selectedAnswer by remember(entryId) { mutableStateOf<String?>(null) }
     var destination by remember(entryId) { mutableStateOf("192.0.2.77") }
 
     if (entryId !in setOf("os-dns", "dns-fundamentals", "http-basics", "ip-cidr", "ip-vlsm", "proto-dhcp", "proto-tcp", "proto-udp", "mt-route")) return
@@ -381,6 +382,50 @@ private fun SimulationPanel(entryId: String) {
                     val route = if (destination == "192.0.2.77") "192.0.2.0/24 → Lab gateway (most specific match)" else "198.51.100.0/24 → Office gateway (most specific match)"
                     Text("Selected route: " + route, style = MaterialTheme.typography.bodyMedium)
                     Text("The simulator uses fixed documentation-only routes.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+            val question = when (entryId) {
+                "os-dns", "dns-fundamentals" -> "Which server provides the final authoritative record?"
+                "ip-cidr", "ip-vlsm" -> "How many total IPv4 addresses are in a /26 block?"
+                "proto-dhcp" -> "What is the correct DHCPv4 DORA order?"
+                "proto-tcp", "proto-udp" -> "Which transport provides an ordered reliable byte stream?"
+                "mt-route" -> "How does a router choose among matching destination prefixes?"
+                "http-basics" -> "Which HTTP status code indicates a successful request in this example?"
+                else -> ""
+            }
+            val options = when (entryId) {
+                "os-dns", "dns-fundamentals" -> listOf("Recursive resolver", "Authoritative server", "Wireless access point")
+                "ip-cidr", "ip-vlsm" -> listOf("32", "64", "128")
+                "proto-dhcp" -> listOf("Offer → Discover → ACK → Request", "Discover → Offer → Request → ACK", "Request → Discover → Offer → ACK")
+                "proto-tcp", "proto-udp" -> listOf("UDP", "TCP", "DNS")
+                "mt-route" -> listOf("First route in the list", "Longest matching prefix", "Random route")
+                "http-basics" -> listOf("200 OK", "404 Not Found", "500 Internal Server Error")
+                else -> emptyList()
+            }
+            val correct = when (entryId) {
+                "os-dns", "dns-fundamentals" -> "Authoritative server"
+                "ip-cidr", "ip-vlsm" -> "64"
+                "proto-dhcp" -> "Discover → Offer → Request → ACK"
+                "proto-tcp", "proto-udp" -> "TCP"
+                "mt-route" -> "Longest matching prefix"
+                "http-basics" -> "200 OK"
+                else -> ""
+            }
+            if (question.isNotBlank()) {
+                Text("QUICK CHECK", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(question, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                options.forEach { option ->
+                    Button(onClick = { selectedAnswer = option }, enabled = selectedAnswer == null, modifier = Modifier.fillMaxWidth()) {
+                        Text(option)
+                    }
+                }
+                if (selectedAnswer != null) {
+                    Text(
+                        if (selectedAnswer == correct) "Correct — good reasoning." else "Not quite. Review the lesson, then try again.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Button(onClick = { selectedAnswer = null }) { Text("Try again") }
                 }
             }
         }
