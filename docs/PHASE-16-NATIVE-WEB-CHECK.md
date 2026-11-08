@@ -36,7 +36,7 @@ The inspected upstream tree contains 40 API check handlers and 44 check definiti
 | server-info | Partial; selected response headers only |
 | dns | Implemented for selected common records |
 | dnssec | Partial; resolver-reported AD metadata is shown, not an independent DNSSEC validator |
-| firewall | Partial; selected public CDN/WAF response-header hints only, no evasion/probing |
+| firewall | Expanded in Phase 24; passive vendor fingerprinting from ordinary response headers and cookie names only |
 | get-ip | Covered by public A/AAAA DNS results |
 | headers | Implemented |
 | hsts | Implemented in the security-header review |
