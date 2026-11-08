@@ -2,11 +2,11 @@ package com.HG.Forge.Ts.data.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
+import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.http.headers
 import org.json.JSONObject
 
 enum class RedisGatewayOperation(val wireValue: String) {
@@ -75,10 +75,9 @@ class RedisGatewayClient(
         val response = httpClient.post(
             "${supabaseUrl.trimEnd('/')}/functions/v1/forge-redis-gateway"
         ) {
-            headers {
-                append("apikey", publishableKey)
-                append("Authorization", "Bearer $accessToken")
-            }
+            // Match the explicit header API used by the working Supabase auth calls.
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer $accessToken")
             contentType(ContentType.Application.Json)
             setBody(payload.toString())
         }
