@@ -96,7 +96,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
             } else {
                 Text("SIGNED IN • ${session?.email ?: session?.userId}", style = MaterialTheme.typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(enabled = !busy, onClick = {
+                    Button(enabled = internetAvailable && !busy, onClick = {
                         scope.launch {
                             busy = true
                             output = "Checking Redis gateway..."
@@ -116,7 +116,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                             busy = false
                         }
                     }) { Text("Test Redis PING") }
-                    OutlinedButton(enabled = !busy, onClick = {
+                    OutlinedButton(enabled = internetAvailable && !busy, onClick = {
                         scope.launch {
                             busy = true
                             output = "Checking Supabase RLS table..."
