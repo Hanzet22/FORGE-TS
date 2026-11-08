@@ -256,14 +256,71 @@ class NativeWebCheckRepository {
             source = "HTTP response headers; values may be absent, masked or intentionally modified"
         )
 
-        val wafSignals = listOf("cf-ray", "x-sucuri-id", "x-akamai-transformed", "x-iinfo", "x-cdn")
-            .mapNotNull { name -> header(name)?.let { "$name: ${it.take(160)}" } }
+        val cookieNames = cookies.mapNotNull { raw ->
+            raw.substringBefore('=').trim().takeIf { it.isNotBlank() }?.lowercase(Locale.US)
+        }
+        val serverValue = header("Server").orEmpty()
+        val wafEvidence = linkedMapOf<String, MutableList<String>>()
+        fun addWafEvidence(vendor: String, evidence: String) {
+            wafEvidence.getOrPut(vendor) { mutableListOf() }.add(evidence)
+        }
+
+        // Passive signatures only: inspect the ordinary page response already collected above.
+        if (header("CF-RAY") != null) addWafEvidence("Cloudflare", "CF-RAY response header")
+        if (serverValue.contains("cloudflare", true)) addWafEvidence("Cloudflare", "Server header identifies Cloudflare")
+        if (cookieNames.any { it == "__cf_bm" || it == "cf_clearance" }) {
+            addWafEvidence("Cloudflare", "Cloudflare-associated cookie name")
+        }
+
+        if (header("X-Iinfo") != null) addWafEvidence("Imperva / Incapsula", "X-Iinfo response header")
+        if (cookieNames.any { it.startsWith("visid_incap_") || it.startsWith("incap_ses_") }) {
+            addWafEvidence("Imperva / Incapsula", "Imperva-associated cookie name")
+        }
+
+        if (listOf("X-Akamai-Request-BC", "X-Akamai-Transformed", "X-Akamai-Request-ID")
+                .any { header(it) != null }) {
+            addWafEvidence("Akamai", "Akamai-specific response header")
+        }
+        if (cookieNames.any { it == "ak_bmsc" || it == "bm_sz" }) {
+            addWafEvidence("Akamai", "Akamai Bot Manager-associated cookie name")
+        }
+
+        if (serverValue.equals("BigIP", true) || cookieNames.any { it.startsWith("bigipserver") }) {
+            addWafEvidence("F5 BIG-IP", "BIG-IP server or persistence-cookie signature")
+        }
+        if (header("X-Sucuri-ID") != null || serverValue.contains("sucuri", true) ||
+            serverValue.contains("cloudproxy", true)) {
+            addWafEvidence("Sucuri", "Sucuri response-header or Server signature")
+        }
+        if (cookieNames.any { it == "barra_counter_session" } || serverValue.contains("barracuda", true)) {
+            addWafEvidence("Barracuda", "Barracuda-associated cookie or Server signature")
+        }
+        if (serverValue.contains("mod_security", true) || serverValue.contains("modsecurity", true)) {
+            addWafEvidence("ModSecurity", "Server header explicitly identifies ModSecurity")
+        }
+
+        val rankedWafEvidence = wafEvidence.entries.sortedByDescending { it.value.size }
+        val wafDetails = rankedWafEvidence.flatMap { (vendor, evidence) ->
+            listOf("$vendor — ${if (evidence.size >= 2) "multiple indicators" else "single indicator"}") +
+                evidence.map { "  • $it" }
+        }.take(18)
+        val wafStatus = when {
+            rankedWafEvidence.isEmpty() -> "No known passive WAF fingerprint observed"
+            rankedWafEvidence.first().value.size >= 2 -> "Likely ${rankedWafEvidence.first().key} · multiple indicators"
+            else -> "Possible ${rankedWafEvidence.first().key} · single indicator"
+        }
         findings += NativeWebFinding(
             category = "Security",
-            title = "Edge and firewall response hints",
-            status = if (wafSignals.isEmpty()) "No selected edge signals detected" else "${wafSignals.size} signal(s)",
-            details = wafSignals.ifEmpty { listOf("No selected CDN/WAF response headers were observed; this does not prove that no firewall is present.") },
-            source = "Passive response-header hints only; no firewall detection probes"
+            title = "WAF fingerprint intelligence",
+            status = wafStatus,
+            details = (wafDetails.ifEmpty {
+                listOf("No supported vendor-specific header or cookie signatures were present in the ordinary page response.")
+            } + listOf(
+                "Passive analysis only: no extra requests, malformed inputs, payloads or firewall challenges were sent.",
+                "A fingerprint is an indicator, not proof of enforcement or product ownership. Multiple edge services may coexist.",
+                "No match does not mean no WAF: transparent, masked or customized deployments may expose no recognizable signature."
+            )).take(21),
+            source = "Ordinary HTTP response headers and cookie names; cookie values are not retained"
         )
 
         val links = Regex("""<a[^>]+href=["']([^"']+)""", RegexOption.IGNORE_CASE)
