@@ -61,7 +61,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text("Crash recovery & diagnostics", style = MaterialTheme.typography.titleMedium)
         Text(
-            "FORGE-TS keeps crash reports and INFO, WARNING, ERROR and DEBUG events locally. If startup fails, the next launch opens a lightweight recovery screen where you can share a diagnostic report through Android Sharesheet. Reports are not automatically uploaded to Supabase.",
+            "FORGE-TS automatically uploads technical crash reports and INFO, WARNING, ERROR and DEBUG diagnostic events to the FORGE-TS Supabase backend when an internet connection is available. Uploads are queued and retried after temporary network or server errors. Reports include app/Android versions, an installation identifier, event labels and technical stack traces; they do not intentionally include message contents or passwords. A local copy is retained until the backend confirms receipt. You can also share a local report from the recovery screen.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
