@@ -15,6 +15,9 @@ data class RdapIpReport(
     val startAddress: String?,
     val endAddress: String?,
     val country: String?,
+    val asn: String?,
+    val asnHolder: String?,
+    val announcedPrefix: String?,
     val source: String
 )
 
@@ -68,6 +71,7 @@ class RdapIpRepository {
                     output.toByteArray()
                 }
                 val json = JSONObject(bytes.toString(Charsets.UTF_8))
+                val ripe = lookupRipeStat(address)
                 return@withContext RdapIpReport(
                     address = address,
                     ipVersion = json.optString("ipVersion").takeIf(String::isNotBlank),
@@ -76,13 +80,51 @@ class RdapIpRepository {
                     startAddress = json.optString("startAddress").takeIf(String::isNotBlank),
                     endAddress = json.optString("endAddress").takeIf(String::isNotBlank),
                     country = json.optString("country").takeIf(String::isNotBlank),
-                    source = current.host
+                    asn = ripe?.optJSONArray("asns")?.optLong(0)?.takeIf { it > 0 }?.toString(),
+                    asnHolder = ripe?.optString("holder")?.takeIf(String::isNotBlank),
+                    announcedPrefix = ripe?.optString("prefix")?.takeIf(String::isNotBlank),
+                    source = "${current.host} + stat.ripe.net (ASN enrichment)"
                 )
             } finally {
                 connection.disconnect()
             }
         }
         error("IP RDAP lookup did not complete.")
+    }
+
+    private fun lookupRipeStat(address: String): JSONObject? {
+        return runCatching {
+            val encoded = java.net.URLEncoder.encode(address, "UTF-8")
+            val url = URL("https://stat.ripe.net/data/network-info/data.json?resource=$encoded")
+            validatePublicHost(url.host)
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                instanceFollowRedirects = false
+                connectTimeout = 6000
+                readTimeout = 6000
+                requestMethod = "GET"
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("User-Agent", "FORGE-TS-Network-Info/1.0")
+                useCaches = false
+            }
+            try {
+                if (connection.responseCode !in 200..299) return@runCatching null
+                val output = java.io.ByteArrayOutputStream()
+                connection.inputStream.use { stream ->
+                    val buffer = ByteArray(2048)
+                    var total = 0
+                    while (true) {
+                        val count = stream.read(buffer)
+                        if (count <= 0) break
+                        total += count
+                        if (total > 65536) return@runCatching null
+                        output.write(buffer, 0, count)
+                    }
+                }
+                JSONObject(output.toByteArray().toString(Charsets.UTF_8)).optJSONObject("data")
+            } finally {
+                connection.disconnect()
+            }
+        }.getOrNull()
     }
 
     private fun isLiteralIp(value: String): Boolean =
