@@ -64,6 +64,18 @@ Important content checks:
 - TLS 1.3 material must follow RFC 9846, which the RFC Editor record identifies as obsoleting RFC 8446; do not copy old references blindly.
 - HTTP semantics should follow RFC 9110; HTTP/1.1 and HTTP/3 wire mappings are specified separately (RFC 9112 and RFC 9114).
 
+### Scholarly evidence
+
+The Undermind literature review completed on 2026-11-08. Its summary is based on available abstracts and metadata, not full-text review. The strongest applicable findings are:
+
+- A meta-analysis of 145 empirical studies reported a large overall positive effect for simulation-based learning of complex skills (g = 0.85). It also found that learners with lower prior knowledge benefit from examples, while learners with higher prior knowledge benefit more from reflection phases. This supports a worked-example-first path and optional challenge/reflection prompts, but the meta-analysis spans higher education domains beyond networking. [Chernikova et al., 2020](https://doi.org/10.3102/0034654320933544)
+- ProtoSim, a networking learning environment evaluated with 211 high-school students, visualized information flow across TCP/IP layers and combined the simulator with short-answer missions. The study reports improved pre/post understanding of protocol-layer mechanisms. [Kitamura et al., 2026](https://doi.org/10.1109/TLT.2026.3699503)
+- ProtoSim 2 was evaluated for self-learning with 18 non-CS undergraduate and graduate participants; all completed the materials within one hour without teacher support, with significant pre/post gains across four TCP/IP layers. The small sample and non-CS participant group limit generalization. [Kitamura et al., 2025](https://doi.org/10.1109/TALE66047.2025.11346737)
+- A mobile network-animation study evaluated accessibility/usability with disabled and non-disabled participants and found improvements while also identifying remaining screen-reader and interaction gaps. This reinforces the need for both semantic accessibility tests and manual assistive-technology review. [Svaigen & Martimiano, 2018](https://doi.org/10.1109/TLA.2018.8291484)
+- A systematic literature review and bibliometric analysis specifically examines simulation-based learning for computer/networking education. [Asadi et al., 2024](https://doi.org/10.1007/s10639-024-12476-7)
+
+These studies support a short guided simulator plus question/feedback cycle. They do not prove that any single UI design will work equally well for all learners or devices; the app still needs its own usability and learning-outcome evaluation.
+
 ### Learning design
 
 The lesson format should use progressive disclosure: start with a concise definition, then explain the model, then let learners run a small guided simulation, and finally diagnose a deliberately seeded issue. Provide an example before asking a beginner to solve a task. Give immediate, specific feedback and explain why the answer is correct. A simulation must teach a concept, not masquerade as a live network diagnostic.
