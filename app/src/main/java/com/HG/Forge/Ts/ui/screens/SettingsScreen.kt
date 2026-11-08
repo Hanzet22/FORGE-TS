@@ -36,6 +36,8 @@ import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.data.preferences.AppPreferencesRepository
 import com.HG.Forge.Ts.data.sync.CrashReportConsent
 import com.HG.Forge.Ts.data.sync.CrashReportUploadScheduler
+import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsConsent
+import com.HG.Forge.Ts.BuildConfig
 import kotlinx.coroutines.launch
 
 @Composable
@@ -46,6 +48,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
     var crashReportingEnabled by remember { mutableStateOf(CrashReportConsent.isEnabled(context)) }
+    var diagnosticUploadEnabled by remember { mutableStateOf(ForgeDiagnosticsConsent.isEnabled(context)) }
 
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),
@@ -64,6 +67,19 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             }
         }
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (BuildConfig.DEBUG) {
+            Text("Debug diagnostic logging", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Share INFO, WARNING, ERROR and DEBUG events")
+                    Text("Debug APKs can upload sanitized startup and component events to the FORGE-TS Supabase diagnostic endpoint. Events include app/Android versions, event labels and exception stack frames; no passwords, tokens, email addresses or message contents are intentionally collected. This is enabled for debug builds only.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = diagnosticUploadEnabled, onCheckedChange = { enabled ->
+                    diagnosticUploadEnabled = enabled
+                    ForgeDiagnosticsConsent.setEnabled(context, enabled)
+                })
+            }
+        }
         Text("Crash diagnostics", style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(modifier = Modifier.weight(1f)) {
