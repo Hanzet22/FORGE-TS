@@ -1,7 +1,6 @@
 package com.HG.Forge.Ts.ui
 
-import android.net.Uri
-import android.widget.VideoView
+import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,8 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.ui.screens.HomeScreen
 import com.HG.Forge.Ts.ui.screens.KnowledgeCenterScreen
@@ -32,6 +35,22 @@ fun ForgeApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
     var selectedToolsSubtab by remember { mutableIntStateOf(0) }
     var showIntro by rememberSaveable { mutableStateOf(true) }
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+
+    SideEffect {
+        if (window != null) {
+            WindowCompat.setDecorFitsSystemWindows(window, !showIntro)
+            val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+            if (showIntro) {
+                insetsController.hide(WindowInsetsCompat.Type.systemBars())
+                insetsController.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            } else {
+                insetsController.show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
         Scaffold(
@@ -63,22 +82,8 @@ fun ForgeApp() {
         }
 
         if (showIntro) {
-            AndroidView(
-                factory = { context ->
-                    VideoView(context).apply {
-                        setBackgroundColor(android.graphics.Color.BLACK)
-                        setVideoURI(Uri.parse("android.resource://${context.packageName}/${R.raw.intro_video}"))
-                        setOnPreparedListener { player ->
-                            player.isLooping = false
-                            start()
-                        }
-                        setOnCompletionListener { showIntro = false }
-                        setOnErrorListener { _, _, _ ->
-                            showIntro = false
-                            true
-                        }
-                    }
-                },
+            IntroVideoTextureViewHost(
+                onFinished = { showIntro = false },
                 modifier = Modifier.fillMaxSize()
             )
             TextButton(
@@ -89,4 +94,17 @@ fun ForgeApp() {
             }
         }
     }
+}
+
+@Composable
+private fun IntroVideoTextureViewHost(
+    onFinished: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        factory = { context ->
+            IntroVideoTextureView(context, R.raw.intro_video, onFinished)
+        },
+        modifier = modifier
+    )
 }
