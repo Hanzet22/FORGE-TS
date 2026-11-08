@@ -1,0 +1,2 @@
+[functions.forge-redis-gateway]
+verify_jwt = true
