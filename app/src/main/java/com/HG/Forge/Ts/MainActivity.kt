@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.HG.Forge.Ts.data.sync.CrashReportStore
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import com.HG.Forge.Ts.ui.ForgeApp
 import com.HG.Forge.Ts.ui.theme.ForgeTheme
@@ -15,8 +16,16 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        ForgeDiagnostics.log(this, "INFO", "MainActivity", "activity.on_create.enter")
         super.onCreate(savedInstanceState)
+
+        // Route to a platform-View-only recovery screen before Compose or app UI starts.
+        if (CrashReportStore.read(this) != null) {
+            startActivity(Intent(this, CrashRecoveryActivity::class.java))
+            finish()
+            return
+        }
+
+        ForgeDiagnostics.log(this, "INFO", "MainActivity", "activity.on_create.enter")
         setContent {
             ForgeTheme {
                 Surface(Modifier.fillMaxSize()) { ForgeApp() }
