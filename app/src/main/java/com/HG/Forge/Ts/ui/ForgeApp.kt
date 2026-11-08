@@ -23,6 +23,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.HG.Forge.Ts.R
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import com.HG.Forge.Ts.ui.screens.HomeScreen
 import com.HG.Forge.Ts.ui.screens.KnowledgeCenterScreen
 import com.HG.Forge.Ts.ui.screens.CoreNetworkingScreen
@@ -37,6 +38,10 @@ fun ForgeApp() {
     var showIntro by rememberSaveable { mutableStateOf(true) }
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
+
+    LaunchedEffect(Unit) {
+        ForgeDiagnostics.log(view.context, "INFO", "ForgeApp", "forge_app.compose_entered")
+    }
 
     SideEffect {
         if (window != null) {
