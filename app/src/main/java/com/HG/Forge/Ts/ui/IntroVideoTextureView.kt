@@ -66,7 +66,7 @@ internal class IntroVideoTextureView(
             }
             player.setOnCompletionListener { finishOnce() }
             player.setOnErrorListener { _, what, extra ->
-                ForgeDiagnostics.log(context, "ERROR", "IntroVideo", "intro.player.error_$what_$extra")
+                ForgeDiagnostics.log(context, "ERROR", "IntroVideo", "intro.player.error_${what}_${extra}")
                 finishOnce()
                 true
             }
@@ -105,6 +105,7 @@ internal class IntroVideoTextureView(
     }
 
     override fun onSurfaceTextureDestroyed(surfaceTexture: android.graphics.SurfaceTexture): Boolean {
+        ForgeDiagnostics.log(context, "DEBUG", "IntroVideo", "intro.surface.destroyed")
         releasePlayer()
         videoSurface?.release()
         videoSurface = null
