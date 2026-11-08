@@ -1,7 +1,6 @@
 package com.HG.Forge.Ts.ui
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Matrix
 import android.media.MediaPlayer
 import android.view.Surface
@@ -26,7 +25,6 @@ internal class IntroVideoTextureView(
     private var finished = false
 
     init {
-        setBackgroundColor(Color.BLACK)
         isOpaque = true
         surfaceTextureListener = this
     }
