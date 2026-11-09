@@ -10,10 +10,12 @@ This roadmap is the **Simulation Runtime** track. It is separate from the older 
 - Exit: inspection is visible in Simulation Center; paths remain inside app-private storage; limitations are explicit.
 
 ## Phase 7 — RouterOS Integration
-- Integrate only after confirming official ARM64 CHR image terms, checksum verification, machine/firmware compatibility and a supported virtualization backend.
+- Current implementation: user-selected CHR ARM64 RAW image is copied into app-private storage only after a 64-character SHA-256 match against the value the user supplies from the official MikroTik source. Staging is capped at 1.5 GiB and rejects mismatches.
+- The app does not bundle or redistribute MikroTik images. A matching user-supplied hash verifies bytes against that value; the app cannot independently prove the hash source is authentic.
+- Guest boot remains gated on confirming official image terms, machine/firmware compatibility, and a supported virtualization backend. No QEMU launch is implemented in this phase increment.
 - Keep RouterOS as a genuine guest, not a command simulator.
 - RouterOS CLI access must terminate inside the guest; never route user commands to Android host shell.
-- Exit: reproducible guest boot and isolation evidence on a supported device/backend.
+- Exit: reproducible guest boot and isolation evidence on a supported device/backend. Image staging alone is not completion of Phase 7.
 
 ## Phase 8 — XFCE4 Integration
 - Provision Linux userland separately from the RouterOS guest.
