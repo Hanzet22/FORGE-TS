@@ -73,7 +73,7 @@ class RouterOsImageImporter(context: Context) {
             }
 
             check(total > 0L) { "The selected image is empty." }
-            val actual = digest.digest().joinToString("") { "%02x".format(it) }
+            val actual = digest.digest().joinToString("") { "%02x".format(it.toInt() and 0xff) }
             check(actual == expected) {
                 "SHA-256 mismatch. The image was rejected and the staged copy will be removed."
             }
