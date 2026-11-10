@@ -16,6 +16,7 @@ import javax.crypto.spec.GCMParameterSpec
 internal object ForgeAuthSessionStore {
     private const val PREFS = "forge_auth_secure_session"
     private const val SESSION_KEY = "encrypted_session"
+    private const val RECOVERY_PENDING_KEY = "password_recovery_pending"
     private const val KEY_ALIAS = "forge_ts_supabase_session_v1"
 
     fun save(context: Context, session: SupabaseAuthSession) {
@@ -69,10 +70,22 @@ internal object ForgeAuthSessionStore {
         }
     }
 
+    fun setPasswordRecoveryPending(context: Context, pending: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(RECOVERY_PENDING_KEY, pending)
+            .apply()
+    }
+
+    fun isPasswordRecoveryPending(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getBoolean(RECOVERY_PENDING_KEY, false)
+
     fun clear(context: Context) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .edit()
             .remove(SESSION_KEY)
+            .remove(RECOVERY_PENDING_KEY)
             .apply()
     }
 
