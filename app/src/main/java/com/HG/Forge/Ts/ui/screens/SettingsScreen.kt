@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -55,7 +57,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
@@ -179,7 +181,7 @@ private fun AccountLifecycleSection() {
                             busy = true
                             val current = ForgeAuthSessionState.session
                             val result = withContext(Dispatchers.IO) {
-                                runCatching { requireNotNull(current); authClient.validSession(current) }
+                                runCatching { authClient.refresh(requireNotNull(current)) }
                             }
                             result.onSuccess {
                                 ForgeAuthSessionState.setSession(context, it)
@@ -200,10 +202,10 @@ private fun AccountLifecycleSection() {
                             busy = true
                             val current = ForgeAuthSessionState.session
                             val result = withContext(Dispatchers.IO) {
-                                runCatching { requireNotNull(current); authClient.signOut(current) }
+                                runCatching { authClient.signOut(requireNotNull(current)) }
                             }
                             val code = (result.exceptionOrNull() as? SupabaseAuthException)?.statusCode
-                            if (result.isSuccess || code in setOf(400, 401, 403)) {
+                            if (result.isSuccess || code == 400 || code == 401 || code == 403) {
                                 ForgeAuthSessionState.clearSession(context)
                                 profile = null
                                 status = "Signed out from this device."
