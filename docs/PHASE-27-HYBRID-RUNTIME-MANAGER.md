@@ -15,10 +15,11 @@
 ## Readiness rules
 
 - A prepared workspace is not an installed runtime.
+- PRoot instance lifecycle transitions are independent per distribution; `READY` requires the instance workspace to be prepared, while the future installer must verify the rootfs before requesting that transition.
 - No environment is marked READY merely because its directories exist.
 - Start requests resolve an injected environment-specific adapter, inspect its capability, and only persist RUNNING after the adapter confirms the session is active. The default registry is empty, so starts remain safely rejected until a concrete adapter is registered.
 - MikroTik RouterOS remains UNAVAILABLE pending licensing, virtualization compatibility, and guest-isolation gates.
-- Lifecycle state is currently in-memory and resets when the app process restarts.
+- Environment and per-distribution lifecycle metadata are persisted in the existing DataStore registry. Startup converts previously active sessions to `RECOVERY_REQUIRED` and never auto-restarts them.
 - Resource readings are device-wide observations, not reservations or guarantees for this app.
 
 ## Storage layout

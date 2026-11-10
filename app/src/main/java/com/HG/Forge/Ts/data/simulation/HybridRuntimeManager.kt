@@ -336,6 +336,33 @@ class HybridRuntimeManager(
         }
     }
 
+    suspend fun transitionProotInstanceForFutureAdapter(
+        distribution: ProotDistribution,
+        next: RuntimeLifecycleState
+    ): RuntimeOperationResult {
+        val current = prootInstanceStates.getValue(distribution)
+        val allowed = when (current) {
+            RuntimeLifecycleState.NOT_INSTALLED -> setOf(RuntimeLifecycleState.READY, RuntimeLifecycleState.FAILED)
+            RuntimeLifecycleState.READY -> setOf(RuntimeLifecycleState.STARTING, RuntimeLifecycleState.UNAVAILABLE, RuntimeLifecycleState.FAILED)
+            RuntimeLifecycleState.STARTING -> setOf(RuntimeLifecycleState.RUNNING, RuntimeLifecycleState.FAILED, RuntimeLifecycleState.STOPPED)
+            RuntimeLifecycleState.RUNNING -> setOf(RuntimeLifecycleState.STOPPING, RuntimeLifecycleState.FAILED)
+            RuntimeLifecycleState.STOPPING -> setOf(RuntimeLifecycleState.STOPPED, RuntimeLifecycleState.FAILED)
+            RuntimeLifecycleState.STOPPED -> setOf(RuntimeLifecycleState.STARTING, RuntimeLifecycleState.READY, RuntimeLifecycleState.FAILED)
+            RuntimeLifecycleState.FAILED -> setOf(RuntimeLifecycleState.STOPPED, RuntimeLifecycleState.READY)
+            RuntimeLifecycleState.RECOVERY_REQUIRED -> setOf(RuntimeLifecycleState.STOPPED, RuntimeLifecycleState.FAILED)
+            RuntimeLifecycleState.UNAVAILABLE -> emptySet()
+        }
+        if (next !in allowed) {
+            return RuntimeOperationResult(false, "Rejected PRoot instance transition: $current -> $next.")
+        }
+        if (next == RuntimeLifecycleState.READY && distribution !in preparedProotInstances) {
+            return RuntimeOperationResult(false, "A verified PRoot instance workspace is required before marking the runtime READY.")
+        }
+        synchronized(this@HybridRuntimeManager) { prootInstanceStates[distribution] = next }
+        registry.writeProotInstance(distribution, next, distribution in preparedProotInstances)
+        return RuntimeOperationResult(true, "PRoot ${distribution.name} lifecycle persisted: $current -> $next.")
+    }
+
     private suspend fun setRuntimeState(
         id: RuntimeEnvironmentId,
         distribution: ProotDistribution?,
