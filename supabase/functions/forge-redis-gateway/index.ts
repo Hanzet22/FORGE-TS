@@ -45,7 +45,13 @@ export default {
     } catch {
       return json({ ok: false, error: "redis_configuration_invalid" }, 503);
     }
-    if (endpoint.protocol !== "https:" || !endpoint.hostname.endsWith(".upstash.io")) {
+    if (
+      endpoint.protocol !== "https:" ||
+      !endpoint.hostname ||
+      endpoint.username ||
+      endpoint.password ||
+      endpoint.hash
+    ) {
       return json({ ok: false, error: "redis_configuration_invalid" }, 503);
     }
 
@@ -72,7 +78,7 @@ export default {
       if (!validKey(input.key)) {
         return json({ ok: false, error: "invalid_key" }, 400);
       }
-      // Every account gets a separate keyspace on the shared Redis database.
+      // Every account gets a separate keyspace in the FORGE-TS Redis database.
       const key = `forge-ts:${userId}:${input.key}`;
 
       switch (operation) {
@@ -123,7 +129,7 @@ export default {
         ok: true,
         operation,
         result: payload?.result ?? null,
-        source: "upstash",
+        source: "redis-compatible",
       });
     } catch {
       return json({ ok: false, error: "redis_upstream_unavailable" }, 502);
