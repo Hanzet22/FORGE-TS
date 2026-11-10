@@ -20,8 +20,19 @@ data class SupabaseAuthSession(
     val refreshToken: String,
     val userId: String,
     val email: String?,
-    val expiresAtEpochSeconds: Long
+    val expiresAtEpochSeconds: Long,
+    val emailConfirmedAt: String? = null
 )
+
+data class SupabaseAuthUserProfile(
+    val userId: String,
+    val email: String?,
+    val emailConfirmedAt: String?,
+    val createdAt: String?,
+    val lastSignInAt: String?
+) {
+    val isEmailVerified: Boolean get() = !emailConfirmedAt.isNullOrBlank()
+}
 
 class SupabaseAuthException(val statusCode: Int, val errorCode: String) :
     Exception("$errorCode (HTTP $statusCode)")
@@ -108,7 +119,8 @@ class SupabaseAuthClient(
             refreshToken = refreshToken,
             userId = user.optString("id"),
             email = user.optString("email").takeIf { it.isNotBlank() },
-            expiresAtEpochSeconds = System.currentTimeMillis() / 1000L + expiresIn
+            expiresAtEpochSeconds = System.currentTimeMillis() / 1000L + expiresIn,
+            emailConfirmedAt = user.optString("email_confirmed_at").takeIf { it.isNotBlank() && it != "null" }
         )
     }
 
@@ -136,6 +148,23 @@ class SupabaseAuthClient(
         val confirmedAt = user.optString("confirmed_at")
         return (emailConfirmedAt.isNotBlank() && emailConfirmedAt != "null") ||
             (confirmedAt.isNotBlank() && confirmedAt != "null")
+    }
+
+    suspend fun getUserProfile(session: SupabaseAuthSession): SupabaseAuthUserProfile {
+        val response = httpClient.get("${supabaseUrl.trimEnd('/')}/auth/v1/user") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        val user = JSONObject(body)
+        return SupabaseAuthUserProfile(
+            userId = user.optString("id"),
+            email = user.optString("email").takeIf { it.isNotBlank() },
+            emailConfirmedAt = user.optString("email_confirmed_at").takeIf { it.isNotBlank() && it != "null" },
+            createdAt = user.optString("created_at").takeIf { it.isNotBlank() && it != "null" },
+            lastSignInAt = user.optString("last_sign_in_at").takeIf { it.isNotBlank() && it != "null" }
+        )
     }
 
     suspend fun signOut(session: SupabaseAuthSession) {
@@ -208,7 +237,8 @@ class SupabaseAuthClient(
             refreshToken = refresh,
             userId = user.optString("id"),
             email = user.optString("email").takeIf { it.isNotBlank() },
-            expiresAtEpochSeconds = expires
+            expiresAtEpochSeconds = expires,
+            emailConfirmedAt = user.optString("email_confirmed_at").takeIf { it.isNotBlank() && it != "null" }
         )
     }
 }
