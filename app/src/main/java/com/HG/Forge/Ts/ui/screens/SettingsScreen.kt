@@ -47,6 +47,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
+        AccountManagementPanel()
         Text("Local preferences are stored on this device.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text("Default DNS record type", style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
