@@ -75,7 +75,7 @@ fun ForgeApp() {
             result.onSuccess {
                 ForgeAuthSessionState.setSession(context, it)
                 if (authClient.isPasswordRecoveryCallback(callbackUrl)) {
-                    ForgeAuthSessionState.beginPasswordRecovery()
+                    ForgeAuthSessionState.beginPasswordRecovery(context)
                 }
             }.onFailure { Log.w("FORGE-TS Auth", "Supabase callback processing failed", it) }
         }
