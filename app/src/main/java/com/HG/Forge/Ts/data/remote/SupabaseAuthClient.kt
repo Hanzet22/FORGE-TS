@@ -3,6 +3,7 @@ package com.HG.Forge.Ts.data.remote
 import android.net.Uri
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.delete
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -24,7 +25,7 @@ data class SupabaseAuthSession(
     val emailConfirmedAt: String? = null
 )
 
-data class SupabaseAuthUserProfile(
+data class SupabaseTotpFactor(\n    val id: String,\n    val friendlyName: String?,\n    val status: String\n)\n\ndata class SupabaseTotpEnrollment(\n    val factorId: String,\n    val qrCodeSvg: String,\n    val secret: String,\n    val uri: String\n)\n\ndata class SupabaseAuthUserProfile(
     val userId: String,
     val email: String?,
     val emailConfirmedAt: String?,
@@ -190,6 +191,106 @@ class SupabaseAuthClient(
         return if (session.expiresAtEpochSeconds <= System.currentTimeMillis() / 1000L + 60L) {
             refresh(session)
         } else session
+    }
+
+    suspend fun listTotpFactors(session: SupabaseAuthSession): List<SupabaseTotpFactor> {
+        val response = httpClient.get("${supabaseUrl.trimEnd('/')}/auth/v1/factors") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        val json = JSONObject(body)
+        val factors = json.optJSONArray("totp") ?: json.optJSONArray("all") ?: org.json.JSONArray()
+        return buildList {
+            for (index in 0 until factors.length()) {
+                val factor = factors.optJSONObject(index) ?: continue
+                if (factor.optString("factor_type", "totp") == "totp") {
+                    add(
+                        SupabaseTotpFactor(
+                            id = factor.optString("id"),
+                            friendlyName = factor.optString("friendly_name").takeIf { it.isNotBlank() && it != "null" },
+                            status = factor.optString("status")
+                        )
+                    )
+                }
+            }
+        }.filter { it.id.isNotBlank() }
+    }
+
+    suspend fun enrollTotp(
+        session: SupabaseAuthSession,
+        friendlyName: String = "FORGE-TS Authenticator"
+    ): SupabaseTotpEnrollment {
+        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/factors") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(
+                JSONObject()
+                    .put("factor_type", "totp")
+                    .put("friendly_name", friendlyName)
+                    .toString()
+            )
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        val json = JSONObject(body)
+        val totp = json.optJSONObject("totp")
+            ?: throw IllegalStateException("Supabase did not return TOTP enrollment data.")
+        return SupabaseTotpEnrollment(
+            factorId = json.optString("id"),
+            qrCodeSvg = totp.optString("qr_code"),
+            secret = totp.optString("secret"),
+            uri = totp.optString("uri")
+        ).also {
+            require(it.factorId.isNotBlank() && it.secret.isNotBlank()) {
+                "Supabase returned incomplete TOTP enrollment data."
+            }
+        }
+    }
+
+    suspend fun createTotpChallenge(session: SupabaseAuthSession, factorId: String): String {
+        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/factors/${factorId}/challenge") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        return JSONObject(body).optString("id").also {
+            require(it.isNotBlank()) { "Supabase did not return an MFA challenge ID." }
+        }
+    }
+
+    suspend fun verifyTotpChallenge(
+        session: SupabaseAuthSession,
+        factorId: String,
+        challengeId: String,
+        code: String
+    ): SupabaseAuthSession {
+        require(code.matches(Regex("\\d{6}"))) { "Enter the 6-digit authenticator code." }
+        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/factors/${factorId}/verify") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(JSONObject().put("challenge_id", challengeId).put("code", code).toString())
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        val json = runCatching { JSONObject(body) }.getOrNull()
+        return if (json?.has("access_token") == true && json.has("refresh_token")) {
+            json.toSession()
+        } else {
+            refresh(session)
+        }
+    }
+
+    suspend fun unenrollTotp(session: SupabaseAuthSession, factorId: String) {
+        val response = httpClient.delete("${supabaseUrl.trimEnd('/')}/auth/v1/factors/${factorId}") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        ensureSuccess(response.status.value, response.bodyAsText())
     }
 
     private fun requireValidInput(email: String, password: String) {
