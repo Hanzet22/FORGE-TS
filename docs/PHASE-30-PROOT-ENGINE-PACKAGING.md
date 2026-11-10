@@ -111,3 +111,6 @@ The inspected community static script currently builds AArch64 only. It is not e
 
 ### P0.5.7 — CI compile correction
 The first CI compile reached PRoot but failed because ashmem_memfd.c used strcmp and memset without including string.h. The builder now inserts string.h at the top of that source file before compilation. This is a compile-only compatibility adjustment; runtime behavior is unchanged. The CI run must still pass the complete build and ELF validation before the artifact can be packaged.
+
+### P0.5.8 — Include talloc portability implementation in static archive
+The first link attempt with talloc 2.5.0 exposed an undefined `rep_memset_explicit` symbol. The upstream 2.5.0 release uses the libreplace portability layer for this function when the target libc does not provide `memset_explicit` (Android API 29 does not provide that API). The builder now includes the generated `lib/replace/*.o` objects alongside `talloc*.o` when assembling the static archive, so the replacement implementation is linked instead of leaving an unresolved reference. This is a dependency-closure correction; it does not change PRoot runtime behavior.
