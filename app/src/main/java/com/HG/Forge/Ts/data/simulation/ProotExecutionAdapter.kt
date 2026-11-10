@@ -81,9 +81,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val process = sessions.remove(request.workspacePath)
                 ?: return@withContext RuntimeAdapterStopResult(false, "No adapter-owned PRoot process exists for this workspace.")
             process.destroy()
-            val stopped = runCatching { process.waitFor(3, TimeUnit.SECONDS) }.getOrDefault(false)
-            if (!stopped) process.destroyForcibly()
-            RuntimeAdapterStopResult(true, if (stopped) "PRoot process stopped." else "PRoot process force-stopped after timeout.")
+            val graceful = runCatching { process.waitFor(3, TimeUnit.SECONDS) }.getOrDefault(false)
+            if (!graceful) process.destroyForcibly()
+            val terminated = graceful || runCatching { process.waitFor(2, TimeUnit.SECONDS) }.getOrDefault(false)
+            RuntimeAdapterStopResult(terminated,
+                if (graceful) "PRoot launcher stopped."
+                else if (terminated) "PRoot launcher was force-stopped after the graceful timeout."
+                else "PRoot launcher termination could not be confirmed; manual recovery is required.")
         }
 
     private data class Paths(val root: File, val engine: File, val loader: File, val logs: File)
@@ -109,7 +113,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     }
 
     private fun command(engine: File, root: File, guest: List<String>): List<String> =
-        listOf(engine.absolutePath, "-0", "-r", root.absolutePath, "-w", "/") + guest
+        listOf(engine.absolutePath, "--kill-on-exit", "-0", "-r", root.absolutePath, "-w", "/") + guest
 
     private fun environment(loader: File): Map<String, String> = mapOf(
         "PROOT_LOADER" to loader.absolutePath,
