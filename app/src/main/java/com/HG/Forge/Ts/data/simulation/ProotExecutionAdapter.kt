@@ -21,7 +21,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val paths = resolvePaths(request)
                 ?: return@withContext RuntimeAdapterCapability(false,
                     "Missing native PRoot engine/loader or verified rootfs; no process was launched.")
-            val (root, engine, loader, logs) = paths
+            val (root, engine, loader, logs, tmp) = paths
             val guestShell = runCatching { File(root, "bin/sh").canonicalFile }.getOrNull()
             if (guestShell == null || !guestShell.path.startsWith(root.canonicalPath + File.separator) ||
                 !guestShell.isFile || !guestShell.canRead()) {
@@ -31,7 +31,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val process = runCatching {
                 ProcessBuilder(command(engine, root, listOf("/bin/sh", "-c", "exit 0")))
                     .directory(root).redirectErrorStream(true).redirectOutput(probeLog)
-                    .apply { environment().putAll(environment(loader)) }.start()
+                    .apply { environment().putAll(environment(loader, tmp)) }.start()
             }.getOrElse {
                 return@withContext RuntimeAdapterCapability(false,
                     "PRoot disposable-child probe could not launch: " + (it.message ?: "unknown error"))
@@ -54,7 +54,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             if (!capability.available) return@withContext RuntimeAdapterStartResult(false, false, capability.detail)
             val paths = resolvePaths(request)
                 ?: return@withContext RuntimeAdapterStartResult(false, false, "PRoot paths changed after inspection.")
-            val (root, engine, loader, logs) = paths
+            val (root, engine, loader, logs, tmp) = paths
             val key = request.workspacePath
             if (sessions[key]?.isAlive == true) {
                 return@withContext RuntimeAdapterStartResult(false, true, "A PRoot process is already active for this workspace.")
@@ -63,7 +63,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 ProcessBuilder(command(engine, root, listOf("/bin/sh", "-l")))
                     .directory(root).redirectErrorStream(true)
                     .redirectOutput(ProcessBuilder.Redirect.appendTo(File(logs, "session.log")))
-                    .apply { environment().putAll(environment(loader)) }.start()
+                    .apply { environment().putAll(environment(loader, tmp)) }.start()
             }.getOrElse {
                 return@withContext RuntimeAdapterStartResult(false, false,
                     "PRoot session launch failed: " + (it.message ?: "unknown error"))
@@ -92,7 +92,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 else "PRoot launcher termination could not be confirmed; manual recovery is required.")
         }
 
-    private data class Paths(val root: File, val engine: File, val loader: File, val logs: File)
+    private data class Paths(
+        val root: File,
+        val engine: File,
+        val loader: File,
+        val logs: File,
+        val tmp: File
+    )
 
     private fun resolvePaths(request: RuntimeAdapterStartRequest): Paths? {
         if (request.environmentId != RuntimeEnvironmentId.XFCE_PROOT) return null
@@ -111,14 +117,19 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val logs = File(workspace, "logs").canonicalFile
         if (!logs.path.startsWith(workspace.path + File.separator) ||
             !(logs.isDirectory || logs.mkdirs()) || !logs.canWrite()) return null
-        return Paths(root, engine, loader, logs)
+        val tmp = File(workspace, "tmp").canonicalFile
+        if (!tmp.path.startsWith(workspace.path + File.separator) ||
+            !(tmp.isDirectory || tmp.mkdirs()) || !tmp.canWrite()) return null
+        return Paths(root, engine, loader, logs, tmp)
     }
 
     private fun command(engine: File, root: File, guest: List<String>): List<String> =
         listOf(engine.absolutePath, "--kill-on-exit", "-0", "-r", root.absolutePath, "-w", "/") + guest
 
-    private fun environment(loader: File): Map<String, String> = mapOf(
+    private fun environment(loader: File, tmp: File): Map<String, String> = mapOf(
         "PROOT_LOADER" to loader.absolutePath,
+        "PROOT_TMP_DIR" to tmp.absolutePath,
+        "TMPDIR" to tmp.absolutePath,
         "LD_LIBRARY_PATH" to appContext.applicationInfo.nativeLibraryDir
     )
 }
