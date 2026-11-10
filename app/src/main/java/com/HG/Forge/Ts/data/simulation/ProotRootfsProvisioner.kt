@@ -73,7 +73,11 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
         val backup = File(workspace, "rootfs.backup-$token")
         try {
             val checksumText = downloadText(source.checksumUrl, 256 * 1024)
-            val digest = source.checksumPinned ?: parseChecksum(checksumText, source.archiveName)
+            val publishedDigest = parseChecksum(checksumText, source.archiveName)
+            val digest = source.checksumPinned ?: publishedDigest
+            if (!publishedDigest.equals(digest, ignoreCase = true)) {
+                throw IllegalStateException("Pinned digest does not match the official upstream checksum metadata.")
+            }
             if (!digest.matches(Regex("[0-9a-fA-F]{64}"))) {
                 throw IllegalStateException("Official checksum metadata did not contain a valid SHA-256 digest.")
             }
