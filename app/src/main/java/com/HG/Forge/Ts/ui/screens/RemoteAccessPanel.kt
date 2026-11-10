@@ -23,14 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.HG.Forge.Ts.AuthDeepLinkBus
 import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.remote.RedisGatewayClient
 import com.HG.Forge.Ts.data.remote.RedisGatewayOperation
 import com.HG.Forge.Ts.data.remote.RedisGatewayRequest
 import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
-import com.HG.Forge.Ts.data.remote.SupabaseAuthSession
 import com.HG.Forge.Ts.data.remote.SupabaseLabRecordsClient
 import com.HG.Forge.Ts.data.sync.CrashReportUploader
 import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
@@ -62,23 +60,6 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
         }
     }
 
-    LaunchedEffect(authClient) {
-        AuthDeepLinkBus.callbacks.collect { callbackUrl ->
-            busy = true
-            output = "Processing Supabase email verification callback..."
-            val result = withContext(Dispatchers.IO) {
-                runCatching { authClient.sessionFromCallback(callbackUrl) }
-            }
-            result.onSuccess {
-                ForgeAuthSessionState.session = it
-                output = "EMAIL VERIFIED • AUTHENTICATED • ${it.email ?: it.userId}"
-            }.onFailure {
-                output = "AUTH CALLBACK FAILED • ${it.message ?: "unknown error"}"
-            }
-            busy = false
-        }
-    }
-
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("REMOTE ACCESS • SUPABASE AUTH", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -95,7 +76,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 runCatching { authClient.signIn(email, password) }
                             }
                             result.onSuccess {
-                                ForgeAuthSessionState.session = it
+                                ForgeAuthSessionState.setSession(context, it)
                                 output = "AUTHENTICATED • ${it.email ?: it.userId}"
                             }.onFailure {
                                 output = it.message ?: "Sign-in failed."
@@ -112,7 +93,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                             }
                             result.onSuccess { created ->
                                 if (created != null) {
-                                    ForgeAuthSessionState.session = created
+                                    ForgeAuthSessionState.setSession(context, created)
                                     output = "ACCOUNT CREATED • authenticated"
                                 } else {
                                     output = "SIGNUP SUBMITTED • open the confirmation email; FORGE-TS should receive the callback automatically."
@@ -139,7 +120,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 }
                             }
                             result.onSuccess {
-                                ForgeAuthSessionState.session = it.first
+                                ForgeAuthSessionState.setSession(context, it.first)
                                 output = "REDIS GATEWAY ONLINE • PING result: ${it.second.result} • source: ${it.second.source}"
                             }.onFailure {
                                 output = "REDIS GATEWAY CHECK FAILED • ${it.message ?: "unknown error"}"
@@ -159,7 +140,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 }
                             }
                             result.onSuccess {
-                                ForgeAuthSessionState.session = it.first
+                                ForgeAuthSessionState.setSession(context, it.first)
                                 output = "SUPABASE REST ONLINE • RLS SELECT succeeded • ${it.second} row(s) visible to this user."
                             }.onFailure {
                                 output = "SUPABASE CHECK FAILED • ${it.message ?: "unknown error"}"
@@ -174,14 +155,14 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                         if (active != null) {
                             withContext(Dispatchers.IO) { runCatching { authClient.signOut(active) } }
                         }
-                        ForgeAuthSessionState.session = null
+                        ForgeAuthSessionState.clearSession(context)
                         password = ""
-                        output = "Signed out. Session tokens are cleared from app memory."
+                        output = "Signed out. Encrypted session tokens are cleared from this device."
                     }
                 }, modifier = Modifier.fillMaxWidth()) { Text("Sign out") }
             }
             Text(output, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("Session tokens stay in app memory and are not saved to disk. Sign in again after restarting the app. The publishable key is public; Redis secrets remain server-side.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Session tokens are stored using Android Keystore-backed encryption. The publishable key is public; Redis secrets remain server-side.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
