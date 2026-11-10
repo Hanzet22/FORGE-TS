@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.data.simulation.HybridRuntimeManager
 import com.HG.Forge.Ts.data.simulation.HybridRuntimeSnapshot
+import com.HG.Forge.Ts.data.simulation.ProotDistribution
+import com.HG.Forge.Ts.data.simulation.RuntimeEnvironmentId
 import com.HG.Forge.Ts.data.simulation.RuntimeLifecycleState
 import kotlinx.coroutines.launch
 
@@ -71,10 +73,14 @@ fun SimulationEnvironmentLauncher() {
                             }) { Text(if (environment.workspaceReady) "Refresh workspace" else "Prepare workspace") }
                             OutlinedButton(
                                 onClick = {
-                                    message = manager.requestStart(environment.id).message
-                                    snapshot = manager.inspect()
+                                    scope.launch {
+                                        val result = manager.requestStart(environment.id)
+                                        message = result.message
+                                        snapshot = manager.inspect()
+                                    }
                                 },
-                                enabled = environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
+                                enabled = environment.id != RuntimeEnvironmentId.XFCE_PROOT &&
+                                    environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
                                     environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED
                             ) { Text("Start") }
                             if (environment.lifecycle == RuntimeLifecycleState.RECOVERY_REQUIRED) {
@@ -90,6 +96,47 @@ fun SimulationEnvironmentLauncher() {
                                         managerEvent = manager.lastManagerEvent()
                                     }
                                 }) { Text("Confirm stopped") }
+                            }
+                        }
+                    }
+                }
+            }
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("PRoot distro instances", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "Debian, Ubuntu, and Alpine have independent workspaces under the existing proot/ root. Preparing a workspace does not install a rootfs or mark the runtime READY.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    snapshot.prootInstances.forEach { instance ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(instance.distribution.name, style = MaterialTheme.typography.titleSmall)
+                                Text("Lifecycle: ${instance.lifecycle}", style = MaterialTheme.typography.bodySmall)
+                                Text(if (instance.workspaceReady) "Workspace prepared" else "Workspace not prepared", style = MaterialTheme.typography.bodySmall)
+                            }
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                OutlinedButton(onClick = {
+                                    scope.launch {
+                                        val result = manager.prepareProotInstance(instance.distribution)
+                                        message = result.message
+                                        snapshot = manager.inspect()
+                                        managerEvent = manager.lastManagerEvent()
+                                    }
+                                }) { Text(if (instance.workspaceReady) "Refresh" else "Prepare") }
+                                OutlinedButton(
+                                    enabled = instance.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
+                                        instance.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED,
+                                    onClick = {
+                                        scope.launch {
+                                            val result = manager.requestStart(RuntimeEnvironmentId.XFCE_PROOT, instance.distribution)
+                                            message = result.message
+                                            snapshot = manager.inspect()
+                                            managerEvent = manager.lastManagerEvent()
+                                        }
+                                    }
+                                ) { Text("Start") }
                             }
                         }
                     }
