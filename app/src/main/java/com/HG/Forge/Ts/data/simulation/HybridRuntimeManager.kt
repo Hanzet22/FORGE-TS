@@ -110,7 +110,7 @@ private class RuntimeRegistryStore(private val context: Context) {
 
 class HybridRuntimeManager(
     context: Context,
-    private val adapterRegistry: RuntimeExecutionAdapterRegistry = RuntimeExecutionAdapterRegistry.empty()
+    private val adapterRegistry: RuntimeExecutionAdapterRegistry = RuntimeExecutionAdapterRegistry.androidDefault(context)
 ) {
     private val appContext = context.applicationContext
     private val runtimeRoot = File(appContext.filesDir, "forge-runtime")
@@ -348,6 +348,35 @@ class HybridRuntimeManager(
             }
             else -> RuntimeOperationResult(true, "Start accepted but activity is not confirmed; lifecycle remains STARTING. ${result.message}")
         }
+    }
+
+    suspend fun requestStop(
+        id: RuntimeEnvironmentId,
+        distribution: ProotDistribution? = null
+    ): RuntimeOperationResult {
+        if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) {
+            return RuntimeOperationResult(false, "Select the Debian, Ubuntu, or Alpine instance to stop.")
+        }
+        if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) {
+            return RuntimeOperationResult(false, "A PRoot distribution can only be stopped through XFCE_PROOT.")
+        }
+        val current = if (distribution == null) states.getValue(id) else prootInstanceStates.getValue(distribution)
+        if (current != RuntimeLifecycleState.RUNNING) {
+            return RuntimeOperationResult(false, "Only a confirmed RUNNING runtime can be stopped; current state is $current.")
+        }
+        val adapter = adapterRegistry.find(id)
+            ?: return RuntimeOperationResult(false, "No execution adapter is registered; no process state was changed.")
+        val root = roots.getValue(id)
+        val workspace = if (distribution == null) root else File(root, distribution.directoryName)
+        val request = RuntimeAdapterStartRequest(id, distribution?.directoryName, workspace.absolutePath)
+        setRuntimeState(id, distribution, RuntimeLifecycleState.STOPPING)
+        val result = runCatching { adapter.stop(request) }.getOrElse {
+            setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED)
+            return RuntimeOperationResult(false, "Adapter stop failed: " + (it.message ?: "unknown error") + ".")
+        }
+        val next = if (result.stopped) RuntimeLifecycleState.STOPPED else RuntimeLifecycleState.FAILED
+        setRuntimeState(id, distribution, next)
+        return RuntimeOperationResult(result.stopped, result.message)
     }
 
     suspend fun transitionProotInstanceForFutureAdapter(
