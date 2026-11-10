@@ -350,6 +350,38 @@ class HybridRuntimeManager(
         }
     }
 
+    /**
+     * Executes one bounded, non-interactive guest command inside a confirmed PRoot session.
+     * This is deliberately separate from a PTY-backed interactive terminal.
+     */
+    suspend fun executeProotCommand(
+        distribution: ProotDistribution,
+        arguments: List<String>,
+        timeoutSeconds: Long = 30
+    ): RuntimeCommandResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING) {
+            return RuntimeCommandResult(false, null, "", "The selected PRoot instance must be confirmed RUNNING before command execution.")
+        }
+        if (distribution !in preparedProotInstances) {
+            return RuntimeCommandResult(false, null, "", "The selected PRoot workspace is not registered as prepared.")
+        }
+        val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
+        val workspace = File(root, distribution.directoryName)
+        if (!isSafeDirectory(workspace, root)) {
+            return RuntimeCommandResult(false, null, "", "The selected PRoot workspace failed its containment check.")
+        }
+        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT)
+            ?: return RuntimeCommandResult(false, null, "", "No PRoot execution adapter is registered.")
+        val request = RuntimeAdapterStartRequest(
+            RuntimeEnvironmentId.XFCE_PROOT,
+            distribution.directoryName,
+            workspace.absolutePath
+        )
+        return runCatching { adapter.execute(request, arguments, timeoutSeconds) }.getOrElse {
+            RuntimeCommandResult(false, null, "", "Guest command execution failed: ${it.message ?: "unknown error"}")
+        }
+    }
+
     suspend fun requestStop(
         id: RuntimeEnvironmentId,
         distribution: ProotDistribution? = null
