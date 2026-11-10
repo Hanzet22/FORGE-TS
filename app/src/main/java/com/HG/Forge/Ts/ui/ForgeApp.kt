@@ -37,6 +37,7 @@ import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
 import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
+import com.HG.Forge.Ts.ui.screens.AuthGateScreen
 import com.HG.Forge.Ts.ui.screens.HomeScreen
 import com.HG.Forge.Ts.ui.screens.KnowledgeCenterScreen
 import com.HG.Forge.Ts.ui.screens.CoreNetworkingScreen
