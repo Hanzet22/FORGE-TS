@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.data.simulation.LoopbackLabServer
 import com.HG.Forge.Ts.data.simulation.RedisOfflineEngine
 import com.HG.Forge.Ts.data.simulation.SupabaseOfflineEngine
-import com.HG.Forge.Ts.ui.screens.RemoteAccessPanel
 import com.HG.Forge.Ts.ui.screens.RuntimeFoundationPanel
 import com.HG.Forge.Ts.ui.screens.RouterOsImageImportPanel
 import com.HG.Forge.Ts.ui.screens.LinuxUserlandFoundationPanel
@@ -105,14 +104,13 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(if (internetValidated) "INTERNET AVAILABLE" else "INTERNET UNAVAILABLE", fontWeight = FontWeight.Bold)
                 Text(
-                    if (internetValidated) "Internet is validated. Each remote service still needs its own successful health check and authenticated client; otherwise the local simulator remains active."
-                    else "Automatic fallback: all modules use local simulation. No remote request is attempted.",
+                    if (internetValidated) "Internet is validated. Simulation Center labs remain local; this screen does not start cloud requests."
+                    else "Internet is unavailable. Local simulation remains available; no cloud request is made.",
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text("Supabase Auth: integrated • Redis gateway: deployed • each remote service requires a successful live check.", style = MaterialTheme.typography.labelSmall)
+                Text("Supabase Auth is managed by the shared app-level authentication gate. Simulation modules on this screen are local.", style = MaterialTheme.typography.labelSmall)
             }
         }
-        RemoteAccessPanel(internetAvailable = internetValidated)
         RuntimeFoundationPanel()
         LinuxUserlandFoundationPanel()
         RouterOsImageImportPanel()
@@ -140,7 +138,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 }
                 Button(onClick = { redisOutput = RedisOfflineEngine.snapshot().entries.joinToString("\n") { "${it.key} = ${it.value}" }.ifBlank { "(empty database)" } }, modifier = Modifier.fillMaxWidth()) { Text("Browse keys") }
                 ResultPanel(redisOutput)
-                Text("Online connector: use Remote Access above to sign in and run a live Redis PING; local Redis simulator remains available.", style = MaterialTheme.typography.bodySmall)
+                Text("Online Redis operations are not exposed in Simulation Center. The local Redis simulator remains available.", style = MaterialTheme.typography.bodySmall)
             }
             SimulationModule.SUPABASE -> {
                 Text("Supabase Lab", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -162,7 +160,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                     }
                 }
                 ResultPanel(statusMessage)
-                Text("Online connector: use Remote Access above to sign in and run an RLS-protected SELECT; local sample table remains separate.", style = MaterialTheme.typography.bodySmall)
+                Text("Online Supabase table operations are not exposed in Simulation Center. This local sample table remains separate.", style = MaterialTheme.typography.bodySmall)
             }
             SimulationModule.LOOPBACK -> {
                 Text("Loopback Lab", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -198,7 +196,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 OutlinedButton(onClick = { loopbackOutput = "SIMULATED • 127.0.0.1\nHTTP/1.1 200 OK\n{ \"status\": \"healthy\", \"source\": \"simulator\" }" }, modifier = Modifier.fillMaxWidth()) { Text("Run simulated response") }
             }
         }
-        Text("IMPORTANT: Local Redis/Supabase simulation data is temporary and never auto-syncs to production. Remote adapters require a valid Supabase user session. Redis additionally requires the two Edge Function secrets; no privileged token belongs in the APK.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("IMPORTANT: Local Redis/Supabase simulation data is temporary and never auto-syncs to production. Cloud connectors are not exposed in Simulation Center. Privileged backend credentials remain server-side and never belong in the APK.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
