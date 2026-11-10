@@ -38,10 +38,12 @@ class LinuxUserlandFoundationSupervisor(context: Context) {
 
         val runtimeCreated = runtimeRoot.exists() || runtimeRoot.mkdirs()
         val rootCreated = root.exists() || root.mkdirs()
+        val runtimeContained = runtimeCanonical.path.startsWith(appFiles.path + File.separator)
         val rootContained = rootCanonical.path.startsWith(appFiles.path + File.separator) &&
             rootCanonical.path.startsWith(runtimeCanonical.path + File.separator)
-        val rootReady = runtimeCreated && rootCreated && rootContained &&
-            runtimeRoot.isDirectory && root.isDirectory && root.canWrite()
+        val rootReady = runtimeCreated && rootCreated && runtimeContained && rootContained &&
+            runtimeRoot.isDirectory && runtimeRoot.canRead() && runtimeRoot.canWrite() &&
+            root.isDirectory && root.canRead() && root.canWrite()
 
         val directories = listOf(
             File(root, "rootfs"),
@@ -49,11 +51,15 @@ class LinuxUserlandFoundationSupervisor(context: Context) {
             File(root, "tmp"),
             File(root, "logs")
         )
-        val ready = directories.map { directory ->
-            val created = directory.exists() || directory.mkdirs()
-            val canonical = directory.canonicalFile
-            val contained = canonical.path.startsWith(rootCanonical.path + File.separator)
-            created && contained && directory.isDirectory && directory.canRead() && directory.canWrite()
+        val ready = if (rootReady) {
+            directories.map { directory ->
+                val created = directory.exists() || directory.mkdirs()
+                val canonical = directory.canonicalFile
+                val contained = canonical.path.startsWith(rootCanonical.path + File.separator)
+                created && contained && directory.isDirectory && directory.canRead() && directory.canWrite()
+            }
+        } else {
+            List(directories.size) { false }
         }
 
         if (!rootReady || ready.any { !it }) {
