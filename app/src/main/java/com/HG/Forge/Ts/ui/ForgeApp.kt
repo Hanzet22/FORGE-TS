@@ -1,6 +1,7 @@
 package com.HG.Forge.Ts.ui
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.HG.Forge.Ts.R
+import com.HG.Forge.Ts.AuthDeepLinkBus
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
@@ -64,6 +66,13 @@ fun ForgeApp() {
 
     LaunchedEffect(authClient) {
         ForgeAuthSessionState.restore(context.applicationContext, authClient)
+        AuthDeepLinkBus.callbacks.collect { callbackUrl ->
+            val result = runCatching {
+                withContext(Dispatchers.IO) { authClient.sessionFromCallback(callbackUrl) }
+            }
+            result.onSuccess { ForgeAuthSessionState.setSession(context, it) }
+                .onFailure { Log.w("FORGE-TS Auth", "Supabase callback processing failed", it) }
+        }
     }
 
     LaunchedEffect(authSession?.accessToken, authSession?.expiresAtEpochSeconds) {
