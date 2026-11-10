@@ -33,7 +33,8 @@ import kotlinx.coroutines.withContext
 fun AuthGateScreen(
     modifier: Modifier = Modifier,
     requestedArea: String,
-    onAuthenticated: () -> Unit
+    onAuthenticated: () -> Unit,
+    recoveryMode: Boolean = false
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -46,8 +47,20 @@ fun AuthGateScreen(
     }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var mode by remember { mutableStateOf("sign_in") }
     var busy by remember { mutableStateOf(false) }
-    var message by remember { mutableStateOf("Sign in or create an account to unlock this area.") }
+    var message by remember {
+        mutableStateOf(
+            if (recoveryMode) "Choose a new password for your FORGE-TS account."
+            else "Sign in or create an account to unlock this area."
+        )
+    }
+    val validPassword = password.length >= 20 &&
+        password.any(Char::isLowerCase) &&
+        password.any(Char::isUpperCase) &&
+        password.any(Char::isDigit) &&
+        password.any { !it.isLetterOrDigit() }
 
     Card(modifier.fillMaxSize().padding(20.dp)) {
         Column(
@@ -55,79 +68,197 @@ fun AuthGateScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text("FORGE-TS ACCOUNT", style = MaterialTheme.typography.titleLarge)
-            Text("Authentication required", style = MaterialTheme.typography.headlineSmall)
             Text(
-                "The ${requestedArea} tab is locked until you sign in. All feature panels and actions in Simulate and Tools require this shared account session.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                if (recoveryMode) "Reset password" else "Account authentication",
+                style = MaterialTheme.typography.headlineSmall
             )
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it.trimStart() },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Email") },
-                singleLine = true,
-                enabled = !busy
-            )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Password") },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                enabled = !busy
-            )
-            Button(
-                onClick = {
-                    scope.launch {
-                        busy = true
-                        message = "Signing in..."
-                        val result = withContext(Dispatchers.IO) {
-                            runCatching { authClient.signIn(email, password) }
-                        }
-                        result.onSuccess {
-                            ForgeAuthSessionState.setSession(context, it)
-                            message = "Signed in. Simulate and Tools are unlocked."
-                            onAuthenticated()
-                        }.onFailure {
-                            message = it.message ?: "Sign-in failed."
-                        }
-                        busy = false
-                    }
-                },
-                enabled = !busy && email.contains("@") && password.length >= 20,
-                modifier = Modifier.fillMaxWidth()
-            ) { Text(if (busy) "Please wait..." else "Sign in") }
-            OutlinedButton(
-                onClick = {
-                    scope.launch {
-                        busy = true
-                        message = "Creating account..."
-                        val result = withContext(Dispatchers.IO) {
-                            runCatching { authClient.signUp(email, password) }
-                        }
-                        result.onSuccess { created ->
-                            if (created != null) {
-                                ForgeAuthSessionState.setSession(context, created)
-                                message = "Account created and authenticated."
-                                onAuthenticated()
-                            } else {
-                                message = "Registration submitted. Check your email and open the verification link to return to FORGE-TS."
+
+            if (recoveryMode) {
+                Text(
+                    "Recovery link verified. Set a new password to finish account recovery.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("New password") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    enabled = !busy
+                )
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Confirm new password") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    enabled = !busy
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            message = "Updating password..."
+                            val active = ForgeAuthSessionState.session
+                            val result = withContext(Dispatchers.IO) {
+                                runCatching {
+                                    requireNotNull(active) { "Recovery session is missing. Request a new reset email." }
+                                    require(validPassword) {
+                                        "Password needs 20+ characters with uppercase, lowercase, a number, and a symbol."
+                                    }
+                                    require(password == confirmPassword) { "Passwords do not match." }
+                                    authClient.updatePassword(active, password)
+                                }
                             }
-                        }.onFailure {
-                            message = it.message ?: "Account creation failed."
+                            result.onSuccess {
+                                ForgeAuthSessionState.completePasswordRecovery()
+                                password = ""
+                                confirmPassword = ""
+                                message = "Password updated. Your account is ready."
+                                onAuthenticated()
+                            }.onFailure {
+                                message = it.message ?: "Password update failed."
+                            }
+                            busy = false
                         }
-                        busy = false
+                    },
+                    enabled = !busy && validPassword && password == confirmPassword &&
+                        ForgeAuthSessionState.session != null,
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(if (busy) "Please wait..." else "Update password") }
+            } else {
+                Text(
+                    "The $requestedArea area requires a shared FORGE-TS account session.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it.trimStart() },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Email") },
+                    singleLine = true,
+                    enabled = !busy
+                )
+
+                if (mode != "reset") {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        enabled = !busy
+                    )
+                }
+
+                when (mode) {
+                    "sign_in" -> {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    busy = true
+                                    message = "Signing in..."
+                                    val result = withContext(Dispatchers.IO) {
+                                        runCatching { authClient.signIn(email, password) }
+                                    }
+                                    result.onSuccess {
+                                        ForgeAuthSessionState.setSession(context, it)
+                                        message = "Signed in. Simulate and Tools are unlocked."
+                                        onAuthenticated()
+                                    }.onFailure {
+                                        message = it.message ?: "Sign-in failed."
+                                    }
+                                    busy = false
+                                }
+                            },
+                            enabled = !busy && email.contains("@") && password.isNotBlank(),
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(if (busy) "Please wait..." else "Sign in") }
+                        OutlinedButton(
+                            onClick = { mode = "create"; message = "Create your FORGE-TS account." },
+                            enabled = !busy,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Create account") }
+                        OutlinedButton(
+                            onClick = { mode = "reset"; message = "Enter your account email to receive a password reset link." },
+                            enabled = !busy,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Reset password") }
                     }
-                },
-                enabled = !busy && email.contains("@") && password.length >= 20,
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Create account") }
-            Text("Password must contain at least 20 characters, matching the configured account policy.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    "create" -> {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    busy = true
+                                    message = "Creating account..."
+                                    val result = withContext(Dispatchers.IO) {
+                                        runCatching { authClient.signUp(email, password) }
+                                    }
+                                    result.onSuccess { created ->
+                                        if (created != null) {
+                                            ForgeAuthSessionState.setSession(context, created)
+                                            message = "Account created and authenticated."
+                                            onAuthenticated()
+                                        } else {
+                                            message = "Registration submitted. Check your email and open the verification link to return to FORGE-TS."
+                                        }
+                                    }.onFailure {
+                                        message = it.message ?: "Account creation failed."
+                                    }
+                                    busy = false
+                                }
+                            },
+                            enabled = !busy && email.contains("@") && validPassword,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(if (busy) "Please wait..." else "Create account") }
+                        OutlinedButton(
+                            onClick = { mode = "sign_in"; message = "Sign in to your existing account." },
+                            enabled = !busy,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Back to sign in") }
+                    }
+                    else -> {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    busy = true
+                                    message = "Sending password reset email..."
+                                    val result = withContext(Dispatchers.IO) {
+                                        runCatching { authClient.requestPasswordReset(email) }
+                                    }
+                                    result.onSuccess {
+                                        message = "If the account exists, a recovery link has been sent. Open it on this device to set a new password."
+                                    }.onFailure {
+                                        message = it.message ?: "Password reset request failed."
+                                    }
+                                    busy = false
+                                }
+                            },
+                            enabled = !busy && email.contains("@"),
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(if (busy) "Please wait..." else "Send reset link") }
+                        OutlinedButton(
+                            onClick = { mode = "sign_in"; message = "Sign in to your existing account." },
+                            enabled = !busy,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Back to sign in") }
+                    }
+                }
+                Text(
+                    "Password policy: at least 20 characters, including uppercase, lowercase, a number, and a symbol.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             Text(message, style = MaterialTheme.typography.bodySmall)
             Text(
-                "Home, Learn, Network and Settings remain available without login. Session tokens are encrypted with Android Keystore and restored when the app reopens. Internet access is required to authenticate and refresh sessions.",
+                "Account credentials are verified by Supabase Auth. Session tokens are encrypted with Android Keystore on this device.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
