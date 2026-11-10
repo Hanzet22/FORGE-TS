@@ -124,6 +124,18 @@ class SupabaseAuthClient(
         return JSONObject(body).toSession()
     }
 
+    suspend fun isEmailVerified(session: SupabaseAuthSession): Boolean {
+        val response = httpClient.get("${supabaseUrl.trimEnd('/')}/auth/v1/user") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+        val user = JSONObject(body)
+        return user.optString("email_confirmed_at").isNotBlank() ||
+            user.optString("confirmed_at").isNotBlank()
+    }
+
     suspend fun signOut(session: SupabaseAuthSession) {
         val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/logout") {
             header("apikey", publishableKey)
