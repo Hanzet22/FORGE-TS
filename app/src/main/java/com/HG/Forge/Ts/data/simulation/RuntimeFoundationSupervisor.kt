@@ -67,15 +67,19 @@ class RuntimeFoundationSupervisor(context: Context) {
         // /dev/kvm is a character device, not a regular file.
         val kvmVisible = kvm.exists()
         val directories = listOf(File(root, "images"), File(root, "instances"), File(root, "logs"))
-
-        var directoriesReady = true
-        directories.forEach { directory ->
-            val created = directory.exists() || directory.mkdirs()
-            val canonicalRoot = root.canonicalFile
+        val appFilesRoot = appContext.filesDir.canonicalFile
+        val canonicalRoot = root.canonicalFile
+        val rootCreated = root.exists() || root.mkdirs()
+        val rootReady = rootCreated &&
+            canonicalRoot.path.startsWith(appFilesRoot.path + File.separator) &&
+            root.isDirectory && root.canRead() && root.canWrite()
+        val directoryReadiness = directories.map { directory ->
+            val created = rootReady && (directory.exists() || directory.mkdirs())
             val canonicalDirectory = directory.canonicalFile
             val contained = canonicalDirectory.path.startsWith(canonicalRoot.path + File.separator)
-            if (!(created && contained && directory.isDirectory && directory.canWrite())) directoriesReady = false
+            created && contained && directory.isDirectory && directory.canRead() && directory.canWrite()
         }
+        val directoriesReady = rootReady && directoryReadiness.all { it }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             notes += "Android API below the declared app minimum; runtime foundation is unsupported."
@@ -100,12 +104,12 @@ class RuntimeFoundationSupervisor(context: Context) {
         val kvmReadObservation = when {
             !kvmVisible -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.UNKNOWN, "No visible KVM node to inspect.")
             kvm.canRead() -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.AVAILABLE, "File API reports readable; advisory metadata only, no open/ioctl probe.")
-            else -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.BLOCKED, "File API does not report read permission; actual open result is untested.")
+            else -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.UNKNOWN, "File API does not report read permission; no open attempt was made, so access remains unknown.")
         }
         val kvmWriteObservation = when {
             !kvmVisible -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.UNKNOWN, "No visible KVM node to inspect.")
             kvm.canWrite() -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.AVAILABLE, "File API reports writable; advisory metadata only, no open/ioctl probe.")
-            else -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.BLOCKED, "File API does not report write permission; actual open result is untested.")
+            else -> RuntimeCapabilityObservation(RuntimeCapabilityStatus.UNKNOWN, "File API does not report write permission; no open attempt was made, so access remains unknown.")
         }
         val adapterObservations = RuntimeEnvironmentId.entries.associateWith { id ->
             if (adapterRegistry.find(id) != null) {
@@ -139,9 +143,9 @@ class RuntimeFoundationSupervisor(context: Context) {
             kvmNodeReadable = kvmVisible && kvm.canRead(),
             kvmNodeWritable = kvmVisible && kvm.canWrite(),
             runtimeRoot = root.canonicalPath,
-            imageDirectoryReady = directories[0].isDirectory && directories[0].canWrite(),
-            instanceDirectoryReady = directories[1].isDirectory && directories[1].canWrite(),
-            logDirectoryReady = directories[2].isDirectory && directories[2].canWrite(),
+            imageDirectoryReady = directoryReadiness[0],
+            instanceDirectoryReady = directoryReadiness[1],
+            logDirectoryReady = directoryReadiness[2],
             notes = notes,
             capabilities = capabilities
         )
