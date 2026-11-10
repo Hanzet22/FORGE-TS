@@ -37,7 +37,8 @@ data class SupabaseTotpEnrollment(
     val secret: String,
     val uri: String
 )
-\ndata class SupabaseAuthUserProfile(
+
+data class SupabaseAuthUserProfile(
     val userId: String,
     val email: String?,
     val emailConfirmedAt: String?,
