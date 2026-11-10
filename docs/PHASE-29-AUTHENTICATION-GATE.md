@@ -12,10 +12,10 @@
 
 - Email/password sign-in and account creation use the existing Supabase Auth REST endpoints.
 - Email confirmation callbacks return through the registered custom-scheme auth callback deep link.
-- A process-wide in-memory session state is shared by the gate and existing remote connector panels.
+- A process-wide session state is shared by the authentication gate and app shell.
 - The session is considered active only until its Supabase expiry timestamp.
 - Sign-out calls the Supabase logout endpoint when possible and always clears the local in-memory session.
-- Existing remote connector panels use the same session and refresh it before remote operations.
+- The app shell restores the encrypted session on startup and refreshes it before expiry. The former Remote Access panel is no longer part of the UI.
 
 ## Security boundaries
 
@@ -23,7 +23,7 @@
 - The existing Redis gateway continues to require a Supabase JWT with JWT verification enabled.
 - The existing lab-record table continues to rely on its owner-scoped RLS policies.
 - The gate is client-side feature access control, not a replacement for server-side JWT verification or RLS.
-- Tokens are intentionally not persisted to disk. Restarting the process requires signing in again.
+- Session tokens are stored with Android Keystore-backed encryption and restored when the app reopens. Sign-out clears the encrypted local session.
 - No new database table, migration, Edge Function, or Redis database is required for this phase.
 
 ## Redis scope
@@ -33,5 +33,5 @@ The existing Upstash database is named hyperai-security-redis and is not a dedic
 ## Verification
 
 - Source review confirms the gate is applied at the root navigation switch for both Simulate and Tools, including Home-to-Tools navigation.
-- Authenticated session state is shared with Remote Access rather than maintaining a second independent login state.
+- Authenticated session state is owned by the app shell and shared with the root authentication gate; there is no separate Remote Access login state.
 - GitHub Actions is the authoritative Android build check; no local Android build is claimed by this commit.
