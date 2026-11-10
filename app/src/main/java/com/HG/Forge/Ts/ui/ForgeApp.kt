@@ -36,6 +36,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.AuthDeepLinkBus
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
+import com.HG.Forge.Ts.data.sync.CrashReportUploader
 import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
 import com.HG.Forge.Ts.data.network.HttpClientProvider
@@ -72,6 +73,18 @@ fun ForgeApp() {
             }
             result.onSuccess { ForgeAuthSessionState.setSession(context, it) }
                 .onFailure { Log.w("FORGE-TS Auth", "Supabase callback processing failed", it) }
+        }
+    }
+
+    LaunchedEffect(authSession?.accessToken) {
+        val accessToken = authSession?.accessToken ?: return@LaunchedEffect
+        val upload = withContext(Dispatchers.IO) {
+            runCatching { CrashReportUploader.uploadPending(context.applicationContext, accessToken) }
+        }
+        upload.onSuccess { status ->
+            if (status != null) Log.i("FORGE-TS CrashSync", "Pending crash reports uploaded: $status")
+        }.onFailure { error ->
+            Log.w("FORGE-TS CrashSync", "Pending crash report upload deferred", error)
         }
     }
 
