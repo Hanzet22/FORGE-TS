@@ -99,3 +99,7 @@ Upgrades the existing Learn tab without replacing its catalog or navigation. Exp
 
 ### Phase 26 — Hybrid Simulation Center
 Adds a dedicated Simulate tab with automatic validated-network awareness, local Redis-style key/value and TTL operations, a local Supabase-style sample table, and a real HTTP health check against a temporary server bound only to `127.0.0.1`. A deterministic loopback simulator is also available and opens no socket. Local data is temporary and is not uploaded. Cloud Redis and Supabase integrations remain gated: the existing HyperAI Redis database and FurFinder Supabase project are not reused; a dedicated Upstash database and dedicated Supabase project with RLS are required before online connectors can be activated. See [Phase 26 technical scope](docs/PHASE-26-HYBRID-SIMULATION-CENTER.md).
+
+
+### Phase 32 — Diagnostic Pipeline Reliability
+Hardens the diagnostic event ingestion boundary without changing the existing database schema, Auth flow, Redis database or rate-limit policy. The `forge-diagnostic-ingest` Edge Function now reports safe stage-specific failures for missing configuration, Redis rate limiting and PostgREST storage, catches upstream storage/network exceptions, and avoids leaking secret values into logs. Existing local queue, bounded batches and WorkManager retry behavior remain unchanged. Runtime recovery still depends on the next normal app diagnostic upload; no synthetic test event was sent. See [Phase 32 technical scope](docs/PHASE-32-DIAGNOSTIC-PIPELINE.md).
