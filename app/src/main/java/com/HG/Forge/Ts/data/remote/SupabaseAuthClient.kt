@@ -95,6 +95,16 @@ class SupabaseAuthClient(
         return JSONObject(body).toSession()
     }
 
+
+    suspend fun signOut(session: SupabaseAuthSession) {
+        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/logout") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        val body = response.bodyAsText()
+        ensureSuccess(response.status.value, body)
+    }
+
     suspend fun refresh(session: SupabaseAuthSession): SupabaseAuthSession {
         val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/token?grant_type=refresh_token") {
             header("apikey", publishableKey)

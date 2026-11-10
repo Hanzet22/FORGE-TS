@@ -2,6 +2,9 @@ package com.HG.Forge.Ts.ui
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.background
@@ -19,12 +22,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
+import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
+import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
+import com.HG.Forge.Ts.data.network.HttpClientProvider
+import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
 import com.HG.Forge.Ts.ui.screens.HomeScreen
 import com.HG.Forge.Ts.ui.screens.KnowledgeCenterScreen
 import com.HG.Forge.Ts.ui.screens.CoreNetworkingScreen
@@ -36,6 +47,18 @@ import com.HG.Forge.Ts.ui.screens.SettingsScreen
 fun ForgeApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
     var selectedToolsSubtab by remember { mutableIntStateOf(0) }
+    val authSession = ForgeAuthSessionState.session
+    val nowEpochSeconds = System.currentTimeMillis() / 1000L
+    val hasActiveSession = authSession?.expiresAtEpochSeconds?.let { it > nowEpochSeconds } == true
+
+    LaunchedEffect(authSession?.accessToken) {
+        val active = authSession ?: return@LaunchedEffect
+        val remainingMillis = ((active.expiresAtEpochSeconds - System.currentTimeMillis() / 1000L).coerceAtLeast(0L)) * 1000L
+        delay(remainingMillis)
+        if (ForgeAuthSessionState.session?.accessToken == active.accessToken) {
+            ForgeAuthSessionState.session = null
+        }
+    }
     var showIntro by rememberSaveable { mutableStateOf(true) }
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -81,8 +104,22 @@ fun ForgeApp() {
                 )
                 1 -> KnowledgeCenterScreen(Modifier.padding(padding))
                 2 -> CoreNetworkingScreen(Modifier.padding(padding))
-                3 -> SimulationScreen(Modifier.padding(padding))
-                4 -> ToolsScreen(modifier = Modifier.padding(padding), initialSelectedTool = selectedToolsSubtab)
+                3 -> if (!hasActiveSession) {
+                    AuthGateScreen(Modifier.padding(padding), "Simulate", onAuthenticated = {})
+                } else {
+                    Column(Modifier.padding(padding).fillMaxSize()) {
+                        AuthenticatedAccessBanner()
+                        SimulationScreen(Modifier.weight(1f))
+                    }
+                }
+                4 -> if (!hasActiveSession) {
+                    AuthGateScreen(Modifier.padding(padding), "Tools", onAuthenticated = {})
+                } else {
+                    Column(Modifier.padding(padding).fillMaxSize()) {
+                        AuthenticatedAccessBanner()
+                        ToolsScreen(Modifier.weight(1f), selectedToolsSubtab)
+                    }
+                }
                 else -> SettingsScreen(Modifier.padding(padding))
             }
         }
@@ -113,4 +150,37 @@ private fun IntroVideoTextureViewHost(
         },
         modifier = modifier
     )
+}
+
+
+@Composable
+private fun AuthenticatedAccessBanner() {
+    val session = ForgeAuthSessionState.session ?: return
+    val scope = rememberCoroutineScope()
+    val authClient = remember {
+        SupabaseAuthClient(
+            ForgeCrashBackendConfig.SUPABASE_URL,
+            ForgeCrashBackendConfig.PUBLISHABLE_KEY,
+            HttpClientProvider.client
+        )
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text("AUTHENTICATED • ${session.email ?: session.userId}", style = MaterialTheme.typography.labelMedium)
+            Text("Simulate & Tools access enabled", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        TextButton(onClick = {
+            scope.launch {
+                val active = ForgeAuthSessionState.session ?: return@launch
+                withContext(Dispatchers.IO) { runCatching { authClient.signOut(active) } }
+                if (ForgeAuthSessionState.session?.accessToken == active.accessToken) {
+                    ForgeAuthSessionState.session = null
+                }
+            }
+        }) { Text("Sign out") }
+    }
 }

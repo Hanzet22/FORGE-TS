@@ -28,6 +28,7 @@ import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.remote.RedisGatewayClient
 import com.HG.Forge.Ts.data.remote.RedisGatewayOperation
 import com.HG.Forge.Ts.data.remote.RedisGatewayRequest
+import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
 import com.HG.Forge.Ts.data.remote.SupabaseAuthSession
 import com.HG.Forge.Ts.data.remote.SupabaseLabRecordsClient
@@ -47,7 +48,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
     val recordsClient = remember { SupabaseLabRecordsClient(ForgeCrashBackendConfig.SUPABASE_URL, ForgeCrashBackendConfig.PUBLISHABLE_KEY, httpClient) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var session by remember { mutableStateOf<SupabaseAuthSession?>(null) }
+    val session = ForgeAuthSessionState.session }
     var busy by remember { mutableStateOf(false) }
     var output by remember { mutableStateOf("Sign in to test the real Supabase and Redis connections.") }
 
@@ -69,7 +70,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                 runCatching { authClient.sessionFromCallback(callbackUrl) }
             }
             result.onSuccess {
-                session = it
+                ForgeAuthSessionState.session = it
                 output = "EMAIL VERIFIED • AUTHENTICATED • ${it.email ?: it.userId}"
             }.onFailure {
                 output = "AUTH CALLBACK FAILED • ${it.message ?: "unknown error"}"
@@ -94,7 +95,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 runCatching { authClient.signIn(email, password) }
                             }
                             result.onSuccess {
-                                session = it
+                                ForgeAuthSessionState.session = it
                                 output = "AUTHENTICATED • ${it.email ?: it.userId}"
                             }.onFailure {
                                 output = it.message ?: "Sign-in failed."
@@ -138,7 +139,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 }
                             }
                             result.onSuccess {
-                                session = it.first
+                                ForgeAuthSessionState.ForgeAuthSessionState.session = it.first
                                 output = "REDIS GATEWAY ONLINE • PING result: ${it.second.result} • source: ${it.second.source}"
                             }.onFailure {
                                 output = "REDIS GATEWAY CHECK FAILED • ${it.message ?: "unknown error"}"
@@ -158,7 +159,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 }
                             }
                             result.onSuccess {
-                                session = it.first
+                                ForgeAuthSessionState.ForgeAuthSessionState.session = it.first
                                 output = "SUPABASE REST ONLINE • RLS SELECT succeeded • ${it.second} row(s) visible to this user."
                             }.onFailure {
                                 output = "SUPABASE CHECK FAILED • ${it.message ?: "unknown error"}"
@@ -168,9 +169,15 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                     }) { Text("Test Supabase SELECT") }
                 }
                 OutlinedButton(enabled = !busy, onClick = {
-                    session = null
-                    password = ""
-                    output = "Signed out locally. No token was persisted on this device."
+                    scope.launch {
+                        val active = ForgeAuthSessionState.session
+                        if (active != null) {
+                            withContext(Dispatchers.IO) { runCatching { authClient.signOut(active) } }
+                        }
+                        ForgeAuthSessionState.session = null
+                        password = ""
+                        output = "Signed out. Session tokens are cleared from app memory."
+                    }
                 }, modifier = Modifier.fillMaxWidth()) { Text("Sign out") }
             }
             Text(output, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
