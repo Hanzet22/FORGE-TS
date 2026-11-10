@@ -114,7 +114,7 @@ fun AuthGateScreen(
                                 }
                             }
                             result.onSuccess {
-                                ForgeAuthSessionState.completePasswordRecovery()
+                                ForgeAuthSessionState.completePasswordRecovery(context)
                                 password = ""
                                 confirmPassword = ""
                                 message = "Password updated. Your account is ready."
