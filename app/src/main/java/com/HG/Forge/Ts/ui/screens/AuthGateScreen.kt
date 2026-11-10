@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.AuthDeepLinkBus
@@ -37,6 +38,7 @@ fun AuthGateScreen(
     onAuthenticated: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val authClient = remember {
         SupabaseAuthClient(
             ForgeCrashBackendConfig.SUPABASE_URL,
@@ -57,7 +59,7 @@ fun AuthGateScreen(
                 runCatching { authClient.sessionFromCallback(callbackUrl) }
             }
             result.onSuccess {
-                ForgeAuthSessionState.session = it
+                ForgeAuthSessionState.setSession(context, it)
                 message = "Email verified. Access granted."
                 onAuthenticated()
             }.onFailure {
@@ -114,7 +116,7 @@ fun AuthGateScreen(
                         busy = false
                     }
                 },
-                enabled = !busy && email.contains("@") && password.length >= 6,
+                enabled = !busy && email.contains("@") && password.length >= 20,
                 modifier = Modifier.fillMaxWidth()
             ) { Text(if (busy) "Please wait..." else "Sign in") }
             OutlinedButton(
@@ -127,7 +129,7 @@ fun AuthGateScreen(
                         }
                         result.onSuccess { created ->
                             if (created != null) {
-                                ForgeAuthSessionState.session = created
+                                ForgeAuthSessionState.setSession(context, created)
                                 message = "Account created and authenticated."
                                 onAuthenticated()
                             } else {
@@ -142,9 +144,10 @@ fun AuthGateScreen(
                 enabled = !busy && email.contains("@") && password.length >= 6,
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Create account") }
+            Text("Password must contain at least 20 characters, matching the configured account policy.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(message, style = MaterialTheme.typography.bodySmall)
             Text(
-                "Home, Learn, Network and Settings remain available without login. Session tokens stay in app memory and are not stored on disk. Internet access is required to authenticate.",
+                "Home, Learn, Network and Settings remain available without login. Session tokens are encrypted with Android Keystore and restored when the app reopens. Internet access is required to authenticate and refresh sessions.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

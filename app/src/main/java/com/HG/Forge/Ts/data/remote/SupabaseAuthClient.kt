@@ -25,7 +25,7 @@ data class SupabaseAuthSession(
 class SupabaseAuthException(val statusCode: Int, val errorCode: String) :
     Exception("$errorCode (HTTP $statusCode)")
 
-/** Minimal password-auth client. Tokens are kept in memory only; no token is written to disk. */
+/** Password-auth client. Session persistence is handled by ForgeAuthSessionStore using Android Keystore encryption. */
 class SupabaseAuthClient(
     private val supabaseUrl: String,
     private val publishableKey: String,
@@ -126,7 +126,7 @@ class SupabaseAuthClient(
         require(supabaseUrl.startsWith("https://")) { "Supabase URL must use HTTPS." }
         require(publishableKey.isNotBlank()) { "Supabase publishable key is missing." }
         require(email.contains("@") && email.length <= 254) { "Enter a valid email address." }
-        require(password.length >= 6) { "Password must contain at least 6 characters." }
+        require(password.length >= 20) { "Password must contain at least 20 characters." }
     }
 
     private fun ensureSuccess(statusCode: Int, body: String) {

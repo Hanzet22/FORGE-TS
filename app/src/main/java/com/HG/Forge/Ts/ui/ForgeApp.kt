@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -49,16 +50,42 @@ import com.HG.Forge.Ts.ui.screens.SettingsScreen
 fun ForgeApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
     var selectedToolsSubtab by remember { mutableIntStateOf(0) }
+    val context = LocalContext.current
+    val authClient = remember(context) {
+        SupabaseAuthClient(
+            ForgeCrashBackendConfig.SUPABASE_URL,
+            ForgeCrashBackendConfig.PUBLISHABLE_KEY,
+            HttpClientProvider.client
+        )
+    }
     val authSession = ForgeAuthSessionState.session
     val nowEpochSeconds = System.currentTimeMillis() / 1000L
     val hasActiveSession = authSession?.expiresAtEpochSeconds?.let { it > nowEpochSeconds } == true
 
-    LaunchedEffect(authSession?.accessToken) {
+    LaunchedEffect(authClient) {
+        ForgeAuthSessionState.restore(context.applicationContext, authClient)
+    }
+
+    LaunchedEffect(authSession?.accessToken, authSession?.expiresAtEpochSeconds) {
         val active = authSession ?: return@LaunchedEffect
-        val remainingMillis = ((active.expiresAtEpochSeconds - System.currentTimeMillis() / 1000L).coerceAtLeast(0L)) * 1000L
-        delay(remainingMillis)
-        if (ForgeAuthSessionState.session?.accessToken == active.accessToken) {
-            ForgeAuthSessionState.session = null
+        while (ForgeAuthSessionState.session?.accessToken == active.accessToken) {
+            val secondsUntilRefresh = active.expiresAtEpochSeconds -
+                System.currentTimeMillis() / 1000L - 45L
+            if (secondsUntilRefresh > 0L) delay(secondsUntilRefresh * 1000L)
+
+            val current = ForgeAuthSessionState.session ?: break
+            val refreshed = runCatching {
+                withContext(Dispatchers.IO) { authClient.validSession(current) }
+            }
+            if (refreshed.isSuccess) {
+                ForgeAuthSessionState.setSession(context, refreshed.getOrThrow())
+                break
+            }
+
+            val secondsRemaining = current.expiresAtEpochSeconds -
+                System.currentTimeMillis() / 1000L
+            if (secondsRemaining <= 0L) break
+            delay(minOf(60L, secondsRemaining) * 1000L)
         }
     }
     var showIntro by rememberSaveable { mutableStateOf(true) }
@@ -158,6 +185,7 @@ private fun IntroVideoTextureViewHost(
 @Composable
 private fun AuthenticatedAccessBanner() {
     val session = ForgeAuthSessionState.session ?: return
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val authClient = remember {
         SupabaseAuthClient(
@@ -180,7 +208,7 @@ private fun AuthenticatedAccessBanner() {
                 val active = ForgeAuthSessionState.session ?: return@launch
                 withContext(Dispatchers.IO) { runCatching { authClient.signOut(active) } }
                 if (ForgeAuthSessionState.session?.accessToken == active.accessToken) {
-                    ForgeAuthSessionState.session = null
+                    ForgeAuthSessionState.clearSession(context)
                 }
             }
         }) { Text("Sign out") }
