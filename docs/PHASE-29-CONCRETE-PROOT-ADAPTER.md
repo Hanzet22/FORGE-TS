@@ -10,7 +10,7 @@
 - Expected engine entrypoints are libproot.so and libproot_loader.so; the loader is supplied through PROOT_LOADER, and LD_LIBRARY_PATH points to the installed native library directory.
 - Adapter inspection runs a bounded disposable guest command through the same PRoot launch path used by the session. A successful exit is required before Start can proceed.
 - Start owns the launched process and only confirms active state when the process remains alive after startup.
-- Stop is routed through the adapter and persists STOPPING followed by STOPPED or FAILED in the existing DataStore registry.
+- Stop is routed through the adapter, requests graceful termination, verifies launcher exit after forced termination if needed, and persists STOPPING followed by STOPPED or FAILED in the existing DataStore registry.
 - No new DataStore keys, database, migration, Supabase project, Redis resource, rootfs download or archive extraction was added.
 
 ## Runtime requirements not yet satisfied
