@@ -25,7 +25,19 @@ data class SupabaseAuthSession(
     val emailConfirmedAt: String? = null
 )
 
-data class SupabaseTotpFactor(\n    val id: String,\n    val friendlyName: String?,\n    val status: String\n)\n\ndata class SupabaseTotpEnrollment(\n    val factorId: String,\n    val qrCodeSvg: String,\n    val secret: String,\n    val uri: String\n)\n\ndata class SupabaseAuthUserProfile(
+data class SupabaseTotpFactor(
+    val id: String,
+    val friendlyName: String?,
+    val status: String
+)
+
+data class SupabaseTotpEnrollment(
+    val factorId: String,
+    val qrCodeSvg: String,
+    val secret: String,
+    val uri: String
+)
+\ndata class SupabaseAuthUserProfile(
     val userId: String,
     val email: String?,
     val emailConfirmedAt: String?,
