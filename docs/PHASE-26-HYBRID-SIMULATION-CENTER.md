@@ -82,3 +82,12 @@ A dedicated Supabase project is required. The existing FurFinder project must no
 ## Important distinction
 
 The first committed version provides functional local learning engines and a real device-local loopback test. It does **not** claim that remote Redis or Supabase is connected. Those connectors must be enabled only after the dedicated cloud resources, RLS model, and server-side gateway are provisioned and verified.
+
+
+## Simulation Environment Launcher — UI increment
+
+- Added a five-entry environment launcher to the existing Simulation tab.
+- Entries: XFCE4 Desktop Native, XFCE4 PRoot, MikroTik RouterOS (Coming soon), Linux Ubuntu/Debian Desktop Native, and VM WStation.
+- The launcher reports implementation status honestly. Selecting a planned environment displays its current readiness and remaining gates; it does not claim to launch an unavailable runtime.
+- The existing connectivity status, Remote Access panel, runtime foundation panels, RouterOS image staging panel, and Redis/Supabase/Loopback learning labs remain in place.
+- This increment is UI/navigation scaffolding only. It does not add distro downloads, PRoot execution, desktop processes, QEMU, or cloud dependencies.

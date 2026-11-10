@@ -44,6 +44,7 @@ import com.HG.Forge.Ts.ui.screens.RemoteAccessPanel
 import com.HG.Forge.Ts.ui.screens.RuntimeFoundationPanel
 import com.HG.Forge.Ts.ui.screens.RouterOsImageImportPanel
 import com.HG.Forge.Ts.ui.screens.LinuxUserlandFoundationPanel
+import com.HG.Forge.Ts.ui.screens.SimulationEnvironmentLauncher
 
 private enum class SimulationModule(val title: String) {
     REDIS("Redis"), SUPABASE("Supabase"), LOOPBACK("Loopback")
@@ -99,6 +100,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Simulation Center", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         Text("Hybrid local labs with automatic connectivity awareness.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        SimulationEnvironmentLauncher()
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(if (internetValidated) "INTERNET AVAILABLE" else "INTERNET UNAVAILABLE", fontWeight = FontWeight.Bold)
