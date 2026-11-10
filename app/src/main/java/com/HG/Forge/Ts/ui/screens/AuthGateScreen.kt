@@ -59,6 +59,10 @@ fun AuthGateScreen(
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var mode by remember { mutableStateOf("sign_in") }
     var busy by remember { mutableStateOf(false) }
+    var mfaPendingSession by remember { mutableStateOf<com.HG.Forge.Ts.data.remote.SupabaseAuthSession?>(null) }
+    var mfaFactorId by remember { mutableStateOf<String?>(null) }
+    var mfaChallengeId by remember { mutableStateOf<String?>(null) }
+    var mfaCode by remember { mutableStateOf("") }
     var message by remember {
         mutableStateOf(
             if (recoveryMode) "Choose a new password for your FORGE-TS account."
@@ -82,7 +86,68 @@ fun AuthGateScreen(
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            if (recoveryMode) {
+            if (mfaPendingSession != null) {
+                Text("Authenticator verification", style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    "Password accepted. Enter the current 6-digit code from your authenticator app to finish signing in.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = mfaCode,
+                    onValueChange = { mfaCode = it.filter(Char::isDigit).take(6) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("6-digit authenticator code") },
+                    singleLine = true,
+                    enabled = !busy
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            message = "Verifying authenticator code…"
+                            val pendingSession = mfaPendingSession
+                            val factorId = mfaFactorId
+                            val challengeId = mfaChallengeId
+                            val result = withContext(Dispatchers.IO) {
+                                runCatching {
+                                    authClient.verifyTotpChallenge(
+                                        requireNotNull(pendingSession),
+                                        requireNotNull(factorId),
+                                        requireNotNull(challengeId),
+                                        mfaCode
+                                    )
+                                }
+                            }
+                            result.onSuccess {
+                                ForgeAuthSessionState.setSession(context, it)
+                                mfaPendingSession = null
+                                mfaFactorId = null
+                                mfaChallengeId = null
+                                mfaCode = ""
+                                message = "Authenticator verified. Simulate and Tools are unlocked."
+                                onAuthenticated()
+                            }.onFailure {
+                                message = it.message ?: "Authenticator verification failed."
+                            }
+                            busy = false
+                        }
+                    },
+                    enabled = !busy && mfaCode.length == 6 && mfaFactorId != null && mfaChallengeId != null,
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(if (busy) "Verifying…" else "Verify and sign in") }
+                OutlinedButton(
+                    enabled = !busy,
+                    onClick = {
+                        mfaPendingSession = null
+                        mfaFactorId = null
+                        mfaChallengeId = null
+                        mfaCode = ""
+                        message = "Sign-in cancelled. Enter your credentials to try again."
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Cancel sign-in") }
+            } else if (recoveryMode) {
                 Text(
                     "Recovery link verified. Set a new password to finish account recovery.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -188,12 +253,26 @@ fun AuthGateScreen(
                                     busy = true
                                     message = "Signing in..."
                                     val result = withContext(Dispatchers.IO) {
-                                        runCatching { authClient.signIn(email, password) }
+                                        runCatching {
+                                            val signedIn = authClient.signIn(email, password)
+                                            val factor = authClient.listTotpFactors(signedIn)
+                                                .firstOrNull { it.status.equals("verified", ignoreCase = true) }
+                                            if (factor == null) Triple(signedIn, null, null)
+                                            else Triple(signedIn, factor.id, authClient.createTotpChallenge(signedIn, factor.id))
+                                        }
                                     }
-                                    result.onSuccess {
-                                        ForgeAuthSessionState.setSession(context, it)
-                                        message = "Signed in. Simulate and Tools are unlocked."
-                                        onAuthenticated()
+                                    result.onSuccess { (signedIn, factorId, challengeId) ->
+                                        if (factorId != null && challengeId != null) {
+                                            mfaPendingSession = signedIn
+                                            mfaFactorId = factorId
+                                            mfaChallengeId = challengeId
+                                            mfaCode = ""
+                                            message = "Password accepted. Complete authenticator verification."
+                                        } else {
+                                            ForgeAuthSessionState.setSession(context, signedIn)
+                                            message = "Signed in. Simulate and Tools are unlocked."
+                                            onAuthenticated()
+                                        }
                                     }.onFailure {
                                         message = it.message ?: "Sign-in failed."
                                     }
