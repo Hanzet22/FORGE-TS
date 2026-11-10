@@ -10,7 +10,7 @@ on:
       - ".github/workflows/proot-native.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: proot-native-arm64
@@ -40,6 +40,25 @@ jobs:
 
       - name: Build pinned PRoot and loader
         run: bash scripts/native/build-proot-runtime.sh
+
+      - name: Bundle ARM64 PRoot payload into Android jniLibs
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -D -m 0755 build/proot-native/artifact/arm64-v8a/libproot.so app/src/main/jniLibs/arm64-v8a/libproot.so
+          install -D -m 0755 build/proot-native/artifact/arm64-v8a/libproot_loader.so app/src/main/jniLibs/arm64-v8a/libproot_loader.so
+          install -D -m 0644 build/proot-native/artifact/build-manifest.txt app/src/main/assets/proot-runtime/build-manifest.txt
+          install -D -m 0644 build/proot-native/artifact/SHA256SUMS app/src/main/assets/proot-runtime/SHA256SUMS
+          install -D -m 0644 build/proot-native/artifact/licenses/PRoot-COPYING app/src/main/assets/licenses/PRoot-COPYING
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/jniLibs/arm64-v8a/libproot.so app/src/main/jniLibs/arm64-v8a/libproot_loader.so app/src/main/assets/proot-runtime/build-manifest.txt app/src/main/assets/proot-runtime/SHA256SUMS app/src/main/assets/licenses/PRoot-COPYING
+          if git diff --cached --quiet; then
+            echo "Bundled PRoot payload is already current."
+          else
+            git commit -m "build(workstation): bundle verified ARM64 PRoot runtime [skip ci]"
+            git push origin HEAD:main
+          fi
 
       - name: Upload native runtime artifact
         uses: actions/upload-artifact@v4
