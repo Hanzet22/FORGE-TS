@@ -89,5 +89,6 @@ The first committed version provides functional local learning engines and a rea
 - Added a five-entry environment launcher to the existing Simulation tab.
 - Entries: XFCE4 Desktop Native, XFCE4 PRoot, MikroTik RouterOS (Coming soon), Linux Ubuntu/Debian Desktop Native, and VM WStation.
 - The launcher reports implementation status honestly. Selecting a planned environment displays its current readiness and remaining gates; it does not claim to launch an unavailable runtime.
-- The existing connectivity status, Remote Access panel, runtime foundation panels, RouterOS image staging panel, and Redis/Supabase/Loopback learning labs remain in place.
+- The existing connectivity status, runtime foundation panels, RouterOS image staging panel, and Redis/Supabase/Loopback learning labs remain in place.
+- The former Remote Access panel was removed. Supabase authentication remains at the shared application gate; this screen exposes local simulation labs only.
 - This increment is UI/navigation scaffolding only. It does not add distro downloads, PRoot execution, desktop processes, QEMU, or cloud dependencies.
