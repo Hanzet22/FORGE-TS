@@ -17,116 +17,88 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-
-private enum class SimulationEnvironment(
-    val title: String,
-    val summary: String,
-    val status: String,
-    val availability: String
-) {
-    XFCE_NATIVE(
-        "XFCE4 Desktop Native",
-        "Standalone XFCE4 desktop managed by the FORGE-TS Linux runtime.",
-        "Foundation prepared",
-        "The private Linux workspace foundation is available below. Desktop installation and display lifecycle are not implemented yet."
-    ),
-    XFCE_PROOT(
-        "XFCE4 PRoot",
-        "XFCE4 inside a user-selected Linux distribution: Alpine, Ubuntu, or Debian.",
-        "Planned",
-        "Distribution downloads, rootfs verification, safe extraction, PRoot setup, and desktop display integration are still pending."
-    ),
-    MIKROTIK(
-        "MikroTik RouterOS",
-        "RouterOS CHR guest environment for network simulation.",
-        "Coming soon",
-        "CHR execution remains gated on licensing clarification, compatible virtualization, and guest-isolation evidence."
-    ),
-    LINUX_NATIVE(
-        "Linux Ubuntu/Debian Desktop Native",
-        "A separately provisioned Ubuntu or Debian desktop userland managed by FORGE-TS.",
-        "Planned",
-        "This will have its own distribution provisioning and lifecycle; it is not the PRoot environment."
-    ),
-    VM_WORKSTATION(
-        "VM WStation",
-        "A general-purpose virtual-machine workstation for compatible guest systems.",
-        "Planned",
-        "The VM supervisor and supported guest/backend matrix have not been implemented or validated."
-    )
-}
+import com.HG.Forge.Ts.data.simulation.HybridRuntimeManager
+import com.HG.Forge.Ts.data.simulation.HybridRuntimeSnapshot
+import com.HG.Forge.Ts.data.simulation.RuntimeLifecycleState
 
 @Composable
 fun SimulationEnvironmentLauncher() {
-    var selected by remember { mutableStateOf<SimulationEnvironment?>(null) }
+    val context = LocalContext.current
+    val manager = remember(context) { HybridRuntimeManager(context) }
+    var snapshot by remember(manager) { mutableStateOf(manager.inspect()) }
+    var message by remember { mutableStateOf("Runtime manager initialized. No environment has been launched.") }
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text("Environment Launcher", style = MaterialTheme.typography.titleLarge)
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Hybrid Runtime Manager", style = MaterialTheme.typography.titleLarge)
             Text(
-                "Choose one of the five independent simulation environments. Entries that are not ready show their current implementation status.",
+                "One supervisor, five isolated workspaces. Preparing a workspace does not install or launch its runtime.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            SimulationEnvironment.entries.forEach { environment ->
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
+            snapshot.environments.forEach { environment ->
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(environment.title, style = MaterialTheme.typography.titleMedium)
+                        Text("Lifecycle: ${environment.lifecycle}", style = MaterialTheme.typography.labelMedium)
                         Text(
-                            environment.summary,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            if (environment.workspaceReady) "Workspace: prepared" else "Workspace: not prepared",
+                            style = MaterialTheme.typography.bodySmall
                         )
+                        Text(environment.notes.joinToString(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            if (environment == SimulationEnvironment.MIKROTIK) {
-                                OutlinedButton(onClick = { selected = environment }, enabled = false) {
-                                    Text(environment.status)
-                                }
-                            } else {
-                                Button(onClick = { selected = environment }) {
-                                    Text("Open")
-                                }
-                                Text(
-                                    environment.status,
-                                    modifier = Modifier.padding(top = 10.dp),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            Button(onClick = {
+                                val result = manager.prepareWorkspace(environment.id)
+                                message = result.message
+                                snapshot = manager.inspect()
+                            }) { Text(if (environment.workspaceReady) "Refresh workspace" else "Prepare workspace") }
+                            OutlinedButton(
+                                onClick = {
+                                    message = manager.requestStart(environment.id).message
+                                    snapshot = manager.inspect()
+                                },
+                                enabled = environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE
+                            ) { Text("Start") }
                         }
                     }
                 }
             }
-
-            selected?.let { environment ->
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(environment.title, style = MaterialTheme.typography.titleSmall)
-                        Text(environment.availability, style = MaterialTheme.typography.bodySmall)
-                    }
+            ResourceSummary(snapshot)
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+                Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Manager event", style = MaterialTheme.typography.titleSmall)
+                    Text(message, style = MaterialTheme.typography.bodySmall)
                 }
             }
+            OutlinedButton(
+                onClick = { snapshot = manager.inspect(); message = "Device resources and environment registry refreshed." },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Refresh manager status") }
         }
     }
+}
+
+@Composable
+private fun ResourceSummary(snapshot: HybridRuntimeSnapshot) {
+    val resources = snapshot.resources
+    Card {
+        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Device resource monitor", style = MaterialTheme.typography.titleMedium)
+            Text("Available RAM: ${formatBytes(resources.availableMemoryBytes)} / ${formatBytes(resources.totalMemoryBytes)}")
+            Text("Available storage: ${formatBytes(resources.availableStorageBytes)} / ${formatBytes(resources.totalStorageBytes)}")
+            Text("Available processors: ${resources.availableProcessors}")
+            Text("Device-wide readings; not resources reserved for FORGE-TS.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+private fun formatBytes(value: Long): String {
+    if (value < 1024L) return "${value} B"
+    val units = listOf("KB", "MB", "GB", "TB")
+    var amount = value.toDouble()
+    var index = -1
+    do { amount /= 1024.0; index++ } while (amount >= 1024.0 && index < units.lastIndex)
+    return String.format(java.util.Locale.US, "%.1f %s", amount, units[index])
 }
