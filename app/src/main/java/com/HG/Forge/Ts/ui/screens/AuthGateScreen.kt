@@ -12,7 +12,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.HG.Forge.Ts.AuthDeepLinkBus
 import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
@@ -50,24 +48,6 @@ fun AuthGateScreen(
     var password by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("Sign in or create an account to unlock this area.") }
-
-    LaunchedEffect(authClient) {
-        AuthDeepLinkBus.callbacks.collect { callbackUrl ->
-            busy = true
-            message = "Verifying your email callback..."
-            val result = withContext(Dispatchers.IO) {
-                runCatching { authClient.sessionFromCallback(callbackUrl) }
-            }
-            result.onSuccess {
-                ForgeAuthSessionState.setSession(context, it)
-                message = "Email verified. Access granted."
-                onAuthenticated()
-            }.onFailure {
-                message = "Verification failed: ${it.message ?: "unknown error"}"
-            }
-            busy = false
-        }
-    }
 
     Card(modifier.fillMaxSize().padding(20.dp)) {
         Column(
