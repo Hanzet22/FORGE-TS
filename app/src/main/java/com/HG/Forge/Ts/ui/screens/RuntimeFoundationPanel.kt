@@ -73,7 +73,7 @@ fun RuntimeFoundationPanel() {
                 Text("RAM available / total: ${current.availableMemoryBytes / 1_048_576} / ${current.totalMemoryBytes / 1_048_576} MiB")
                 Text("Storage available / total: ${current.availableStorageBytes / 1_073_741_824} / ${current.totalStorageBytes / 1_073_741_824} GiB")
                 Text("/dev/kvm visible: ${current.kvmNodeVisible} • readable flag: ${current.kvmNodeReadable} • writable flag: ${current.kvmNodeWritable}")
-                Text("Process ABI: ${current.capabilities.processAbi}")
+                Text("Process architecture: ${current.capabilities.processArchitecture}")
                 Text("KVM node: ${current.capabilities.kvmNode.status} — ${current.capabilities.kvmNode.detail}", style = MaterialTheme.typography.bodySmall)
                 Text("KVM read: ${current.capabilities.kvmReadPermission.status} • write: ${current.capabilities.kvmWritePermission.status}", style = MaterialTheme.typography.bodySmall)
                 Text("KVM API probe: ${current.capabilities.kvmApiProbe.status} — ${current.capabilities.kvmApiProbe.detail}", style = MaterialTheme.typography.bodySmall)

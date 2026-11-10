@@ -13,7 +13,7 @@ These states are not interchangeable. UNKNOWN is never promoted to AVAILABLE.
 
 ## Reported dimensions
 
-- Supported Android ABIs and the current process ABI are separate values.
+- Supported Android ABIs and the process architecture reported by the runtime are separate values.
 - /dev/kvm visibility is reported independently from advisory read/write permission flags.
 - KVM API and VM-creation probes remain UNKNOWN; foundation inspection does not open the device, issue ioctls, or create a VM.
 - PRoot ptrace remains UNKNOWN until a concrete adapter probes the actual app process and its disposable child using the same launch path it will ship.
