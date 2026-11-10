@@ -39,7 +39,8 @@ data class HybridRuntimeSnapshot(
     val resources: RuntimeResourceSnapshot,
     val managerWorkspaceReady: Boolean,
     val notes: List<String>,
-    val prootInstances: List<ProotRuntimeInstanceSnapshot> = emptyList()
+    val prootInstances: List<ProotRuntimeInstanceSnapshot> = emptyList(),
+    val foundation: RuntimeFoundationReport? = null
 )
 data class RuntimeOperationResult(val accepted: Boolean, val message: String)
 data class ProotRuntimeInstanceSnapshot(
@@ -115,6 +116,7 @@ class HybridRuntimeManager(
     private val runtimeRoot = File(appContext.filesDir, "forge-runtime")
     private val managerRoot = File(runtimeRoot, "manager")
     private val registry = RuntimeRegistryStore(appContext)
+    private val foundationSupervisor = RuntimeFoundationSupervisor(appContext)
     private val roots = mapOf(
         RuntimeEnvironmentId.XFCE_NATIVE to File(runtimeRoot, "native-xfce"),
         RuntimeEnvironmentId.XFCE_PROOT to File(runtimeRoot, "proot"),
@@ -211,6 +213,7 @@ class HybridRuntimeManager(
         val activityManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.getMemoryInfo(memory)
         val storage = StatFs(appContext.filesDir.absolutePath)
+        val foundation = foundationSupervisor.inspect(adapterRegistry)
         val environments = RuntimeEnvironmentId.entries.map { id ->
             val root = roots.getValue(id)
             val ready = id in prepared && isSafeDirectory(root, runtimeRoot)
@@ -244,7 +247,8 @@ class HybridRuntimeManager(
                     distribution in preparedProotInstances &&
                         isSafeDirectory(instanceRoot, roots.getValue(RuntimeEnvironmentId.XFCE_PROOT))
                 )
-            }
+            },
+            foundation
         )
     }
 

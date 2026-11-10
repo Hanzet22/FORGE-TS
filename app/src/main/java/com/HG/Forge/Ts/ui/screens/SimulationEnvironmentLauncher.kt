@@ -143,6 +143,19 @@ fun SimulationEnvironmentLauncher() {
                 }
             }
             ResourceSummary(snapshot)
+            snapshot.foundation?.let { foundation ->
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Runtime capability gate", style = MaterialTheme.typography.titleSmall)
+                        Text("PRoot ptrace: ${foundation.capabilities.prootPtraceProbe.status}", style = MaterialTheme.typography.bodySmall)
+                        Text("KVM API: ${foundation.capabilities.kvmApiProbe.status} • VM creation: ${foundation.capabilities.kvmVmCreationProbe.status}", style = MaterialTheme.typography.bodySmall)
+                        foundation.capabilities.executionAdapters.forEach { (environment, observation) ->
+                            Text("$environment adapter: ${observation.status}", style = MaterialTheme.typography.bodySmall)
+                        }
+                        Text("Unknown means not probed; it is not treated as available.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Manager event", style = MaterialTheme.typography.titleSmall)

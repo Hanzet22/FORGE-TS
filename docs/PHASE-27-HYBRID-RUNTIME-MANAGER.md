@@ -1,6 +1,6 @@
 # Phase 2 — Hybrid Runtime Manager
 
-**Status:** P0 adapter contract and per-distribution PRoot workspace registry integrated; actual execution remains gated until a concrete adapter and installed runtime are supplied.
+**Status:** P0 adapter contract, per-distribution PRoot workspace registry, and conservative device-capability reporting integrated. Actual execution remains gated until a concrete adapter and installed runtime are supplied.
 
 ## Implemented
 
@@ -10,6 +10,9 @@
 - Separate workspace roots with home, tmp, logs, and data directories for every environment.
 - Independent Debian, Ubuntu, and Alpine PRoot instance workspaces under the existing `proot/` root, with separate persisted lifecycle and workspace metadata.
 - Device-wide RAM, storage, and processor observations.
+- Explicit capability observations for process ABI, /dev/kvm visibility, advisory file permission flags, KVM API/VM-creation probe states, PRoot ptrace probe state, and per-environment adapter registration.
+- Capability states distinguish AVAILABLE, UNAVAILABLE, BLOCKED, and UNKNOWN; unknown or metadata-only observations never imply an executable backend.
+- HybridRuntimeManager includes the same foundation capability report in its snapshot; Simulation Center displays the backend gate alongside lifecycle state.
 - Simulation Center integration for workspace status, lifecycle state, start gating, and resource observations.
 
 ## Readiness rules
@@ -57,6 +60,7 @@ Each environment receives its own private directories. No rootfs, image, or gues
 
 ## Next increments
 
-1. Add a verified rootfs import pipeline with archive limits, path-traversal rejection, and rollback.
-2. Implement and register the PRoot execution adapter against the new contract.
+1. Add a verified rootfs acquisition and extraction pipeline with archive limits, path-traversal rejection, checksum/signature verification where available, and rollback.
+2. Implement and register the PRoot execution adapter; it must perform a process-local ptrace probe and report backend capability before start.
 3. Add lifecycle cleanup and Android process-death recovery before enabling long-running sessions.
+4. Implement KVM API/VM-creation probes inside a dedicated VM adapter; do not infer KVM support from the foundation report.

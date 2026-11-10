@@ -72,7 +72,17 @@ fun RuntimeFoundationPanel() {
                 Text("CPU cores: ${current.availableProcessors}")
                 Text("RAM available / total: ${current.availableMemoryBytes / 1_048_576} / ${current.totalMemoryBytes / 1_048_576} MiB")
                 Text("Storage available / total: ${current.availableStorageBytes / 1_073_741_824} / ${current.totalStorageBytes / 1_073_741_824} GiB")
-                Text("/dev/kvm visible: ${current.kvmNodeVisible} • readable: ${current.kvmNodeReadable} • writable: ${current.kvmNodeWritable}")
+                Text("/dev/kvm visible: ${current.kvmNodeVisible} • readable flag: ${current.kvmNodeReadable} • writable flag: ${current.kvmNodeWritable}")
+                Text("Process ABI: ${current.capabilities.processAbi}")
+                Text("KVM node: ${current.capabilities.kvmNode.status} — ${current.capabilities.kvmNode.detail}", style = MaterialTheme.typography.bodySmall)
+                Text("KVM read: ${current.capabilities.kvmReadPermission.status} • write: ${current.capabilities.kvmWritePermission.status}", style = MaterialTheme.typography.bodySmall)
+                Text("KVM API probe: ${current.capabilities.kvmApiProbe.status} — ${current.capabilities.kvmApiProbe.detail}", style = MaterialTheme.typography.bodySmall)
+                Text("KVM VM creation: ${current.capabilities.kvmVmCreationProbe.status} — ${current.capabilities.kvmVmCreationProbe.detail}", style = MaterialTheme.typography.bodySmall)
+                Text("PRoot ptrace: ${current.capabilities.prootPtraceProbe.status} — ${current.capabilities.prootPtraceProbe.detail}", style = MaterialTheme.typography.bodySmall)
+                Text("Execution adapters:", style = MaterialTheme.typography.labelMedium)
+                current.capabilities.executionAdapters.forEach { (environment, observation) ->
+                    Text("• $environment: ${observation.status} — ${observation.detail}", style = MaterialTheme.typography.bodySmall)
+                }
                 Text("Private runtime root: ${current.runtimeRoot}")
                 Text("Directories: images=${current.imageDirectoryReady}, instances=${current.instanceDirectoryReady}, logs=${current.logDirectoryReady}")
                 current.notes.forEach { note ->
