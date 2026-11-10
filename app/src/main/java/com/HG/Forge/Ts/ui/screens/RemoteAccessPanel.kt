@@ -48,7 +48,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
     val recordsClient = remember { SupabaseLabRecordsClient(ForgeCrashBackendConfig.SUPABASE_URL, ForgeCrashBackendConfig.PUBLISHABLE_KEY, httpClient) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val session = ForgeAuthSessionState.session }
+    val session = ForgeAuthSessionState.session
     var busy by remember { mutableStateOf(false) }
     var output by remember { mutableStateOf("Sign in to test the real Supabase and Redis connections.") }
 
@@ -112,7 +112,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                             }
                             result.onSuccess { created ->
                                 if (created != null) {
-                                    session = created
+                                    ForgeAuthSessionState.session = created
                                     output = "ACCOUNT CREATED • authenticated"
                                 } else {
                                     output = "SIGNUP SUBMITTED • open the confirmation email; FORGE-TS should receive the callback automatically."
@@ -139,7 +139,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 }
                             }
                             result.onSuccess {
-                                ForgeAuthSessionState.ForgeAuthSessionState.session = it.first
+                                ForgeAuthSessionState.session = it.first
                                 output = "REDIS GATEWAY ONLINE • PING result: ${it.second.result} • source: ${it.second.source}"
                             }.onFailure {
                                 output = "REDIS GATEWAY CHECK FAILED • ${it.message ?: "unknown error"}"
@@ -159,7 +159,7 @@ fun RemoteAccessPanel(internetAvailable: Boolean) {
                                 }
                             }
                             result.onSuccess {
-                                ForgeAuthSessionState.ForgeAuthSessionState.session = it.first
+                                ForgeAuthSessionState.session = it.first
                                 output = "SUPABASE REST ONLINE • RLS SELECT succeeded • ${it.second} row(s) visible to this user."
                             }.onFailure {
                                 output = "SUPABASE CHECK FAILED • ${it.message ?: "unknown error"}"
