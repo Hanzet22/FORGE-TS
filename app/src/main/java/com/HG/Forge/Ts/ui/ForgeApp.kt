@@ -62,6 +62,7 @@ fun ForgeApp() {
         )
     }
     val authSession = ForgeAuthSessionState.session
+    val passwordRecoveryPending = ForgeAuthSessionState.passwordRecoveryPending
     val nowEpochSeconds = System.currentTimeMillis() / 1000L
     val hasActiveSession = authSession?.expiresAtEpochSeconds?.let { it > nowEpochSeconds } == true
 
@@ -71,8 +72,12 @@ fun ForgeApp() {
             val result = runCatching {
                 withContext(Dispatchers.IO) { authClient.sessionFromCallback(callbackUrl) }
             }
-            result.onSuccess { ForgeAuthSessionState.setSession(context, it) }
-                .onFailure { Log.w("FORGE-TS Auth", "Supabase callback processing failed", it) }
+            result.onSuccess {
+                ForgeAuthSessionState.setSession(context, it)
+                if (authClient.isPasswordRecoveryCallback(callbackUrl)) {
+                    ForgeAuthSessionState.beginPasswordRecovery()
+                }
+            }.onFailure { Log.w("FORGE-TS Auth", "Supabase callback processing failed", it) }
         }
     }
 
@@ -186,6 +191,15 @@ fun ForgeApp() {
             ) {
                 Text("Skip intro")
             }
+        }
+
+        if (passwordRecoveryPending) {
+            AuthGateScreen(
+                modifier = Modifier.fillMaxSize(),
+                requestedArea = "Password recovery",
+                onAuthenticated = {},
+                recoveryMode = true
+            )
         }
     }
 }
