@@ -49,7 +49,7 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
             "https://partner-images.canonical.com/oci/noble/current/ubuntu-noble-oci-arm64-root.tar.gz",
             "https://partner-images.canonical.com/oci/noble/current/SHA256SUMS",
             "ubuntu-noble-oci-arm64-root.tar.gz", "gzip",
-            "c5a6798b238c14d4714ea0b2db40e83af7c86008e7e31c90ca44355dc36933db",
+            null,
             maxArchiveBytes = 256L * 1024 * 1024
         )
     )
