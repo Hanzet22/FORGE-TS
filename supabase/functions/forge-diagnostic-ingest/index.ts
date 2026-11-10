@@ -138,12 +138,13 @@ Deno.serve(async (req: Request) => {
 
     stage = "redis_rate_limit";
     const installHash = await sha256(installationId.toLowerCase());
-    const rateKey = \`forge-ts:diagnostic-ingest:\${installHash}:\${new Date().toISOString().slice(0, 10)}\`;
+    const rateKey = "forge-ts:diagnostic-ingest:" + installHash + ":" +
+      new Date().toISOString().slice(0, 10);
     let rateResponse: Response;
     try {
       rateResponse = await fetch(redisEndpoint, {
         method: "POST",
-        headers: { Authorization: \`Bearer \${redisToken}\`, "Content-Type": "application/json" },
+        headers: { Authorization: "Bearer " + redisToken, "Content-Type": "application/json" },
         body: JSON.stringify(["EVAL", RATE_LIMIT_SCRIPT, "1", rateKey]),
         signal: AbortSignal.timeout(4000),
       });
@@ -177,7 +178,7 @@ Deno.serve(async (req: Request) => {
     stage = "database_insert";
     let insertUrl: URL;
     try {
-      insertUrl = new URL(\`\${supabaseUrl}/rest/v1/forge_ts_diagnostic_events\`);
+      insertUrl = new URL(supabaseUrl! + "/rest/v1/forge_ts_diagnostic_events");
     } catch {
       console.error("diagnostic_ingest_supabase_endpoint_invalid");
       return json({ ok: false, error: "diagnostic_storage_unavailable" }, 502);
@@ -191,7 +192,7 @@ Deno.serve(async (req: Request) => {
         method: "POST",
         headers: {
           apikey: serviceRoleKey!,
-          Authorization: \`Bearer \${serviceRoleKey}\`,
+          Authorization: "Bearer " + serviceRoleKey,
           "Content-Type": "application/json",
           Prefer: "resolution=ignore-duplicates,return=minimal",
         },
