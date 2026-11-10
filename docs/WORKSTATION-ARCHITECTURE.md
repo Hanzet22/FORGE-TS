@@ -2,7 +2,7 @@
 
 **Document status:** Approved architecture baseline  
 **Specification:** v1.0  
-**Implementation status:** Not started  
+**Runtime execution status:** Not started; existing foundation scaffolding is already present  
 **Repository:** `Hanzet22/FORGE-TS`  
 **Branch:** `main`  
 **Date:** 2026-11-10
@@ -25,6 +25,18 @@ Repository inspection found:
 - No NDK/CMake, X11 server, PRoot binary or QEMU engine is currently declared in the inspected app Gradle file.
 
 The implementation must preserve the existing app identity and Android 10 minimum unless a separately approved platform change is made. Runtime compatibility must be detected on-device; Android version alone is not sufficient.
+
+### Existing WorkStation foundation already in the repository
+
+Source inspection found these existing components under `app/src/main/java/com/HG/Forge/Ts/data/simulation/` and `ui/screens/`:
+
+- `HybridRuntimeManager`: persistent DataStore registry, five environment entries, app-private workspaces, resource snapshots, conservative crash recovery and a guarded `requestStart()` that currently refuses execution because no execution adapter is implemented.
+- `RuntimeFoundationSupervisor`: Android API/ABI, memory/storage and `/dev/kvm` node visibility/permission inspection; prepares `images`, `instances` and `logs`. A visible KVM node is not proof that KVM can be initialized or used.
+- `LinuxUserlandFoundationSupervisor`: prepares a private Linux-userland workspace only; it does not download, extract, mount or execute a distro.
+- `RouterOsImageImporter`: accepts a user-selected CHR ARM64 RAW image and stages it after comparing its bytes with a user-supplied SHA-256. It does not authenticate the hash source, boot or execute the image.
+- `RuntimeFoundationPanel`, `LinuxUserlandFoundationPanel`, `RouterOsImageImportPanel` and `SimulationEnvironmentLauncher` are currently shown inside `SimulationScreen`. `ToolsScreen` does not yet contain a WorkStation Center.
+
+These are foundation/preparation features, not completed Native Linux, PRoot, X11, RouterOS or VM runtimes. The next implementation must extend these components instead of creating a second runtime manager.
 
 ## 3. Approved architecture decisions
 
@@ -228,24 +240,28 @@ All workstation environment storage is managed by FORGE-TS.
 Proposed layout:
 
 ```text
-workstation/
-+-- system/
-|   +-- native/
-|   +-- proot/
-|   |   +-- debian/
-|   |   +-- ubuntu/
-|   |   +-- alpine/
-|   +-- vm/
+filesDir/forge-runtime/
++-- manager/
+|   +-- registry/
+|   +-- state/
+|   +-- logs/
++-- native-xfce/
++-- proot/
+|   +-- debian/
+|   +-- ubuntu/
+|   +-- alpine/
++-- linux-native/
++-- linux-userland/   (existing foundation path; consolidate deliberately)
++-- vm-workstation/
++-- routeros/         (reserved; no guest execution)
++-- images/
++-- instances/
++-- logs/
 +-- workspace/
 |   +-- shared/
 |   +-- projects/
 |   +-- exports/
-+-- configs/
-|   +-- native/
-|   +-- proot/
-|   +-- vm/
 +-- backups/
-+-- logs/
 ```
 
 Policy:
@@ -272,18 +288,19 @@ Guest network forwarding is disabled by default. Do not expose guest management 
 
 ## 12. Lifecycle contract
 
-All adapters expose a common state vocabulary:
+The existing persisted `RuntimeLifecycleState` vocabulary is the compatibility baseline:
 
 - `NOT_INSTALLED`
-- `INSTALLING`
-- `STOPPED`
+- `READY`
 - `STARTING`
 - `RUNNING`
 - `STOPPING`
-- `ERROR`
-- `UNSUPPORTED`
+- `STOPPED`
+- `FAILED`
+- `UNAVAILABLE`
+- `RECOVERY_REQUIRED`
 
-The Hybrid Manager may show `RUNNING` only after the adapter confirms the session is active. A submitted Start command is not proof of a successful start.
+Do not replace the DataStore state model or discard existing records while adding adapters. Add new states only with a documented compatibility/migration path. The Hybrid Manager may show `RUNNING` only after the adapter confirms the session is active. A submitted Start command is not proof of a successful start.
 
 ## 13. Dependency policy
 
@@ -338,7 +355,7 @@ A runtime module is complete only when:
 
 **Architecture:** Approved baseline  
 **Specification:** v1.0  
-**Implementation:** Not started  
+**Runtime execution:** Not started; foundation registry, workspace preparation and inspection code already exist  
 **Repository code changes:** None in this specification commit  
 **Database changes:** None  
 **New infrastructure:** None
