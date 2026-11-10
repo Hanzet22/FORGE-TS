@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -45,10 +46,38 @@ class SupabaseAuthClient(
         return json.takeIf { it.has("access_token") }?.toSession()
     }
 
+    suspend fun requestPasswordReset(email: String) {
+        requireValidEmail(email)
+        val redirect = URLEncoder.encode(FORGE_AUTH_REDIRECT_URI, "UTF-8")
+        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/recover?redirect_to=$redirect") {
+            header("apikey", publishableKey)
+            contentType(ContentType.Application.Json)
+            setBody(JSONObject().put("email", email.trim()).toString())
+        }
+        ensureSuccess(response.status.value, response.bodyAsText())
+    }
+
+    suspend fun updatePassword(session: SupabaseAuthSession, newPassword: String) {
+        requireValidPassword(newPassword)
+        val response = httpClient.put("${supabaseUrl.trimEnd('/')}/auth/v1/user") {
+            header("apikey", publishableKey)
+            header("Authorization", "Bearer ${session.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(JSONObject().put("password", newPassword).toString())
+        }
+        ensureSuccess(response.status.value, response.bodyAsText())
+    }
+
+    fun isPasswordRecoveryCallback(callbackUrl: String): Boolean {
+        val uri = Uri.parse(callbackUrl)
+        val fragment = Uri.parse("https://callback.invalid/?${uri.encodedFragment.orEmpty()}")
+        return fragment.getQueryParameter("type") == "recovery" ||
+            uri.getQueryParameter("type") == "recovery"
+    }
+
     /**
-     * Exchanges the access/refresh tokens returned by Supabase's email verification
-     * redirect for a verified user profile. Callback URLs must only be accepted from
-     * the app's registered custom scheme and exact callback host/path.
+     * Exchanges the access/refresh tokens returned by Supabase email confirmation
+     * or password recovery for a verified user profile.
      */
     suspend fun sessionFromCallback(callbackUrl: String): SupabaseAuthSession {
         val uri = Uri.parse(callbackUrl)
@@ -95,14 +124,12 @@ class SupabaseAuthClient(
         return JSONObject(body).toSession()
     }
 
-
     suspend fun signOut(session: SupabaseAuthSession) {
         val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/logout") {
             header("apikey", publishableKey)
             header("Authorization", "Bearer ${session.accessToken}")
         }
-        val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, response.bodyAsText())
     }
 
     suspend fun refresh(session: SupabaseAuthSession): SupabaseAuthSession {
@@ -123,10 +150,22 @@ class SupabaseAuthClient(
     }
 
     private fun requireValidInput(email: String, password: String) {
+        requireValidEmail(email)
+        requireValidPassword(password)
+    }
+
+    private fun requireValidEmail(email: String) {
         require(supabaseUrl.startsWith("https://")) { "Supabase URL must use HTTPS." }
         require(publishableKey.isNotBlank()) { "Supabase publishable key is missing." }
         require(email.contains("@") && email.length <= 254) { "Enter a valid email address." }
+    }
+
+    private fun requireValidPassword(password: String) {
         require(password.length >= 20) { "Password must contain at least 20 characters." }
+        require(password.any(Char::isLowerCase) && password.any(Char::isUpperCase) &&
+            password.any(Char::isDigit) && password.any { !it.isLetterOrDigit() }) {
+            "Password must include uppercase, lowercase, a number, and a symbol."
+        }
     }
 
     private fun ensureSuccess(statusCode: Int, body: String) {
