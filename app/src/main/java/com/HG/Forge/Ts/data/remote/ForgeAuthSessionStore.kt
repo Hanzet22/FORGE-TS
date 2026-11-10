@@ -26,6 +26,7 @@ internal object ForgeAuthSessionStore {
             .put("user_id", session.userId)
             .put("email", session.email)
             .put("expires_at", session.expiresAtEpochSeconds)
+            .put("email_confirmed_at", session.emailConfirmedAt)
             .toString()
             .toByteArray(Charsets.UTF_8)
 
@@ -62,7 +63,8 @@ internal object ForgeAuthSessionStore {
                 refreshToken = json.getString("refresh_token"),
                 userId = json.getString("user_id"),
                 email = json.optString("email").takeIf { it.isNotBlank() && it != "null" },
-                expiresAtEpochSeconds = json.getLong("expires_at")
+                expiresAtEpochSeconds = json.getLong("expires_at"),
+                emailConfirmedAt = json.optString("email_confirmed_at").takeIf { it.isNotBlank() && it != "null" }
             )
         }.getOrElse {
             clear(context)
