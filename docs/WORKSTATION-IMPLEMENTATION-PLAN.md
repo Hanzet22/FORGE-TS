@@ -13,15 +13,19 @@
 - Do not bundle distro RootFS images or installer ISOs into the APK.
 - Never label a PRoot session as Native Linux or a PRoot environment as a VM.
 
-## P0 — Hybrid Manager Foundation
+## P0 — Hybrid Manager Foundation (extend existing foundation)
+
+Existing code to preserve and extend:
+- `HybridRuntimeManager` already persists a registry with DataStore, manages app-private workspaces and exposes resource snapshots.
+- `RuntimeFoundationSupervisor` already inspects Android API/ABI, resources and `/dev/kvm` node visibility/permissions.
+- `LinuxUserlandFoundationSupervisor` already prepares a private Linux workspace.
 
 Deliverables:
-- Runtime adapter contract.
-- Runtime registry and state model.
-- Capability detection result model.
-- Lifecycle orchestration.
-- Resource policy interface.
-- Local diagnostic events.
+- Add a runtime execution-adapter contract and registry; do not create a parallel manager.
+- Integrate adapter capability reports with the existing persistent manager.
+- Preserve the existing `RuntimeLifecycleState` values and DataStore records; document any required state migration before changing them.
+- Separate workspace-prepared state from runtime-installed and runtime-running state.
+- Add resource policy and bounded local diagnostic events.
 
 Acceptance:
 - UI can enumerate runtime adapters and display their real state.
@@ -29,6 +33,8 @@ Acceptance:
 - Adapter failures do not corrupt another runtime's state.
 
 ## P1 — Display Foundation and XFCE Native
+
+Reuse the existing Linux-userland and Native runtime foundation code where it fits; do not interpret workspace readiness as an installed runtime.
 
 Deliverables:
 - Embedded X11 feasibility and licensing decision.
@@ -68,6 +74,8 @@ Acceptance:
 
 ## P3 — VM WorkStation
 
+Reuse `RuntimeFoundationSupervisor` for initial device/resource inspection, but replace node-visibility assumptions with a real backend initialization capability result before offering KVM.
+
 Deliverables:
 - Independent VM Supervisor.
 - Engine Adapter interface.
@@ -85,6 +93,8 @@ Acceptance:
 
 ## P4 — Shared Services
 
+Reconcile existing storage paths under `filesDir/forge-runtime/` before adding new directories. In particular, review the existing `linux-userland/` and `proot/` roots and preserve existing DataStore records; do not perform a blind migration.
+
 Deliverables:
 - App-managed storage and free-space policy.
 - Shared Workspace with explicit mounts.
@@ -99,7 +109,7 @@ Acceptance:
 
 ## P5 — RouterOS MikroTik
 
-Status: Coming Soon; not part of initial implementation.
+Status: Coming Soon; not part of initial implementation. The existing `RouterOsImageImporter` only stages a user-selected CHR ARM64 RAW image after comparing a user-provided SHA-256; it does not authenticate the hash source or boot a guest. Keep its UI clearly marked Coming Soon or hidden until the RouterOS module is formally released.
 
 Entry criteria:
 - Official distribution/deployment method confirmed.
@@ -107,6 +117,8 @@ Entry criteria:
 - Runtime adapter and network isolation design approved.
 
 ## P6 — WorkStation Center Integration
+
+Existing runtime foundation panels currently appear inside the Simulate screen; the dedicated WorkStation Center placement/navigation must be decided and integrated without duplicating those panels.
 
 Deliverables:
 - Four module cards.
