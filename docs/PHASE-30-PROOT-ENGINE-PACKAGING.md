@@ -74,3 +74,36 @@ The inspected community static script currently builds AArch64 only. It is not e
 - Static Android build reference: https://github.com/berilevi/proot-static/tree/6f8ebfd8e24887dfba64c3f2d7d5fe9dc059b60e
 - Android NDK ABI guidance: https://developer.android.com/ndk/guides/abis
 - Android native library packaging: https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs
+
+
+## P0.5.6 — Reproducible ARM64 build pipeline
+
+**Status:** Build script and GitHub Actions workflow committed. Native binaries are generated as a CI artifact only after the workflow succeeds; they are not committed to the repository and are not yet available to the Android adapter.
+
+### Dependency decision
+
+- Build PRoot from the pinned Termux source archive above.
+- Build talloc 2.5.0 from its pinned upstream source archive (SHA-256: `912afa237510ae542a7733998eb18a12bcda35ab6729c8e2ddb43e8d0ebab007`) and link it statically.
+- Disable `PROOT_WITH_LIBANDROID_SHMEM` for the first standalone FORGE-TS runtime. The optional library is used by Termux's Android shared-memory integration; the initial FORGE-TS runtime does not promise Termux interoperability or cross-process Android shared-memory features. This avoids adding an unneeded native dependency to the first deliverable.
+- Preserve PRoot's own source and loader logic without local patches in this first build.
+- Use Android NDK r27c, Android API 29, `arm64-v8a`, and 16 KB maximum ELF page alignment. No other ABI is claimed.
+
+### Build implementation
+
+- Builder: `scripts/native/build-proot-runtime.sh`.
+- Workflow: `.github/workflows/proot-native.yml`.
+- Trigger: manual dispatch or relevant changes on `main`.
+- The script verifies both source archives against pinned SHA-256 digests before extraction.
+- It cross-compiles the talloc static archive using the cross-answer profile used by the Termux package recipe, then builds PRoot and its separate 64-bit loader from the pinned source.
+- The output names match the Android adapter contract:
+  - `arm64-v8a/libproot.so`
+  - `arm64-v8a/libproot_loader.so`
+- The build checks ELF architecture, 16 KB maximum page alignment for both payloads, and absence of a dynamic `libtalloc.so` dependency. It emits ELF reports, source/license materials, a build manifest and SHA-256 sums.
+- GitHub Actions uploads `forge-ts-proot-native-arm64` as a 14-day artifact. The artifact must be reviewed and copied into `app/src/main/jniLibs/arm64-v8a/` before it can be included in an APK.
+
+### Validation boundary
+
+- The pipeline source and workflow are committed, but the first CI execution has not yet been confirmed successful.
+- No binary is currently bundled in `jniLibs`; the adapter must continue to report unavailable.
+- A successful CI build is not a device runtime test. The disposable guest-child probe, ptrace behavior, rootfs verification, and Android device execution remain mandatory before enabling PRoot.
+- The first artifact is ARM64 only; no 32-bit guest loader is generated or advertised by this phase.
