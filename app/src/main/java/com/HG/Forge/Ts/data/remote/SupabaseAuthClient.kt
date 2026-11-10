@@ -132,8 +132,10 @@ class SupabaseAuthClient(
         val body = response.bodyAsText()
         ensureSuccess(response.status.value, body)
         val user = JSONObject(body)
-        return user.optString("email_confirmed_at").isNotBlank() ||
-            user.optString("confirmed_at").isNotBlank()
+        val emailConfirmedAt = user.optString("email_confirmed_at")
+        val confirmedAt = user.optString("confirmed_at")
+        return (emailConfirmedAt.isNotBlank() && emailConfirmedAt != "null") ||
+            (confirmedAt.isNotBlank() && confirmedAt != "null")
     }
 
     suspend fun signOut(session: SupabaseAuthSession) {
