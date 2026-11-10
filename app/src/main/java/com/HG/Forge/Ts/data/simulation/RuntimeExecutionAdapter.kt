@@ -18,10 +18,18 @@ data class RuntimeAdapterStartResult(
     val message: String
 )
 data class RuntimeAdapterStopResult(val stopped: Boolean, val message: String)
+data class RuntimeCommandResult(
+    val completed: Boolean,
+    val exitCode: Int?,
+    val output: String,
+    val message: String
+)
 interface RuntimeExecutionAdapter {
     val environmentId: RuntimeEnvironmentId
     suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability
     suspend fun start(request: RuntimeAdapterStartRequest): RuntimeAdapterStartResult
+    suspend fun execute(request: RuntimeAdapterStartRequest, arguments: List<String>, timeoutSeconds: Long = 30): RuntimeCommandResult =
+        RuntimeCommandResult(false, null, "", "This adapter does not expose command execution.")
     suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         RuntimeAdapterStopResult(false, "This adapter does not expose process shutdown.")
 }
