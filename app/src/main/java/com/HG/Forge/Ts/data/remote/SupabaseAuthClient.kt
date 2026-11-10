@@ -207,22 +207,27 @@ class SupabaseAuthClient(
     }
 
     suspend fun listTotpFactors(session: SupabaseAuthSession): List<SupabaseTotpFactor> {
-        val response = httpClient.get("${supabaseUrl.trimEnd('/')}/auth/v1/factors") {
+        // Supabase documents factor discovery through the PostgREST auth schema.
+        // The Auth REST route /auth/v1/factors returned HTTP 405 in FORGE-TS.
+        val response = httpClient.get(
+            "${supabaseUrl.trimEnd('/')}/rest/v1/auth/factors?select=id,factor_type,friendly_name,status"
+        ) {
             header("apikey", publishableKey)
             header("Authorization", "Bearer ${session.accessToken}")
+            header("Accept", "application/json")
         }
         val body = response.bodyAsText()
         ensureSuccess(response.status.value, body)
-        val json = JSONObject(body)
-        val factors = json.optJSONArray("totp") ?: json.optJSONArray("all") ?: org.json.JSONArray()
+        val factors = org.json.JSONArray(body)
         return buildList {
             for (index in 0 until factors.length()) {
                 val factor = factors.optJSONObject(index) ?: continue
-                if (factor.optString("factor_type", "totp") == "totp") {
+                if (factor.optString("factor_type").equals("totp", ignoreCase = true)) {
                     add(
                         SupabaseTotpFactor(
                             id = factor.optString("id"),
-                            friendlyName = factor.optString("friendly_name").takeIf { it.isNotBlank() && it != "null" },
+                            friendlyName = factor.optString("friendly_name")
+                                .takeIf { it.isNotBlank() && it != "null" },
                             status = factor.optString("status")
                         )
                     )
