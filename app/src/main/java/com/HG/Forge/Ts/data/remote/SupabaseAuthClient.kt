@@ -207,14 +207,14 @@ class SupabaseAuthClient(
     }
 
     suspend fun listTotpFactors(session: SupabaseAuthSession): List<SupabaseTotpFactor> {
-        // Supabase documents factor discovery through the PostgREST auth schema.
-        // The Auth REST route /auth/v1/factors returned HTTP 405 in FORGE-TS.
+        // Query the auth schema through PostgREST using its schema-selection header.
         val response = httpClient.get(
-            "${supabaseUrl.trimEnd('/')}/rest/v1/auth/factors?select=id,factor_type,friendly_name,status"
+            "${supabaseUrl.trimEnd('/')}/rest/v1/factors?select=id,factor_type,friendly_name,status"
         ) {
             header("apikey", publishableKey)
             header("Authorization", "Bearer ${session.accessToken}")
             header("Accept", "application/json")
+            header("Accept-Profile", "auth")
         }
         val body = response.bodyAsText()
         ensureSuccess(response.status.value, body)
