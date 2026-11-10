@@ -85,7 +85,7 @@ The inspected community static script currently builds AArch64 only. It is not e
 - Build PRoot from the pinned Termux source archive above.
 - Build talloc 2.5.0 from its pinned upstream source archive (SHA-256: `912afa237510ae542a7733998eb18a12bcda35ab6729c8e2ddb43e8d0ebab007`) and link it statically.
 - Disable `PROOT_WITH_LIBANDROID_SHMEM` for the first standalone FORGE-TS runtime. The optional library is used by Termux's Android shared-memory integration; the initial FORGE-TS runtime does not promise Termux interoperability or cross-process Android shared-memory features. This avoids adding an unneeded native dependency to the first deliverable.
-- Preserve PRoot's own source and loader logic except for one deterministic compatibility include fix: add string.h to ashmem_memfd.c because the pinned source calls strcmp/memset without declaring them.
+- Preserve PRoot's own source and loader logic without local patches in this first build.
 - Use Android NDK r27c, Android API 29, `arm64-v8a`, and 16 KB maximum ELF page alignment. No other ABI is claimed.
 
 ### Build implementation
@@ -109,9 +109,5 @@ The inspected community static script currently builds AArch64 only. It is not e
 - The first artifact is ARM64 only; no 32-bit guest loader is generated or advertised by this phase.
 
 
-### P0.5.7 — CI compile failure correction
-
-- The first PRoot Native ARM64 workflow run (#3) reached the PRoot compile stage but failed in upstream `extension/ashmem_memfd/ashmem_memfd.c`: `strcmp` and `memset` were used without including `<string.h>`.
-- Added a deterministic, guarded build-time include insertion for `<string.h>` immediately after `<stdlib.h>`. This is the only local source adjustment; it does not change runtime behavior.
-- The builder verifies that the include is present before invoking the PRoot build and records the patch in the build manifest.
-- Next acceptance gate: the rerun must compile both PRoot and the separate loader, pass architecture/alignment/dependency checks, and upload the artifact. No native payload is considered available before that succeeds.
+### P0.5.7 — CI compile correction
+The first CI compile reached PRoot but failed because ashmem_memfd.c used strcmp and memset without including string.h. The builder now inserts string.h at the top of that source file before compilation. This is a compile-only compatibility adjustment; runtime behavior is unchanged. The CI run must still pass the complete build and ELF validation before the artifact can be packaged.
