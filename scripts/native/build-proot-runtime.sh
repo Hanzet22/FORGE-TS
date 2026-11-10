@@ -71,6 +71,15 @@ ASHMEM_SOURCE="$WORK/proot-src/src/extension/ashmem_memfd/ashmem_memfd.c"
 sed -i '1i #include <string.h>' "$ASHMEM_SOURCE"
 grep -q 'include <string.h>' "$ASHMEM_SOURCE"
 
+# The upstream loader has a dedicated LOADER_LDFLAGS rule and does not inherit
+# the global LDFLAGS above. Apply the Android 16 KB page-size flag there too.
+PROOT_MAKEFILE="$WORK/proot-src/src/GNUmakefile"
+sed -i 's|LOADER_LDFLAGS$1 += -static -nostdlib|LOADER_LDFLAGS$1 += -Wl,-z,max-page-size=16384 -static -nostdlib|' "$PROOT_MAKEFILE"
+grep -Fq 'LOADER_LDFLAGS$1 += -Wl,-z,max-page-size=16384 -static -nostdlib' "$PROOT_MAKEFILE" || {
+  echo "Failed to apply 16 KB alignment to the dedicated PRoot loader linker rule." >&2
+  exit 3
+}
+
 # Build talloc using the same cross-answer profile used by the Termux package.
 cat > "$WORK/talloc/cross-answers.txt" <<'ANSWERS'
 Checking uname sysname type: "Linux"
@@ -171,7 +180,7 @@ LIBANDROID_SHMEM=disabled
 TALLOC_LINKAGE=static
 ELF_MAX_PAGE_SIZE=16384
 PROOT_LOADER_MODE=external
-SOURCE_PATCHES=ashmem_memfd-add-string.h
+SOURCE_PATCHES=ashmem_memfd-add-string.h,loader-16kb-page-alignment
 MANIFEST
 (
   cd "$STAGE"
