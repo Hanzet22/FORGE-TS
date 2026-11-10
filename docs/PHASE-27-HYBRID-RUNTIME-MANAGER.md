@@ -52,7 +52,8 @@ Each environment receives its own private directories. No rootfs, image, or gues
 ## Not implemented
 
 - Distribution downloads, archive extraction, or rootfs installation.
-- A concrete PRoot execution adapter or XFCE desktop startup.
+- A concrete Android PRoot adapter is now registered by default. It remains unavailable until the patched native engine, loader, dependency closure and a verified distro rootfs are packaged/installed.
+- PRoot disposable-child launch probing, process ownership and adapter-level stop handling are implemented; no distro payload is bundled by this change.
 - Native desktop/display bridge.
 - QEMU or another VM backend.
 - RouterOS CHR boot or redistribution.
@@ -61,6 +62,7 @@ Each environment receives its own private directories. No rootfs, image, or gues
 ## Next increments
 
 1. Add a verified rootfs acquisition and extraction pipeline with archive limits, path-traversal rejection, checksum/signature verification where available, and rollback.
-2. Implement and register the PRoot execution adapter; it must perform a process-local ptrace probe and report backend capability before start.
-3. Add lifecycle cleanup and Android process-death recovery before enabling long-running sessions.
+2. Package a provenance-reviewed Android-patched PRoot engine, loader and all required native dependencies for each supported ABI; then validate the process-local ptrace probe on target devices.
+3. Add a PTY/terminal bridge and foreground-session service before exposing interactive shell or desktop controls.
+4. Harden descendant cleanup and Android process-death recovery before enabling long-running sessions.
 4. Implement KVM API/VM-creation probes inside a dedicated VM adapter; do not infer KVM support from the foundation report.
