@@ -41,6 +41,7 @@
 - No new Supabase project, table, Edge Function, provider or credential.
 - No Redis storage for TOTP secrets, challenges, passwords or sessions.
 - Existing Supabase Auth, publishable key, Android Keystore session store and Redis gateway remain in place.
+- This phase enforces the second-factor step in the native app sign-in gate; it does not change the Redis gateway to require an AAL2 claim on every request. Backend-wide AAL2 enforcement is a separate policy decision and must preserve access for accounts that have not enabled optional MFA.
 - Existing phone authentication remains disabled; this phase is TOTP-only.
 
 ## Verification boundary
