@@ -36,6 +36,7 @@ fun SimulationEnvironmentLauncher() {
     var snapshot by remember(manager) { mutableStateOf(manager.inspect()) }
     var message by remember { mutableStateOf("Loading persistent runtime registry…") }
     var managerEvent by remember { mutableStateOf("Reading local event record…") }
+    var installing by remember { mutableStateOf<ProotDistribution?>(null) }
 
     LaunchedEffect(manager) {
         val result = manager.initialize()
@@ -47,93 +48,78 @@ fun SimulationEnvironmentLauncher() {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Hybrid Runtime Manager", style = MaterialTheme.typography.titleLarge)
-            Text(
-                "Persistent registry, conservative process recovery, and five isolated workspaces. Recovery never auto-starts an environment.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text("Persistent registry, conservative process recovery, and five isolated workspaces. Recovery never auto-starts an environment.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             snapshot.environments.forEach { environment ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(environment.title, style = MaterialTheme.typography.titleMedium)
                         Text("Lifecycle: ${environment.lifecycle}", style = MaterialTheme.typography.labelMedium)
-                        Text(
-                            if (environment.workspaceReady) "Workspace: prepared and verified" else "Workspace: not prepared / not verified",
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Text(if (environment.workspaceReady) "Workspace: prepared and verified" else "Workspace: not prepared / not verified", style = MaterialTheme.typography.bodySmall)
                         Text(environment.notes.joinToString(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(onClick = {
                                 scope.launch {
                                     val result = manager.prepareWorkspace(environment.id)
-                                    message = result.message
-                                    snapshot = manager.inspect()
-                                    managerEvent = manager.lastManagerEvent()
+                                    message = result.message; snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
                                 }
                             }) { Text(if (environment.workspaceReady) "Refresh workspace" else "Prepare workspace") }
-                            OutlinedButton(
-                                onClick = {
-                                    scope.launch {
-                                        val result = manager.requestStart(environment.id)
-                                        message = result.message
-                                        snapshot = manager.inspect()
-                                    }
-                                },
-                                enabled = environment.id != RuntimeEnvironmentId.XFCE_PROOT &&
-                                    environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
-                                    environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED
-                            ) { Text("Start") }
-                            if (environment.lifecycle == RuntimeLifecycleState.RECOVERY_REQUIRED) {
-                                OutlinedButton(onClick = {
-                                    scope.launch {
-                                        val result = manager.transitionForFutureAdapter(
-                                            environment.id, RuntimeLifecycleState.STOPPED
-                                        )
-                                        message = if (result.accepted) {
-                                            "Previous session marked stopped. Only confirm this after verifying no environment process is still running."
-                                        } else result.message
-                                        snapshot = manager.inspect()
-                                        managerEvent = manager.lastManagerEvent()
-                                    }
-                                }) { Text("Confirm stopped") }
-                            }
+                            OutlinedButton(onClick = {
+                                scope.launch {
+                                    val result = manager.requestStart(environment.id)
+                                    message = result.message; snapshot = manager.inspect()
+                                }
+                            }, enabled = environment.id != RuntimeEnvironmentId.XFCE_PROOT &&
+                                environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
+                                environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED) { Text("Start") }
                         }
                     }
                 }
             }
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("PRoot distro instances", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "Debian, Ubuntu, and Alpine have independent workspaces under the existing proot/ root. Preparing a workspace does not install a rootfs or mark the runtime READY.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Text("Official ARM64 rootfs downloads are installed into each distro's existing private workspace. Debian remains gated pending a verified archive pipeline.",
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     snapshot.prootInstances.forEach { instance ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                Text(instance.distribution.name, style = MaterialTheme.typography.titleSmall)
-                                Text("Lifecycle: ${instance.lifecycle}", style = MaterialTheme.typography.bodySmall)
-                                Text(if (instance.workspaceReady) "Workspace prepared" else "Workspace not prepared", style = MaterialTheme.typography.bodySmall)
-                            }
+                        Column(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(instance.distribution.name, style = MaterialTheme.typography.titleSmall)
+                            Text("Lifecycle: ${instance.lifecycle}", style = MaterialTheme.typography.bodySmall)
+                            Text(if (instance.workspaceReady) "Workspace prepared" else "Workspace not prepared", style = MaterialTheme.typography.bodySmall)
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 OutlinedButton(onClick = {
                                     scope.launch {
                                         val result = manager.prepareProotInstance(instance.distribution)
-                                        message = result.message
-                                        snapshot = manager.inspect()
-                                        managerEvent = manager.lastManagerEvent()
+                                        message = result.message; snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
                                     }
                                 }) { Text(if (instance.workspaceReady) "Refresh" else "Prepare") }
-                                OutlinedButton(
-                                    enabled = instance.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
+                                Button(
+                                    enabled = installing == null && instance.distribution != ProotDistribution.DEBIAN &&
+                                        instance.lifecycle != RuntimeLifecycleState.RUNNING &&
+                                        instance.lifecycle != RuntimeLifecycleState.STARTING &&
                                         instance.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED,
+                                    onClick = {
+                                        installing = instance.distribution
+                                        scope.launch {
+                                            try {
+                                                val result = manager.installProotRootfs(instance.distribution)
+                                                message = result.message
+                                            } finally {
+                                                installing = null
+                                                snapshot = manager.inspect()
+                                                managerEvent = manager.lastManagerEvent()
+                                            }
+                                        }
+                                    }
+                                ) { Text(if (installing == instance.distribution) "Installing…" else "Install rootfs") }
+                                OutlinedButton(
+                                    enabled = instance.lifecycle == RuntimeLifecycleState.READY ||
+                                        instance.lifecycle == RuntimeLifecycleState.STOPPED ||
+                                        instance.lifecycle == RuntimeLifecycleState.FAILED,
                                     onClick = {
                                         scope.launch {
                                             val result = manager.requestStart(RuntimeEnvironmentId.XFCE_PROOT, instance.distribution)
-                                            message = result.message
-                                            snapshot = manager.inspect()
-                                            managerEvent = manager.lastManagerEvent()
+                                            message = result.message; snapshot = manager.inspect()
                                         }
                                     }
                                 ) { Text("Start") }
@@ -163,16 +149,12 @@ fun SimulationEnvironmentLauncher() {
                     Text(managerEvent, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            OutlinedButton(
-                onClick = {
-                    scope.launch {
-                        snapshot = manager.inspect()
-                        managerEvent = manager.lastManagerEvent()
-                        message = "Device resources and persistent registry refreshed."
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Refresh manager status") }
+            OutlinedButton(onClick = {
+                scope.launch {
+                    snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
+                    message = "Device resources and persistent registry refreshed."
+                }
+            }, modifier = Modifier.fillMaxWidth()) { Text("Refresh manager status") }
         }
     }
 }
@@ -192,7 +174,7 @@ private fun ResourceSummary(snapshot: HybridRuntimeSnapshot) {
 }
 
 private fun formatBytes(value: Long): String {
-    if (value < 1024L) return "${value} B"
+    if (value < 1024L) return "$value B"
     val units = listOf("KB", "MB", "GB", "TB")
     var amount = value.toDouble()
     var index = -1

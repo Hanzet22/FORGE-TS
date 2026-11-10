@@ -52,4 +52,6 @@ dependencies {
  implementation("io.ktor:ktor-client-android:3.3.1")
  implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
  implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
+ implementation("org.apache.commons:commons-compress:1.28.0")
+ implementation("org.tukaani:xz:1.10")
 }

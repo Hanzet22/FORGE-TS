@@ -117,6 +117,7 @@ class HybridRuntimeManager(
     private val managerRoot = File(runtimeRoot, "manager")
     private val registry = RuntimeRegistryStore(appContext)
     private val foundationSupervisor = RuntimeFoundationSupervisor(appContext)
+    private val rootfsProvisioner = ProotRootfsProvisioner(runtimeRoot)
     private val roots = mapOf(
         RuntimeEnvironmentId.XFCE_NATIVE to File(runtimeRoot, "native-xfce"),
         RuntimeEnvironmentId.XFCE_PROOT to File(runtimeRoot, "proot"),
@@ -167,17 +168,20 @@ class HybridRuntimeManager(
                 }
                 ProotDistribution.entries.forEach { distribution ->
                     val record = prootRecords.getValue(distribution)
-                    prootInstanceStates[distribution] = when (record.state) {
-                        RuntimeLifecycleState.STARTING, RuntimeLifecycleState.RUNNING, RuntimeLifecycleState.STOPPING ->
-                            RuntimeLifecycleState.RECOVERY_REQUIRED
+                    val rootfs = File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT),
+                        "${distribution.directoryName}/rootfs/.forge-rootfs.json")
+                    val rootfsValid = rootfs.isFile
+                    prootInstanceStates[distribution] = when {
+                        record.state == RuntimeLifecycleState.STARTING ||
+                            record.state == RuntimeLifecycleState.RUNNING ||
+                            record.state == RuntimeLifecycleState.STOPPING -> RuntimeLifecycleState.RECOVERY_REQUIRED
+                        record.state == RuntimeLifecycleState.READY && !rootfsValid -> RuntimeLifecycleState.RECOVERY_REQUIRED
                         else -> record.state
                     }
                     val instanceRoot = File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName)
                     if (record.workspacePrepared && isSafeDirectory(instanceRoot, roots.getValue(RuntimeEnvironmentId.XFCE_PROOT))) {
                         preparedProotInstances += distribution
-                    } else {
-                        preparedProotInstances -= distribution
-                    }
+                    } else preparedProotInstances -= distribution
                 }
                 initialized = true
             }
@@ -185,9 +189,7 @@ class HybridRuntimeManager(
                 val recovered = states.getValue(id)
                 val wasPrepared = records.getValue(id).workspacePrepared
                 val isPrepared = id in prepared
-                if (records.getValue(id).state != recovered || wasPrepared != isPrepared) {
-                    registry.write(id, recovered, isPrepared)
-                }
+                if (records.getValue(id).state != recovered || wasPrepared != isPrepared) registry.write(id, recovered, isPrepared)
             }
             ProotDistribution.entries.forEach { distribution ->
                 val previous = prootRecords.getValue(distribution)
@@ -206,9 +208,7 @@ class HybridRuntimeManager(
 
     @Synchronized
     fun inspect(): HybridRuntimeSnapshot {
-        val managerReady = listOf("registry", "state", "logs").all {
-            isSafeDirectory(File(managerRoot, it), managerRoot)
-        }
+        val managerReady = listOf("registry", "state", "logs").all { isSafeDirectory(File(managerRoot, it), managerRoot) }
         val memory = ActivityManager.MemoryInfo()
         val activityManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.getMemoryInfo(memory)
@@ -241,11 +241,8 @@ class HybridRuntimeManager(
             ProotDistribution.entries.map { distribution ->
                 val instanceRoot = File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName)
                 ProotRuntimeInstanceSnapshot(
-                    distribution,
-                    prootInstanceStates.getValue(distribution),
-                    instanceRoot.absolutePath,
-                    distribution in preparedProotInstances &&
-                        isSafeDirectory(instanceRoot, roots.getValue(RuntimeEnvironmentId.XFCE_PROOT))
+                    distribution, prootInstanceStates.getValue(distribution), instanceRoot.absolutePath,
+                    distribution in preparedProotInstances && isSafeDirectory(instanceRoot, roots.getValue(RuntimeEnvironmentId.XFCE_PROOT))
                 )
             },
             foundation
@@ -288,45 +285,52 @@ class HybridRuntimeManager(
             if (!childrenReady) return@withContext RuntimeOperationResult(false, "PRoot instance workspace failed containment or filesystem checks.")
             synchronized(this@HybridRuntimeManager) { preparedProotInstances += distribution }
             registry.writeProotInstance(distribution, prootInstanceStates.getValue(distribution), true)
-            RuntimeOperationResult(true, "${distribution.name} workspace prepared under the existing proot/ root. No rootfs was downloaded and no process was launched.")
+            RuntimeOperationResult(true, "${distribution.name} workspace prepared under the existing proot/ root.")
         } catch (error: Exception) {
             RuntimeOperationResult(false, error.message ?: "PRoot instance workspace preparation failed.")
         }
+    }
+
+    suspend fun installProotRootfs(distribution: ProotDistribution): RuntimeOperationResult = withContext(Dispatchers.IO) {
+        val preparedResult = prepareProotInstance(distribution)
+        if (!preparedResult.accepted) return@withContext preparedResult
+        val current = prootInstanceStates.getValue(distribution)
+        if (current == RuntimeLifecycleState.RUNNING || current == RuntimeLifecycleState.STARTING ||
+            current == RuntimeLifecycleState.RECOVERY_REQUIRED) {
+            return@withContext RuntimeOperationResult(false, "Stop or recover the selected PRoot instance before replacing its rootfs.")
+        }
+        registry.writeProotInstance(distribution, RuntimeLifecycleState.STARTING, true)
+        synchronized(this@HybridRuntimeManager) { prootInstanceStates[distribution] = RuntimeLifecycleState.STARTING }
+        val result = rootfsProvisioner.install(distribution)
+        val next = if (result.installed) RuntimeLifecycleState.READY else RuntimeLifecycleState.FAILED
+        synchronized(this@HybridRuntimeManager) { prootInstanceStates[distribution] = next }
+        registry.writeProotInstance(distribution, next, true)
+        registry.recordEvent("Rootfs ${distribution.name}: ${result.message}")
+        RuntimeOperationResult(result.installed, result.message)
     }
 
     suspend fun requestStart(
         id: RuntimeEnvironmentId,
         distribution: ProotDistribution? = null
     ): RuntimeOperationResult {
-        if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) {
-            return RuntimeOperationResult(false, "Select a Debian, Ubuntu, or Alpine instance before starting PRoot.")
-        }
-        if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) {
-            return RuntimeOperationResult(false, "A PRoot distribution can only be used with XFCE_PROOT.")
-        }
+        if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) return RuntimeOperationResult(false, "Select a Debian, Ubuntu, or Alpine instance before starting PRoot.")
+        if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) return RuntimeOperationResult(false, "A PRoot distribution can only be used with XFCE_PROOT.")
         val state = if (distribution == null) states.getValue(id) else prootInstanceStates.getValue(distribution)
         if (state == RuntimeLifecycleState.UNAVAILABLE) return RuntimeOperationResult(false, "This environment is gated and cannot be started.")
         if (state == RuntimeLifecycleState.RECOVERY_REQUIRED) return RuntimeOperationResult(false, "Resolve the previous session state before requesting a start.")
-        if (state != RuntimeLifecycleState.READY) {
-            return RuntimeOperationResult(false, "Runtime must be installed and READY before start; current state is $state. Workspace preparation alone is insufficient.")
-        }
+        if (state != RuntimeLifecycleState.READY) return RuntimeOperationResult(false, "Runtime must be installed and READY before start; current state is $state. Workspace preparation alone is insufficient.")
         val root = roots.getValue(id)
         val workspace = if (distribution == null) root else File(root, distribution.directoryName)
         val workspaceReady = if (distribution == null) id in prepared && isSafeDirectory(workspace, runtimeRoot)
             else distribution in preparedProotInstances && isSafeDirectory(workspace, root)
         if (!workspaceReady) return RuntimeOperationResult(false, "The selected runtime workspace is not prepared and verified.")
-        val adapter = adapterRegistry.find(id)
-            ?: return RuntimeOperationResult(false, "No execution adapter is registered for $id. No process was launched.")
+        val adapter = adapterRegistry.find(id) ?: return RuntimeOperationResult(false, "No execution adapter is registered for $id. No process was launched.")
         val foundation = runCatching { foundationSupervisor.inspect(adapterRegistry) }.getOrElse {
             return RuntimeOperationResult(false, "Runtime foundation inspection failed: ${it.message ?: "unknown error"}.")
         }
-        if (foundation.status != RuntimeFoundationStatus.READY) {
-            return RuntimeOperationResult(false, "Runtime foundation is ${foundation.status}; Android compatibility or app-private foundation storage is not ready. No process was launched.")
-        }
+        if (foundation.status != RuntimeFoundationStatus.READY) return RuntimeOperationResult(false, "Runtime foundation is ${foundation.status}; Android compatibility or app-private foundation storage is not ready. No process was launched.")
         val adapterObservation = foundation.capabilities.executionAdapters[id]
-        if (adapterObservation?.status != RuntimeCapabilityStatus.AVAILABLE) {
-            return RuntimeOperationResult(false, "Runtime adapter is not reported as registered. No process was launched.")
-        }
+        if (adapterObservation?.status != RuntimeCapabilityStatus.AVAILABLE) return RuntimeOperationResult(false, "Runtime adapter is not reported as registered. No process was launched.")
         val request = RuntimeAdapterStartRequest(id, distribution?.directoryName, workspace.absolutePath)
         val capability = runCatching { adapter.inspect(request) }.getOrElse {
             return RuntimeOperationResult(false, "Adapter capability inspection failed: ${it.message ?: "unknown error"}.")
@@ -338,66 +342,31 @@ class HybridRuntimeManager(
             return RuntimeOperationResult(false, "Adapter start failed: ${it.message ?: "unknown error"}.")
         }
         return when {
-            result.accepted && result.confirmedRunning -> {
-                setRuntimeState(id, distribution, RuntimeLifecycleState.RUNNING)
-                RuntimeOperationResult(true, result.message)
-            }
-            !result.accepted -> {
-                setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED)
-                RuntimeOperationResult(false, result.message)
-            }
+            result.accepted && result.confirmedRunning -> { setRuntimeState(id, distribution, RuntimeLifecycleState.RUNNING); RuntimeOperationResult(true, result.message) }
+            !result.accepted -> { setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED); RuntimeOperationResult(false, result.message) }
             else -> RuntimeOperationResult(true, "Start accepted but activity is not confirmed; lifecycle remains STARTING. ${result.message}")
         }
     }
 
-    /**
-     * Executes one bounded, non-interactive guest command inside a confirmed PRoot session.
-     * This is deliberately separate from a PTY-backed interactive terminal.
-     */
-    suspend fun executeProotCommand(
-        distribution: ProotDistribution,
-        arguments: List<String>,
-        timeoutSeconds: Long = 30
-    ): RuntimeCommandResult {
-        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING) {
-            return RuntimeCommandResult(false, null, "", "The selected PRoot instance must be confirmed RUNNING before command execution.")
-        }
-        if (distribution !in preparedProotInstances) {
-            return RuntimeCommandResult(false, null, "", "The selected PRoot workspace is not registered as prepared.")
-        }
+    suspend fun executeProotCommand(distribution: ProotDistribution, arguments: List<String>, timeoutSeconds: Long = 30): RuntimeCommandResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING) return RuntimeCommandResult(false, null, "", "The selected PRoot instance must be confirmed RUNNING before command execution.")
+        if (distribution !in preparedProotInstances) return RuntimeCommandResult(false, null, "", "The selected PRoot workspace is not registered as prepared.")
         val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
         val workspace = File(root, distribution.directoryName)
-        if (!isSafeDirectory(workspace, root)) {
-            return RuntimeCommandResult(false, null, "", "The selected PRoot workspace failed its containment check.")
-        }
-        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT)
-            ?: return RuntimeCommandResult(false, null, "", "No PRoot execution adapter is registered.")
-        val request = RuntimeAdapterStartRequest(
-            RuntimeEnvironmentId.XFCE_PROOT,
-            distribution.directoryName,
-            workspace.absolutePath
-        )
+        if (!isSafeDirectory(workspace, root)) return RuntimeCommandResult(false, null, "", "The selected PRoot workspace failed its containment check.")
+        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeCommandResult(false, null, "", "No PRoot execution adapter is registered.")
+        val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
         return runCatching { adapter.execute(request, arguments, timeoutSeconds) }.getOrElse {
             RuntimeCommandResult(false, null, "", "Guest command execution failed: ${it.message ?: "unknown error"}")
         }
     }
 
-    suspend fun requestStop(
-        id: RuntimeEnvironmentId,
-        distribution: ProotDistribution? = null
-    ): RuntimeOperationResult {
-        if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) {
-            return RuntimeOperationResult(false, "Select the Debian, Ubuntu, or Alpine instance to stop.")
-        }
-        if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) {
-            return RuntimeOperationResult(false, "A PRoot distribution can only be stopped through XFCE_PROOT.")
-        }
+    suspend fun requestStop(id: RuntimeEnvironmentId, distribution: ProotDistribution? = null): RuntimeOperationResult {
+        if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) return RuntimeOperationResult(false, "Select the Debian, Ubuntu, or Alpine instance to stop.")
+        if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) return RuntimeOperationResult(false, "A PRoot distribution can only be stopped through XFCE_PROOT.")
         val current = if (distribution == null) states.getValue(id) else prootInstanceStates.getValue(distribution)
-        if (current != RuntimeLifecycleState.RUNNING) {
-            return RuntimeOperationResult(false, "Only a confirmed RUNNING runtime can be stopped; current state is $current.")
-        }
-        val adapter = adapterRegistry.find(id)
-            ?: return RuntimeOperationResult(false, "No execution adapter is registered; no process state was changed.")
+        if (current != RuntimeLifecycleState.RUNNING) return RuntimeOperationResult(false, "Only a confirmed RUNNING runtime can be stopped; current state is $current.")
+        val adapter = adapterRegistry.find(id) ?: return RuntimeOperationResult(false, "No execution adapter is registered; no process state was changed.")
         val root = roots.getValue(id)
         val workspace = if (distribution == null) root else File(root, distribution.directoryName)
         val request = RuntimeAdapterStartRequest(id, distribution?.directoryName, workspace.absolutePath)
@@ -411,10 +380,7 @@ class HybridRuntimeManager(
         return RuntimeOperationResult(result.stopped, result.message)
     }
 
-    suspend fun transitionProotInstanceForFutureAdapter(
-        distribution: ProotDistribution,
-        next: RuntimeLifecycleState
-    ): RuntimeOperationResult {
+    suspend fun transitionProotInstanceForFutureAdapter(distribution: ProotDistribution, next: RuntimeLifecycleState): RuntimeOperationResult {
         val current = prootInstanceStates.getValue(distribution)
         val allowed = when (current) {
             RuntimeLifecycleState.NOT_INSTALLED -> setOf(RuntimeLifecycleState.READY, RuntimeLifecycleState.FAILED)
@@ -427,29 +393,10 @@ class HybridRuntimeManager(
             RuntimeLifecycleState.RECOVERY_REQUIRED -> setOf(RuntimeLifecycleState.STOPPED, RuntimeLifecycleState.FAILED)
             RuntimeLifecycleState.UNAVAILABLE -> emptySet()
         }
-        if (next !in allowed) {
-            return RuntimeOperationResult(false, "Rejected PRoot instance transition: $current -> $next.")
-        }
-        if (next == RuntimeLifecycleState.READY && distribution !in preparedProotInstances) {
-            return RuntimeOperationResult(false, "A verified PRoot instance workspace is required before marking the runtime READY.")
-        }
-        synchronized(this@HybridRuntimeManager) { prootInstanceStates[distribution] = next }
+        if (next !in allowed) return RuntimeOperationResult(false, "Rejected lifecycle transition: $current -> $next.")
+        prootInstanceStates[distribution] = next
         registry.writeProotInstance(distribution, next, distribution in preparedProotInstances)
-        return RuntimeOperationResult(true, "PRoot ${distribution.name} lifecycle persisted: $current -> $next.")
-    }
-
-    private suspend fun setRuntimeState(
-        id: RuntimeEnvironmentId,
-        distribution: ProotDistribution?,
-        next: RuntimeLifecycleState
-    ) {
-        if (distribution == null) {
-            synchronized(this@HybridRuntimeManager) { states[id] = next }
-            registry.write(id, next, id in prepared)
-        } else {
-            synchronized(this@HybridRuntimeManager) { prootInstanceStates[distribution] = next }
-            registry.writeProotInstance(distribution, next, distribution in preparedProotInstances)
-        }
+        return RuntimeOperationResult(true, "Lifecycle state persisted: $current -> $next.")
     }
 
     suspend fun transitionForFutureAdapter(id: RuntimeEnvironmentId, next: RuntimeLifecycleState): RuntimeOperationResult {
@@ -473,14 +420,18 @@ class HybridRuntimeManager(
 
     suspend fun lastManagerEvent(): String = registry.lastEvent() ?: "No manager event recorded."
 
+    private suspend fun setRuntimeState(id: RuntimeEnvironmentId, distribution: ProotDistribution?, next: RuntimeLifecycleState) {
+        if (distribution == null) { states[id] = next; registry.write(id, next, id in prepared) }
+        else { prootInstanceStates[distribution] = next; registry.writeProotInstance(distribution, next, distribution in preparedProotInstances) }
+    }
+
     private fun createSafeDirectory(directory: File, parent: File): Boolean {
         val parentPath = parent.canonicalPath
         val appPath = appContext.filesDir.canonicalPath
         if (parentPath != appPath && !parentPath.startsWith(appPath + File.separator)) return false
         val created = directory.exists() || directory.mkdirs()
         val path = directory.canonicalPath
-        return created && path.startsWith(parentPath + File.separator) &&
-            directory.isDirectory && directory.canRead() && directory.canWrite()
+        return created && path.startsWith(parentPath + File.separator) && directory.isDirectory && directory.canRead() && directory.canWrite()
     }
 
     private fun isSafeDirectory(directory: File, parent: File): Boolean = runCatching {
