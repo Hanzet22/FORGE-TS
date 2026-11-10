@@ -3,9 +3,9 @@
 -- Ingestion and crash linking are performed by trusted Edge Functions only.
 
 revoke all privileges on table public.forge_ts_crash_events
-  from public, anon, authenticated;
+  from public, anon, authenticated, service_role;
 revoke all privileges on table public.forge_ts_diagnostic_events
-  from public, anon, authenticated;
+  from public, anon, authenticated, service_role;
 
 -- Crash ingestion inserts rows; authenticated crash linking updates user_id
 -- through forge-crash-ingest. SELECT is needed for the filtered update path.
