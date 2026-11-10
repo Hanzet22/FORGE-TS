@@ -1,0 +1,76 @@
+# Phase 30 — PRoot Native Engine Packaging
+
+**Status:** Android packaging contract and runtime prerequisites documented; native engine binaries are not generated or bundled yet.
+
+## Decision summary
+
+- PRoot source of record: `termux/proot`, release tag `v5.1.107.102`.
+- Source archive: `https://github.com/termux/proot/archive/v5.1.107.102.zip`.
+- SHA-256 from the Termux package recipe: `30d12a6e2cc4147123756ff58edea262d3083bbc238c12d0ab9b39e3d1c40852`.
+- License declared by the Termux package recipe: GPL-2.0.
+- Official Termux package recipe declares `libandroid-shmem` and `libtalloc` dependencies and builds with `PROOT_WITH_LIBANDROID_SHMEM=true`.
+- A static Android build recipe was inspected at `berilevi/proot-static`, commit `6f8ebfd8e24887dfba64c3f2d7d5fe9dc059b60e`. It demonstrates an AArch64 static build, bundled talloc 2.4.2, NDK toolchain use and 16 KB ELF page alignment. It is a community build reference, not the authoritative source pin and not an approved binary download source.
+- No third-party prebuilt binary is copied into FORGE-TS.
+
+## ABI and packaging contract
+
+Initial native-engine target: `arm64-v8a`. Other ABIs remain unsupported by the PRoot engine until separately built and verified.
+
+Expected files in `app/src/main/jniLibs/arm64-v8a/`:
+
+| Packaged name | Build output role | Runtime use |
+|---|---|---|
+| `libproot.so` | PRoot executable, renamed from the build output `proot` | Direct `ProcessBuilder` executable |
+| `libproot_loader.so` | Native guest ELF loader, renamed from `loader` | `PROOT_LOADER` |
+| `libproot_loader32.so` | Optional 32-bit guest loader, renamed from `loader32` | `PROOT_LOADER_32` if 32-bit guest support is enabled |
+
+These are executable ELF payloads packaged in Android's native-library location. Their `.so` suffix is a packaging convention; they are not JNI libraries to be loaded with `System.loadLibrary`.
+
+The Android Gradle packaging option `jniLibs.useLegacyPackaging = true` is enabled so native payloads are extracted to the installed native-library directory. Runtime paths must always be resolved from `ApplicationInfo.nativeLibraryDir`, never hard-coded.
+
+## Runtime environment
+
+- `PROOT_LOADER` must point to the packaged loader for the device ABI.
+- `PROOT_TMP_DIR` must point to a writable, app-private temporary directory. The adapter now uses the selected instance workspace's `tmp/` directory.
+- `TMPDIR` is set to the same app-private temporary directory for child tools.
+- `LD_LIBRARY_PATH` points to `nativeLibraryDir` for any host-side shared dependencies.
+- The launcher must use the selected distribution's exact app-managed rootfs and keep the existing `--kill-on-exit` lifecycle behavior.
+
+## Dependency and compatibility gates
+
+The static reference build vendors talloc and links it statically, but the official Termux recipe also enables Android shared-memory support. Before a distributable engine is approved, the build must explicitly decide whether `libandroid-shmem` is required for the intended FORGE-TS feature set. Do not silently omit it or claim full dependency closure from the static example.
+
+The build must record:
+- Exact PRoot source tag, archive digest and any local patch set.
+- Exact talloc source/version/digest and license notice.
+- Whether Android shared-memory support is compiled in and how it is supplied.
+- NDK version, Android API target, ABI, linker flags and 16 KB ELF alignment.
+- ELF machine/class, executable type, dependency table and loader architecture.
+- Corresponding source and license materials for every redistributed native component.
+
+The inspected community static script currently builds AArch64 only. It is not evidence that x86_64 or 32-bit artifacts are available.
+
+## Work completed in this phase
+
+- Corrected Android packaging to extract native executable payloads into `nativeLibraryDir`.
+- Added explicit app-private `PROOT_TMP_DIR` and `TMPDIR` routing in the PRoot adapter.
+- Locked the initial source and packaging decision in this document.
+- Kept the current adapter's `libproot.so` / `libproot_loader.so` filename contract; upstream build outputs must be renamed during packaging.
+- Preserved the existing DataStore, workspace layout, Supabase and Redis configuration.
+
+## Not completed / still gated
+
+- No native binaries were built, downloaded or committed.
+- No `jniLibs/arm64-v8a` payload is claimed to exist.
+- No APK build, device execution, ptrace test, rootfs install or interactive PTY session was run.
+- The PRoot adapter remains unavailable until the actual engine, matching loader, dependency closure and verified distro rootfs are installed and the disposable guest-process probe succeeds.
+- A successful source audit or native file-existence check alone must never mark the runtime READY.
+
+## References
+
+- Termux PRoot: https://github.com/termux/proot
+- Termux package recipe: https://github.com/termux/termux-packages/blob/master/packages/proot/build.sh
+- PRoot source archive: https://github.com/termux/proot/archive/v5.1.107.102.zip
+- Static Android build reference: https://github.com/berilevi/proot-static/tree/6f8ebfd8e24887dfba64c3f2d7d5fe9dc059b60e
+- Android NDK ABI guidance: https://developer.android.com/ndk/guides/abis
+- Android native library packaging: https://developer.android.com/guide/topics/manifest/application-element#extractNativeLibs
