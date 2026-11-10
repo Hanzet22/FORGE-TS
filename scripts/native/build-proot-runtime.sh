@@ -68,7 +68,8 @@ tar -xzf "$TALLOC_TAR" --strip-components=1 -C "$WORK/talloc"
 # The pinned upstream Android ashmem/memfd extension calls strcmp/memset
 # without including string.h. Apply one minimal deterministic include fix.
 ASHMEM_SOURCE="$WORK/proot-src/src/extension/ashmem_memfd/ashmem_memfd.c"
-if ! grep -q '^#include <string.h> using the same cross-answer profile used by the Termux package.
+if ! grep -q '^#include <string.h>
+# Build talloc using the same cross-answer profile used by the Termux package.
 cat > "$WORK/talloc/cross-answers.txt" <<'ANSWERS'
 Checking uname sysname type: "Linux"
 Checking uname machine type: "dontcare"
@@ -181,7 +182,8 @@ echo "Artifact directory: $STAGE"
  "$ASHMEM_SOURCE"; then
   sed -i '/^#include <stdlib.h>$/a #include <string.h>' "$ASHMEM_SOURCE"
 fi
-grep -q '^#include <string.h> using the same cross-answer profile used by the Termux package.
+grep -q '^#include <string.h>
+# Build talloc using the same cross-answer profile used by the Termux package.
 cat > "$WORK/talloc/cross-answers.txt" <<'ANSWERS'
 Checking uname sysname type: "Linux"
 Checking uname machine type: "dontcare"
