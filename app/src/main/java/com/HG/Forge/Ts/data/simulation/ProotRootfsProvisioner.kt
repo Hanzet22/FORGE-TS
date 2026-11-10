@@ -209,7 +209,14 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
                     target.parentFile?.let { require(it.isDirectory || it.mkdirs()) { "Cannot create archive parent directory." } }
                     require(!target.exists()) { "Duplicate archive path rejected." }
                     FileOutputStream(target).use { output ->
-                        val copied = tar.copyEntryContents(output)
+                        val buffer = ByteArray(64 * 1024)
+                        var copied = 0L
+                        while (copied < entry.size) {
+                            val read = tar.read(buffer, 0, minOf(buffer.size.toLong(), entry.size - copied).toInt())
+                            if (read < 0) break
+                            output.write(buffer, 0, read)
+                            copied += read
+                        }
                         require(copied == entry.size) { "Truncated archive member rejected." }
                     }
                     Os.chmod(target.absolutePath, entry.mode and 0x1ff)
@@ -277,7 +284,8 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
     private fun validateRootfs(root: File) {
         val shell = File(root, "bin/sh")
         val usrShell = File(root, "usr/bin/sh")
-        require((shell.exists() || shell.isSymbolicLink()) && (shell.isFile || shell.isSymbolicLink() || usrShell.isFile)) {
+        require((shell.exists() || java.nio.file.Files.isSymbolicLink(shell.toPath())) &&
+            (shell.isFile || java.nio.file.Files.isSymbolicLink(shell.toPath()) || usrShell.isFile)) {
             "Rootfs validation failed: guest /bin/sh is missing."
         }
         require(File(root, "etc").isDirectory && File(root, "usr").isDirectory) {
