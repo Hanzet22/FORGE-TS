@@ -11,7 +11,7 @@
 - Adapter inspection runs a bounded disposable guest command through the same PRoot launch path used by the session. A successful exit is required before Start can proceed.
 - Start owns the launched process and only confirms active state when the process remains alive after startup.
 - Stop is routed through the adapter, requests graceful termination, verifies launcher exit after forced termination if needed, and persists STOPPING followed by STOPPED or FAILED in the existing DataStore registry.
-- PRoot_TMP_DIR and TMPDIR are directed to the selected instance's app-private tmp/ directory; logs remain in the same instance workspace.
+- PROOT_TMP_DIR and TMPDIR are directed to the selected instance's app-private tmp/ directory; logs remain in the same instance workspace.
 - Android Gradle packaging extracts native runtime payloads into the installed native-library directory.
 - No new DataStore keys, database, migration, Supabase project, Redis resource, rootfs download or archive extraction was added.
 
