@@ -14,6 +14,12 @@ android {
   versionName = "0.1.0"
  }
  buildFeatures { compose = true; buildConfig = true }
+ packaging {
+  jniLibs {
+   // PRoot payloads are executable ELF files stored in the native-library directory.
+   useLegacyPackaging = true
+  }
+ }
  buildTypes {
   // Diagnostic telemetry is enabled in debug and release builds for crash mitigation.
   getByName("debug") { buildConfigField("boolean", "DIAGNOSTICS_UPLOAD_ENABLED", "true") }
