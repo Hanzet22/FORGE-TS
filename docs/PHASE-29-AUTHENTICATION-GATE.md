@@ -10,8 +10,10 @@
 
 ## Authentication flow
 
-- Email/password sign-in and account creation use the existing Supabase Auth REST endpoints.
-- Email confirmation callbacks return through the registered custom-scheme auth callback deep link.
+- Create Account and Sign-in Account use the existing Supabase Auth email/password REST endpoints.
+- Reset Password requests a Supabase recovery email. The registered custom-scheme callback exchanges the recovery access/refresh tokens, opens the in-app new-password form, and updates the password through the authenticated Supabase user endpoint.
+- Password creation and reset enforce the configured policy: at least 20 characters with uppercase, lowercase, a number and a symbol.
+- Email confirmation and password-recovery callbacks return through the registered custom-scheme auth callback deep link.
 - A process-wide session state is shared by the authentication gate and app shell.
 - The session is considered active only until its Supabase expiry timestamp.
 - Sign-out calls the Supabase logout endpoint when possible and always clears the local in-memory session.
