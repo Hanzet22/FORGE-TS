@@ -78,6 +78,42 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 "PRoot shell process is active. Interactive terminal/display integration remains a separate milestone.")
         }
 
+    override suspend fun execute(
+        request: RuntimeAdapterStartRequest,
+        arguments: List<String>,
+        timeoutSeconds: Long
+    ): RuntimeCommandResult = withContext(Dispatchers.IO) {
+        if (arguments.isEmpty() || arguments.size > 64 ||
+            arguments.any { it.isEmpty() || it.length > 4096 || it.indexOf('\u0000') >= 0 } ||
+            timeoutSeconds !in 1L..120L) {
+            return@withContext RuntimeCommandResult(false, null, "", "Command arguments or timeout are outside the supported bounds.")
+        }
+        val paths = resolvePaths(request)
+            ?: return@withContext RuntimeCommandResult(false, null, "", "PRoot engine, loader, or selected rootfs is unavailable.")
+        val (root, engine, loader, logs, tmp) = paths
+        val outputFile = File(logs, "command-${System.currentTimeMillis()}.log")
+        val process = runCatching {
+            ProcessBuilder(command(engine, root, arguments))
+                .directory(root)
+                .redirectErrorStream(true)
+                .redirectOutput(outputFile)
+                .apply { environment().putAll(environment(loader, tmp)) }
+                .start()
+        }.getOrElse {
+            return@withContext RuntimeCommandResult(false, null, "", "Guest command launch failed: ${it.message ?: "unknown error"}")
+        }
+        val completed = runCatching { process.waitFor(timeoutSeconds, TimeUnit.SECONDS) }.getOrDefault(false)
+        if (!completed) {
+            process.destroy()
+            if (!runCatching { process.waitFor(500, TimeUnit.MILLISECONDS) }.getOrDefault(false)) process.destroyForcibly()
+            val partial = runCatching { outputFile.takeIf { it.isFile }?.readText()?.take(32768) ?: "" }.getOrDefault("")
+            return@withContext RuntimeCommandResult(false, null, partial, "Guest command timed out after $timeoutSeconds seconds.")
+        }
+        val output = runCatching { outputFile.takeIf { it.isFile }?.readText()?.take(32768) ?: "" }.getOrDefault("")
+        val code = process.exitValue()
+        RuntimeCommandResult(true, code, output, if (code == 0) "Guest command completed." else "Guest command exited with code $code.")
+    }
+
     override suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         withContext(Dispatchers.IO) {
             val process = sessions.remove(request.workspacePath)
