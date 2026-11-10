@@ -104,7 +104,8 @@ ANSWERS
   cd bin/default
   "$AR" rcsD "$WORK/talloc-install/lib/libtalloc.a" talloc*.o
   "$RANLIB" "$WORK/talloc-install/lib/libtalloc.a"
-  cp "$WORK/talloc/../talloc/talloc.h" "$WORK/talloc-install/include/"
+  test -s "$WORK/talloc-install/lib/libtalloc.a"
+  cp "$WORK/talloc/talloc.h" "$WORK/talloc-install/include/"
 )
 
 # Build from the pinned, unmodified Termux PRoot source. The official
@@ -127,8 +128,13 @@ chmod 0755 "$STAGE/$ABI/libproot.so" "$STAGE/$ABI/libproot_loader.so"
 "$READELF" -l "$STAGE/$ABI/libproot.so" > "$STAGE/proot-elf-program-headers.txt"
 "$READELF" -d "$STAGE/$ABI/libproot.so" > "$STAGE/proot-elf-dynamic.txt"
 "$READELF" -h "$STAGE/$ABI/libproot_loader.so" > "$STAGE/loader-elf-header.txt"
+"$READELF" -l "$STAGE/$ABI/libproot_loader.so" > "$STAGE/loader-elf-program-headers.txt"
 grep -q "AArch64" "$STAGE/proot-elf-header.txt"
 grep -q "AArch64" "$STAGE/loader-elf-header.txt"
+grep -q "0x4000" "$STAGE/loader-elf-program-headers.txt" || {
+  echo "PRoot loader is missing the expected 16 KB maximum page alignment." >&2
+  exit 4
+}
 grep -q "0x4000" "$STAGE/proot-elf-program-headers.txt" || {
   echo "PRoot ELF is missing the expected 16 KB maximum page alignment." >&2
   exit 4
