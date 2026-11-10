@@ -317,6 +317,16 @@ class HybridRuntimeManager(
         if (!workspaceReady) return RuntimeOperationResult(false, "The selected runtime workspace is not prepared and verified.")
         val adapter = adapterRegistry.find(id)
             ?: return RuntimeOperationResult(false, "No execution adapter is registered for $id. No process was launched.")
+        val foundation = runCatching { foundationSupervisor.inspect(adapterRegistry) }.getOrElse {
+            return RuntimeOperationResult(false, "Runtime foundation inspection failed: ${it.message ?: "unknown error"}.")
+        }
+        if (foundation.status != RuntimeFoundationStatus.READY) {
+            return RuntimeOperationResult(false, "Runtime foundation is ${foundation.status}; Android compatibility or app-private foundation storage is not ready. No process was launched.")
+        }
+        val adapterObservation = foundation.capabilities.executionAdapters[id]
+        if (adapterObservation?.status != RuntimeCapabilityStatus.AVAILABLE) {
+            return RuntimeOperationResult(false, "Runtime adapter is not reported as registered. No process was launched.")
+        }
         val request = RuntimeAdapterStartRequest(id, distribution?.directoryName, workspace.absolutePath)
         val capability = runCatching { adapter.inspect(request) }.getOrElse {
             return RuntimeOperationResult(false, "Adapter capability inspection failed: ${it.message ?: "unknown error"}.")

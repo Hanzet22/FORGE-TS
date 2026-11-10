@@ -24,7 +24,8 @@ These states are not interchangeable. UNKNOWN is never promoted to AVAILABLE.
 
 - RuntimeFoundationStatus.READY means only that the declared Android minimum is met and app-private foundation directories are safely prepared.
 - A workspace being prepared does not install a rootfs or mark a runtime READY.
-- Runtime start still requires a registered adapter, adapter-specific inspection, a verified workspace, and the existing lifecycle guards.
+- Runtime start is rejected unless foundation status is READY, the selected workspace is verified, the adapter is registered in the capability report, and adapter-specific inspection succeeds.
+- Foundation READY means only that the declared Android minimum is met and app-private foundation directories are safely prepared; it does not imply KVM, PRoot, or any guest engine is usable.
 - Only an adapter that independently confirms an active session can move the lifecycle to RUNNING.
 
 ## Deliberately not claimed
