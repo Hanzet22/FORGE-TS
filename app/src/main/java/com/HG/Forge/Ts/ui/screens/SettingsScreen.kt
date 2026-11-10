@@ -63,7 +63,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
         Text("Local preferences are stored on this device.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         AccountLifecycleSection()
-        AuthenticatorMfaSection()
         Text("Default DNS record type", style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("A", "AAAA", "MX", "TXT").forEach { type ->
