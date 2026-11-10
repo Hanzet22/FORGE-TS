@@ -1,0 +1,50 @@
+name: PRoot Native ARM64
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/native/build-proot-runtime.sh"
+      - "docs/PHASE-30-PROOT-ENGINE-PACKAGING.md"
+      - ".github/workflows/proot-native.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: proot-native-arm64
+  cancel-in-progress: true
+
+jobs:
+  build-arm64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install Android NDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ndk;27.2.12479018
+
+      - name: Configure NDK path
+        shell: bash
+        run: echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+
+      - name: Install build utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential curl unzip
+
+      - name: Build pinned PRoot and loader
+        run: bash scripts/native/build-proot-runtime.sh
+
+      - name: Upload native runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-ts-proot-native-arm64
+          path: build/proot-native/artifact/
+          if-no-files-found: error
+          retention-days: 14
