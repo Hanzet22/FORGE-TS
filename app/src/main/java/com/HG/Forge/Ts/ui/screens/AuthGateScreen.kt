@@ -107,7 +107,7 @@ fun AuthGateScreen(
                             runCatching { authClient.signIn(email, password) }
                         }
                         result.onSuccess {
-                            ForgeAuthSessionState.session = it
+                            ForgeAuthSessionState.setSession(context, it)
                             message = "Signed in. Simulate and Tools are unlocked."
                             onAuthenticated()
                         }.onFailure {
@@ -141,7 +141,7 @@ fun AuthGateScreen(
                         busy = false
                     }
                 },
-                enabled = !busy && email.contains("@") && password.length >= 6,
+                enabled = !busy && email.contains("@") && password.length >= 20,
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Create account") }
             Text("Password must contain at least 20 characters, matching the configured account policy.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
