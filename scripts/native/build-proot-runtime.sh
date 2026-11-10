@@ -108,7 +108,7 @@ ANSWERS
   PATH="$TOOLCHAIN:$PATH" make -j"$(getconf _NPROCESSORS_ONLN)"
   mkdir -p "$WORK/talloc-install/lib" "$WORK/talloc-install/include"
   cd bin/default
-  "$AR" rcsD "$WORK/talloc-install/lib/libtalloc.a" talloc*.o
+  "$AR" rcsD "$WORK/talloc-install/lib/libtalloc.a" talloc*.o lib/replace/*.o
   "$RANLIB" "$WORK/talloc-install/lib/libtalloc.a"
   test -s "$WORK/talloc-install/lib/libtalloc.a"
   cp "$WORK/talloc/talloc.h" "$WORK/talloc-install/include/"
