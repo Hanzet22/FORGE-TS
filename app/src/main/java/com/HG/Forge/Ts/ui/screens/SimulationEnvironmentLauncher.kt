@@ -77,6 +77,20 @@ fun SimulationEnvironmentLauncher() {
                                 enabled = environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
                                     environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED
                             ) { Text("Start") }
+                            if (environment.lifecycle == RuntimeLifecycleState.RECOVERY_REQUIRED) {
+                                OutlinedButton(onClick = {
+                                    scope.launch {
+                                        val result = manager.transitionForFutureAdapter(
+                                            environment.id, RuntimeLifecycleState.STOPPED
+                                        )
+                                        message = if (result.accepted) {
+                                            "Previous session marked stopped. Only confirm this after verifying no environment process is still running."
+                                        } else result.message
+                                        snapshot = manager.inspect()
+                                        managerEvent = manager.lastManagerEvent()
+                                    }
+                                }) { Text("Confirm stopped") }
+                            }
                         }
                     }
                 }

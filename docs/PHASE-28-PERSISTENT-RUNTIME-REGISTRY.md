@@ -23,7 +23,7 @@
 
 - Workspace preparation runs on the IO dispatcher and persists the prepared flag.
 - Future lifecycle transitions are validated and persisted.
-- RECOVERY_REQUIRED may only transition to STOPPED or FAILED; it cannot jump directly to RUNNING.
+- RECOVERY_REQUIRED may only transition to STOPPED or FAILED; it cannot jump directly to RUNNING. The UI exposes a manual Confirm stopped action, with an explicit instruction to verify no environment process remains active.
 - Start requests remain rejected because no environment-specific execution adapter exists.
 - No rootfs download, archive extraction, PRoot process, XFCE desktop, QEMU guest, or RouterOS CHR boot is introduced.
 
