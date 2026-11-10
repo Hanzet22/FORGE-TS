@@ -1,0 +1,15 @@
+FORGE-TS PRoot native build
+ABI=arm64-v8a
+ANDROID_API=29
+NDK_REVISION=27.2.12479018
+PRoot_SOURCE=https://github.com/termux/proot/archive/v5.1.107.102.zip
+PRoot_SHA256=30d12a6e2cc4147123756ff58edea262d3083bbc238c12d0ab9b39e3d1c40852
+PRoot_LICENSE=GPL-2.0 (Termux package recipe declaration; inspect bundled COPYING)
+TALLOC_SOURCE=https://www.samba.org/ftp/talloc/talloc-2.5.0.tar.gz
+TALLOC_SHA256=912afa237510ae542a7733998eb18a12bcda35ab6729c8e2ddb43e8d0ebab007
+TALLOC_LICENSE=Bundled upstream COPYING file (Termux package recipe declares GPL-3.0)
+LIBANDROID_SHMEM=disabled
+TALLOC_LINKAGE=static
+ELF_MAX_PAGE_SIZE=16384
+PROOT_LOADER_MODE=external
+SOURCE_PATCHES=ashmem_memfd-add-string.h,loader-16kb-page-alignment
