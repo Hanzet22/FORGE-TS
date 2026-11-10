@@ -18,9 +18,12 @@ This roadmap is the **Simulation Runtime** track. It is separate from the older 
 - Exit: reproducible guest boot and isolation evidence on a supported device/backend. Image staging alone is not completion of Phase 7.
 
 ## Phase 8 — XFCE4 Integration
-- Provision Linux userland separately from the RouterOS guest.
-- Integrate display lifecycle/fullscreen with clear process ownership and graceful shutdown.
-- Exit: stable desktop lifecycle and verified separation from the RouterOS guest.
+- Current increment: prepare an app-private Linux userland workspace with separate rootfs, home, tmp, and logs directories; verify canonical containment and access.
+- No Linux distribution is bundled, downloaded, extracted, mounted, or executed in this increment.
+- Keep Linux userland separate from the RouterOS guest and from the Android host.
+- Next: select a distribution with reviewed package licenses; add a bounded, checksum-verified rootfs importer; then design process ownership and display lifecycle.
+- Do not start arbitrary host shell commands, QEMU, or CHR from the workspace foundation.
+- Exit: stable desktop lifecycle and verified separation from the RouterOS guest. Workspace preparation alone is not completion of Phase 8.
 
 ## Phase 9 — Networking Integration
 - Create a private guest management network; expose no public inbound management by default.

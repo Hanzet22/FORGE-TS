@@ -43,6 +43,7 @@ import com.HG.Forge.Ts.data.simulation.SupabaseOfflineEngine
 import com.HG.Forge.Ts.ui.screens.RemoteAccessPanel
 import com.HG.Forge.Ts.ui.screens.RuntimeFoundationPanel
 import com.HG.Forge.Ts.ui.screens.RouterOsImageImportPanel
+import com.HG.Forge.Ts.ui.screens.LinuxUserlandFoundationPanel
 
 private enum class SimulationModule(val title: String) {
     REDIS("Redis"), SUPABASE("Supabase"), LOOPBACK("Loopback")
@@ -111,6 +112,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
         }
         RemoteAccessPanel(internetAvailable = internetValidated)
         RuntimeFoundationPanel()
+        LinuxUserlandFoundationPanel()
         RouterOsImageImportPanel()
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SimulationModule.entries.forEach { module ->
