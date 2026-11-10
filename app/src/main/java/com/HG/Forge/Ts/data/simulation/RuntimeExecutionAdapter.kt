@@ -1,5 +1,7 @@
 package com.HG.Forge.Ts.data.simulation
 
+import android.content.Context
+
 /**
  * Contract between HybridRuntimeManager and an environment-specific runtime.
  * Implementations must only confirm RUNNING after independently verifying the session.
@@ -15,10 +17,13 @@ data class RuntimeAdapterStartResult(
     val confirmedRunning: Boolean,
     val message: String
 )
+data class RuntimeAdapterStopResult(val stopped: Boolean, val message: String)
 interface RuntimeExecutionAdapter {
     val environmentId: RuntimeEnvironmentId
     suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability
     suspend fun start(request: RuntimeAdapterStartRequest): RuntimeAdapterStartResult
+    suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
+        RuntimeAdapterStopResult(false, "This adapter does not expose process shutdown.")
 }
 /** Empty by default: workspace preparation never implies an installed execution engine. */
 class RuntimeExecutionAdapterRegistry(adapters: Collection<RuntimeExecutionAdapter> = emptyList()) {
@@ -26,5 +31,7 @@ class RuntimeExecutionAdapterRegistry(adapters: Collection<RuntimeExecutionAdapt
     fun find(environmentId: RuntimeEnvironmentId): RuntimeExecutionAdapter? = adaptersByEnvironment[environmentId]
     companion object {
         fun empty(): RuntimeExecutionAdapterRegistry = RuntimeExecutionAdapterRegistry()
+        fun androidDefault(context: Context): RuntimeExecutionAdapterRegistry =
+            RuntimeExecutionAdapterRegistry(listOf(ProotExecutionAdapter(context)))
     }
 }
