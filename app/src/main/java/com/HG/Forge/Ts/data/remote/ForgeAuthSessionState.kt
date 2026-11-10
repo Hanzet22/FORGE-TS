@@ -10,13 +10,25 @@ object ForgeAuthSessionState {
     var session: SupabaseAuthSession? by mutableStateOf(null)
         private set
 
+    var passwordRecoveryPending by mutableStateOf(false)
+        private set
+
     fun setSession(context: Context, value: SupabaseAuthSession) {
         session = value
         ForgeAuthSessionStore.save(context.applicationContext, value)
     }
 
+    fun beginPasswordRecovery() {
+        passwordRecoveryPending = true
+    }
+
+    fun completePasswordRecovery() {
+        passwordRecoveryPending = false
+    }
+
     fun clearSession(context: Context) {
         session = null
+        passwordRecoveryPending = false
         ForgeAuthSessionStore.clear(context.applicationContext)
     }
 
