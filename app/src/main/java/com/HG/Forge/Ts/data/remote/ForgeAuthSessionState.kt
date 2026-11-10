@@ -18,12 +18,14 @@ object ForgeAuthSessionState {
         ForgeAuthSessionStore.save(context.applicationContext, value)
     }
 
-    fun beginPasswordRecovery() {
+    fun beginPasswordRecovery(context: Context) {
         passwordRecoveryPending = true
+        ForgeAuthSessionStore.setPasswordRecoveryPending(context.applicationContext, true)
     }
 
-    fun completePasswordRecovery() {
+    fun completePasswordRecovery(context: Context) {
         passwordRecoveryPending = false
+        ForgeAuthSessionStore.setPasswordRecoveryPending(context.applicationContext, false)
     }
 
     fun clearSession(context: Context) {
@@ -38,6 +40,7 @@ object ForgeAuthSessionState {
      */
     suspend fun restore(context: Context, authClient: SupabaseAuthClient) {
         val appContext = context.applicationContext
+        passwordRecoveryPending = ForgeAuthSessionStore.isPasswordRecoveryPending(appContext)
         val stored = ForgeAuthSessionStore.load(appContext) ?: return
         val restored = runCatching { authClient.validSession(stored) }.getOrDefault(stored)
         if (restored.expiresAtEpochSeconds > System.currentTimeMillis() / 1000L) {
