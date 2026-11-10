@@ -12,29 +12,41 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.data.simulation.HybridRuntimeManager
 import com.HG.Forge.Ts.data.simulation.HybridRuntimeSnapshot
 import com.HG.Forge.Ts.data.simulation.RuntimeLifecycleState
+import kotlinx.coroutines.launch
 
 @Composable
 fun SimulationEnvironmentLauncher() {
     val context = LocalContext.current
     val manager = remember(context) { HybridRuntimeManager(context) }
+    val scope = rememberCoroutineScope()
     var snapshot by remember(manager) { mutableStateOf(manager.inspect()) }
-    var message by remember { mutableStateOf("Runtime manager initialized. No environment has been launched.") }
+    var message by remember { mutableStateOf("Loading persistent runtime registry…") }
+    var managerEvent by remember { mutableStateOf("Reading local event record…") }
+
+    LaunchedEffect(manager) {
+        val result = manager.initialize()
+        message = result.message
+        snapshot = manager.inspect()
+        managerEvent = manager.lastManagerEvent()
+    }
 
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Hybrid Runtime Manager", style = MaterialTheme.typography.titleLarge)
             Text(
-                "One supervisor, five isolated workspaces. Preparing a workspace does not install or launch its runtime.",
+                "Persistent registry, conservative process recovery, and five isolated workspaces. Recovery never auto-starts an environment.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -44,22 +56,26 @@ fun SimulationEnvironmentLauncher() {
                         Text(environment.title, style = MaterialTheme.typography.titleMedium)
                         Text("Lifecycle: ${environment.lifecycle}", style = MaterialTheme.typography.labelMedium)
                         Text(
-                            if (environment.workspaceReady) "Workspace: prepared" else "Workspace: not prepared",
+                            if (environment.workspaceReady) "Workspace: prepared and verified" else "Workspace: not prepared / not verified",
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(environment.notes.joinToString(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(onClick = {
-                                val result = manager.prepareWorkspace(environment.id)
-                                message = result.message
-                                snapshot = manager.inspect()
+                                scope.launch {
+                                    val result = manager.prepareWorkspace(environment.id)
+                                    message = result.message
+                                    snapshot = manager.inspect()
+                                    managerEvent = manager.lastManagerEvent()
+                                }
                             }) { Text(if (environment.workspaceReady) "Refresh workspace" else "Prepare workspace") }
                             OutlinedButton(
                                 onClick = {
                                     message = manager.requestStart(environment.id).message
                                     snapshot = manager.inspect()
                                 },
-                                enabled = environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE
+                                enabled = environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
+                                    environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED
                             ) { Text("Start") }
                         }
                     }
@@ -70,10 +86,17 @@ fun SimulationEnvironmentLauncher() {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Manager event", style = MaterialTheme.typography.titleSmall)
                     Text(message, style = MaterialTheme.typography.bodySmall)
+                    Text(managerEvent, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             OutlinedButton(
-                onClick = { snapshot = manager.inspect(); message = "Device resources and environment registry refreshed." },
+                onClick = {
+                    scope.launch {
+                        snapshot = manager.inspect()
+                        managerEvent = manager.lastManagerEvent()
+                        message = "Device resources and persistent registry refreshed."
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Refresh manager status") }
         }
