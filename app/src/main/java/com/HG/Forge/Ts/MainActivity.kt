@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.HG.Forge.Ts.data.sync.CrashReportStore
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import com.HG.Forge.Ts.ui.ForgeApp
+import com.HG.Forge.Ts.ui.DiagnosticConsentGate
 import com.HG.Forge.Ts.ui.theme.ForgeTheme
 import kotlinx.coroutines.launch
 
@@ -29,7 +30,10 @@ class MainActivity : ComponentActivity() {
         ForgeDiagnostics.log(this, "INFO", "MainActivity", "activity.on_create.enter")
         setContent {
             ForgeTheme {
-                Surface(Modifier.fillMaxSize()) { ForgeApp() }
+                Surface(Modifier.fillMaxSize()) {
+                    ForgeApp()
+                    DiagnosticConsentGate()
+                }
             }
         }
         ForgeDiagnostics.log(this, "INFO", "MainActivity", "activity.compose_content_set")
