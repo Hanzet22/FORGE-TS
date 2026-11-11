@@ -141,7 +141,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
     override suspend fun writeInteractive(request: RuntimeAdapterStartRequest, input: String): RuntimeInteractiveResult =
         withContext(Dispatchers.IO) {
-            if (input.isEmpty() || input.length > 16384 || input.indexOf('\\u0000') >= 0) {
+            if (input.isEmpty() || input.length > 16384 || input.indexOf('\u0000') >= 0) {
                 return@withContext RuntimeInteractiveResult(false, message = "Input is empty or exceeds the 16 KiB session limit.")
             }
             val key = request.workspacePath
