@@ -85,6 +85,9 @@ fun ProotTerminalPanel() {
                 if (result.rawOutput.isNotEmpty()) {
                     terminalEmulator.writeInput(result.rawOutput)
                 }
+                if (result.message != "Native PTY output read.") {
+                    status = result.message
+                }
                 if (!result.accepted) {
                     lifecycle = "EXITED"
                     status = result.message
