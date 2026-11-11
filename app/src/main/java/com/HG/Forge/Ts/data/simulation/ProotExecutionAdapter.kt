@@ -241,46 +241,39 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         if (input.isEmpty() || input.size > 16384 || input.any { it == 0.toByte() }) {
             return@withContext RuntimeInteractiveResult(false, message = "Input is empty or exceeds the 16 KiB session limit.")
         }
-        val session = sessions[request.workspacePath]
-            ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-        val processStatus = NativePtyEngine.nativeWait(session.handle)
-        if (processStatus > 0) {
-            return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
-        }
-        if (processStatus < 0) {
-            return@withContext RuntimeInteractiveResult(false,
+        val key = request.workspacePath
+        val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
+        synchronized(sessionLock) {
+            val session = sessions[key]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+            val processStatus = NativePtyEngine.nativeWait(session.handle)
+            if (processStatus > 0) return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+            if (processStatus < 0) return@withContext RuntimeInteractiveResult(false,
                 message = "Could not verify PRoot PTY process status (errno=" + (-processStatus) + ").")
-        }
-        val bytes = input.copyOf()
-        try {
-            synchronized(session.inputLock) {
-                var offset = 0
-                var backpressureRetries = 0
-                while (offset < bytes.size) {
-                    val written = NativePtyEngine.nativeWrite(session.handle, bytes, offset, bytes.size - offset)
-                    when {
-                        written > 0 -> {
-                            offset += written
-                            backpressureRetries = 0
-                        }
-                        written == -11 -> {
-                            if (backpressureRetries >= 50) {
-                                return@withContext RuntimeInteractiveResult(false,
-                                    message = "PTY remained backpressured after $offset of ${bytes.size} bytes.")
+            val bytes = input.copyOf()
+            try {
+                synchronized(session.inputLock) {
+                    var offset = 0
+                    var retries = 0
+                    while (offset < bytes.size) {
+                        val written = NativePtyEngine.nativeWrite(session.handle, bytes, offset, bytes.size - offset)
+                        when {
+                            written > 0 -> { offset += written; retries = 0 }
+                            written == -11 -> {
+                                if (retries >= 50) return@withContext RuntimeInteractiveResult(false,
+                                    message = "PTY remained backpressured after " + offset + " of " + bytes.size + " bytes.")
+                                retries++
+                                Thread.sleep(2)
                             }
-                            backpressureRetries += 1
-                            Thread.sleep(2)
-                        }
-                        else -> {
-                            return@withContext RuntimeInteractiveResult(false,
-                                message = "PTY input failed after $offset of ${bytes.size} bytes (errno=${-written}).")
+                            else -> return@withContext RuntimeInteractiveResult(false,
+                                message = "PTY input failed after " + offset + " of " + bytes.size + " bytes (errno=" + (-written) + ").")
                         }
                     }
                 }
+                RuntimeInteractiveResult(true, message = "Input delivered through the native PTY master.")
+            } catch (error: Exception) {
+                RuntimeInteractiveResult(false, message = "Could not write to the guest PTY: " + (error.message ?: "I/O error"))
             }
-            RuntimeInteractiveResult(true, message = "Input delivered through the native PTY master.")
-        } catch (error: Exception) {
-            RuntimeInteractiveResult(false, message = "Could not write to the guest PTY: ${error.message ?: "I/O error"}")
         }
     }
 
@@ -324,20 +317,20 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         if (rows !in 1..1000 || columns !in 1..1000) {
             return@withContext RuntimeInteractiveResult(false, message = "Terminal dimensions must be between 1 and 1000.")
         }
-        val session = sessions[request.workspacePath]
-            ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-        val processStatus = NativePtyEngine.nativeWait(session.handle)
-        if (processStatus > 0) {
-            return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
-        }
-        if (processStatus < 0) {
-            return@withContext RuntimeInteractiveResult(false,
+        val key = request.workspacePath
+        val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
+        synchronized(sessionLock) {
+            val session = sessions[key]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+            val processStatus = NativePtyEngine.nativeWait(session.handle)
+            if (processStatus > 0) return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+            if (processStatus < 0) return@withContext RuntimeInteractiveResult(false,
                 message = "Could not verify PRoot PTY process status (errno=" + (-processStatus) + ").")
+            val resized = NativePtyEngine.nativeResize(session.handle, rows, columns)
+            RuntimeInteractiveResult(resized,
+                message = if (resized) "PTY window size updated to " + rows + "x" + columns + "."
+                else "Native PTY rejected the window-size update.")
         }
-        val resized = NativePtyEngine.nativeResize(session.handle, rows, columns)
-        RuntimeInteractiveResult(resized,
-            message = if (resized) "PTY window size updated to ${rows}x${columns}."
-            else "Native PTY rejected the window-size update.")
     }
 
     override suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
