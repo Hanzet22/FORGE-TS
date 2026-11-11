@@ -1,0 +1,57 @@
+{
+  "batch": 18,
+  "capturedAt": "2026-11-11T10:32:24.215Z",
+  "pages": [],
+  "missing": [
+    {
+      "code": "de",
+      "page": 18,
+      "url": "https://www.publicdns.xyz/country/de/18.html"
+    },
+    {
+      "code": "kz",
+      "page": 2,
+      "url": "https://www.publicdns.xyz/country/kz/2.html"
+    },
+    {
+      "code": "il",
+      "page": 2,
+      "url": "https://www.publicdns.xyz/country/il/2.html"
+    },
+    {
+      "code": "il",
+      "page": 3,
+      "url": "https://www.publicdns.xyz/country/il/3.html"
+    },
+    {
+      "code": "in",
+      "page": 2,
+      "url": "https://www.publicdns.xyz/country/in/2.html"
+    },
+    {
+      "code": "in",
+      "page": 3,
+      "url": "https://www.publicdns.xyz/country/in/3.html"
+    },
+    {
+      "code": "in",
+      "page": 4,
+      "url": "https://www.publicdns.xyz/country/in/4.html"
+    },
+    {
+      "code": "in",
+      "page": 5,
+      "url": "https://www.publicdns.xyz/country/in/5.html"
+    },
+    {
+      "code": "in",
+      "page": 6,
+      "url": "https://www.publicdns.xyz/country/in/6.html"
+    },
+    {
+      "code": "in",
+      "page": 7,
+      "url": "https://www.publicdns.xyz/country/in/7.html"
+    }
+  ]
+}
