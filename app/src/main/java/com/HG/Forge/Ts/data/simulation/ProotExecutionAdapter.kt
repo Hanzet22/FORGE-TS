@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit
 class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     private val appContext = context.applicationContext
     private val sessions = ConcurrentHashMap<String, Process>()
+    private val interactiveOutput = ConcurrentHashMap<String, StringBuilder>()
+    private val interactiveInputLocks = ConcurrentHashMap<String, Any>()
     override val environmentId = RuntimeEnvironmentId.XFCE_PROOT
 
     override suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability =
@@ -62,13 +64,36 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val process = runCatching {
                 ProcessBuilder(command(engine, root, listOf("/bin/sh", "-l")))
                     .directory(root).redirectErrorStream(true)
-                    .redirectOutput(ProcessBuilder.Redirect.appendTo(File(logs, "session.log")))
                     .apply { environment().putAll(environment(loader, tmp)) }.start()
             }.getOrElse {
                 return@withContext RuntimeAdapterStartResult(false, false,
                     "PRoot session launch failed: " + (it.message ?: "unknown error"))
             }
             sessions[key] = process
+            interactiveOutput[key] = StringBuilder()
+            interactiveInputLocks[key] = Any()
+            Thread({
+                val logFile = File(logs, "session.log")
+                val buffer = ByteArray(2048)
+                try {
+                    process.inputStream.use { stream ->
+                        logFile.outputStream().buffered().use { log ->
+                            while (true) {
+                                val count = stream.read(buffer)
+                                if (count < 0) break
+                                val chunk = String(buffer, 0, count, Charsets.UTF_8)
+                                synchronized(interactiveOutput[key] ?: continue) {
+                                    val output = interactiveOutput[key] ?: continue
+                                    output.append(chunk)
+                                    if (output.length > 262144) output.delete(0, output.length - 262144)
+                                }
+                                log.write(buffer, 0, count)
+                                log.flush()
+                            }
+                        }
+                    }
+                } catch (_: Exception) { }
+            }, "forge-proot-output-${key.hashCode()}").apply { isDaemon = true; start() }
             Thread.sleep(150)
             if (!process.isAlive) {
                 sessions.remove(key, process)
@@ -114,6 +139,42 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         RuntimeCommandResult(true, code, output, if (code == 0) "Guest command completed." else "Guest command exited with code $code.")
     }
 
+    override suspend fun writeInteractive(request: RuntimeAdapterStartRequest, input: String): RuntimeInteractiveResult =
+        withContext(Dispatchers.IO) {
+            if (input.isEmpty() || input.length > 16384 || input.indexOf('\\u0000') >= 0) {
+                return@withContext RuntimeInteractiveResult(false, message = "Input is empty or exceeds the 16 KiB session limit.")
+            }
+            val key = request.workspacePath
+            val process = sessions[key]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "No active PRoot session exists.")
+            if (!process.isAlive) return@withContext RuntimeInteractiveResult(false, message = "PRoot session is no longer running.")
+            val lock = interactiveInputLocks[key] ?: return@withContext RuntimeInteractiveResult(false, message = "Session input channel is unavailable.")
+            try {
+                synchronized(lock) {
+                    process.outputStream.write(input.toByteArray(Charsets.UTF_8))
+                    process.outputStream.flush()
+                }
+                RuntimeInteractiveResult(true, message = "Input delivered to the active guest shell.")
+            } catch (error: Exception) {
+                RuntimeInteractiveResult(false, message = "Could not write to the guest shell: ${error.message ?: "I/O error"}")
+            }
+        }
+
+    override suspend fun readInteractive(request: RuntimeAdapterStartRequest): RuntimeInteractiveResult =
+        withContext(Dispatchers.IO) {
+            val key = request.workspacePath
+            val process = sessions[key]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "No active PRoot session exists.")
+            val output = interactiveOutput[key]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "Session output channel is unavailable.")
+            val chunk = synchronized(output) {
+                val value = output.toString()
+                output.setLength(0)
+                value
+            }
+            RuntimeInteractiveResult(process.isAlive, chunk, if (process.isAlive) "Session output read." else "Session has exited; remaining output returned.")
+        }
+
     override suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         withContext(Dispatchers.IO) {
             val process = sessions.remove(request.workspacePath)
@@ -122,6 +183,8 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val graceful = runCatching { process.waitFor(3, TimeUnit.SECONDS) }.getOrDefault(false)
             if (!graceful) process.destroyForcibly()
             val terminated = graceful || runCatching { process.waitFor(2, TimeUnit.SECONDS) }.getOrDefault(false)
+            interactiveOutput.remove(request.workspacePath)
+            interactiveInputLocks.remove(request.workspacePath)
             RuntimeAdapterStopResult(terminated,
                 if (graceful) "PRoot launcher stopped."
                 else if (terminated) "PRoot launcher was force-stopped after the graceful timeout."
