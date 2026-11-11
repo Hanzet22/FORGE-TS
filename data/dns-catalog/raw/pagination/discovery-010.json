@@ -1,0 +1,151 @@
+{
+  "batch": 9,
+  "capturedAt": "2026-11-11T10:27:28.637Z",
+  "pages": [
+    {
+      "url": "https://www.publicdns.xyz/country/lk.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tr.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/tr/2.html",
+        "https://www.publicdns.xyz/country/tr/3.html",
+        "https://www.publicdns.xyz/country/tr/4.html",
+        "https://www.publicdns.xyz/country/tr/5.html",
+        "https://www.publicdns.xyz/country/tr/6.html"
+      ],
+      "lastPage": 6
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tj.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/se.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/se/2.html",
+        "https://www.publicdns.xyz/country/se/3.html",
+        "https://www.publicdns.xyz/country/se/4.html",
+        "https://www.publicdns.xyz/country/se/5.html"
+      ],
+      "lastPage": 5
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tn.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/es.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/es/2.html",
+        "https://www.publicdns.xyz/country/es/3.html",
+        "https://www.publicdns.xyz/country/es/4.html",
+        "https://www.publicdns.xyz/country/es/5.html",
+        "https://www.publicdns.xyz/country/es/12.html"
+      ],
+      "lastPage": 12
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/th.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/th/2.html",
+        "https://www.publicdns.xyz/country/th/3.html",
+        "https://www.publicdns.xyz/country/th/4.html",
+        "https://www.publicdns.xyz/country/th/5.html",
+        "https://www.publicdns.xyz/country/th/23.html"
+      ],
+      "lastPage": 23
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tw.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/tw/2.html",
+        "https://www.publicdns.xyz/country/tw/3.html",
+        "https://www.publicdns.xyz/country/tw/4.html",
+        "https://www.publicdns.xyz/country/tw/5.html",
+        "https://www.publicdns.xyz/country/tw/14.html"
+      ],
+      "lastPage": 14
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/sy.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tt.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/sd.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tm.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ch.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/ch/2.html",
+        "https://www.publicdns.xyz/country/ch/3.html",
+        "https://www.publicdns.xyz/country/ch/4.html"
+      ],
+      "lastPage": 4
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tz.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/kr.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/kr/2.html",
+        "https://www.publicdns.xyz/country/kr/3.html",
+        "https://www.publicdns.xyz/country/kr/4.html",
+        "https://www.publicdns.xyz/country/kr/5.html",
+        "https://www.publicdns.xyz/country/kr/22.html"
+      ],
+      "lastPage": 22
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/sr.html",
+      "pagination": [],
+      "lastPage": 1
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/sz.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tg.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/to.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tc.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    }
+  ]
+}
