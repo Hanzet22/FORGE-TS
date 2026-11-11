@@ -78,3 +78,9 @@ Therefore:
 - Keep display capability separate from runtime capability: a PRoot shell may work while desktop display is unavailable.
 - Keep UNAVAILABLE/UNKNOWN explicit on devices that do not meet the selected backend's requirements.
 - The next P1 implementation slice is the host-side display contract and capability reporting; native engine integration follows only after the backend target and minimum Android version are explicitly pinned.
+
+
+## Phase 44 candidate pin
+The MagicDesk X11 candidate baseline is pinned for review at `mekhontsev/magicdesk-x11` revision `0676518439b125cda7b4dd19a58f6763afbf81b2`. Its documented native build requires Android API 34, ARM64, NDK 27.3.13750724, recursive submodules, CMake 3.22+, Ninja, Python 3, Bison, patch and a host C compiler. FORGE-TS currently uses NDK 27.2.12479018, so the native toolchain is not yet aligned.
+
+The candidate's Android runtime module depends on MagicDesk's separate `hosted-runtime`; it is not a drop-in library for this repository. FORGE-TS must implement its own host bridge against the native embedding contract. The candidate is GPL-3.0; any distributed build containing it must preserve notices and provide exact corresponding source, pinned dependencies and build scripts. No candidate source or binary has been copied into FORGE-TS. See [Phase 44](PHASE-44-EMBEDDED-X11-ADMISSION-GATE.md).
