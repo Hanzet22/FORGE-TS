@@ -389,13 +389,36 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         return Paths(root, engine, loader, logs, tmp)
     }
 
-    private fun command(engine: File, root: File, guest: List<String>): List<String> =
-        listOf(engine.absolutePath, "--kill-on-exit", "-0", "-r", root.absolutePath, "-w", "/") + guest
+    /**
+     * Expose only the baseline Linux pseudo-filesystems. Android storage,
+     * /system, /data and Termux paths remain outside the guest boundary.
+     */
+    private fun command(engine: File, root: File, guest: List<String>): List<String> {
+        val args = mutableListOf(
+            engine.absolutePath,
+            "--kill-on-exit",
+            "-0",
+            "-r", root.absolutePath,
+            "-w", "/"
+        )
+        listOf("/dev", "/proc", "/sys").forEach { hostPath ->
+            val source = File(hostPath)
+            if (source.isDirectory && source.canRead() && source.canExecute()) {
+                args += "--bind=$hostPath"
+            }
+        }
+        args += guest
+        return args
+    }
 
     private fun environment(loader: File, tmp: File): Map<String, String> = mapOf(
         "PROOT_LOADER" to loader.absolutePath,
         "PROOT_TMP_DIR" to tmp.absolutePath,
         "TMPDIR" to tmp.absolutePath,
-        "LD_LIBRARY_PATH" to appContext.applicationInfo.nativeLibraryDir
+        "LD_LIBRARY_PATH" to appContext.applicationInfo.nativeLibraryDir,
+        "HOME" to "/root",
+        "PATH" to "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "TERM" to "xterm-256color",
+        "LANG" to "C.UTF-8"
     )
 }
