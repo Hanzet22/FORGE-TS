@@ -248,24 +248,30 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeClose(
     }
 
     std::lock_guard<std::mutex> lock(session->ioMutex);
-    if (session->child > 0 && !session->exited) {
+    if (session->child > 0) {
+        // The PTY leader may already be reaped while descendants still hold
+        // the slave side open. Signal the process group on every close path.
         kill(-session->child, graceful == JNI_TRUE ? SIGHUP : SIGKILL);
-        int status = 0;
-        pid_t result = 0;
-        if (graceful == JNI_TRUE) {
-            for (int attempt = 0; attempt < 50; ++attempt) {
-                result = waitpid(session->child, &status, WNOHANG);
-                if (result == session->child || (result < 0 && errno == ECHILD)) break;
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if (!session->exited) {
+            int status = 0;
+            pid_t result = 0;
+            if (graceful == JNI_TRUE) {
+                for (int attempt = 0; attempt < 50; ++attempt) {
+                    result = waitpid(session->child, &status, WNOHANG);
+                    if (result == session->child || (result < 0 && errno == ECHILD)) break;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
             }
+            if (result == 0) {
+                kill(-session->child, SIGKILL);
+                kill(session->child, SIGKILL);
+                do { result = waitpid(session->child, &status, 0); } while (result < 0 && errno == EINTR);
+            }
+            if (result == session->child) {
+                session->waitStatus = status;
+            }
+            session->exited = true;
         }
-        if (result == 0) {
-            kill(-session->child, SIGKILL);
-            kill(session->child, SIGKILL);
-            do { result = waitpid(session->child, &status, 0); } while (result < 0 && errno == EINTR);
-        }
-        session->exited = true;
-        session->waitStatus = status;
     }
     if (session->master >= 0) {
         close(session->master);
