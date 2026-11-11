@@ -14,11 +14,26 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 object ForgeDiagnosticsConsent {
-    fun isEnabled(context: Context): Boolean = BuildConfig.DIAGNOSTICS_UPLOAD_ENABLED
+    private const val PREFS = "forge_diagnostics_consent"
+    private const val KEY_UPLOADS_ENABLED = "uploads_enabled"
 
-    // Uploading is intentionally always enabled in builds configured for telemetry.
+    /** Remote telemetry is opt-in per installation; local diagnostics remain enabled. */
+    fun isEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getBoolean(KEY_UPLOADS_ENABLED, false)
+
     fun setEnabled(context: Context, enabled: Boolean) {
-        if (enabled) ForgeDiagnosticsUploadScheduler.enqueue(context)
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_UPLOADS_ENABLED, enabled)
+            .apply()
+        if (enabled) {
+            ForgeDiagnosticsUploadScheduler.enqueue(context)
+            CrashReportUploadScheduler.enqueue(context)
+        } else {
+            WorkManager.getInstance(context).cancelUniqueWork("forge-ts-diagnostic-upload")
+            WorkManager.getInstance(context).cancelUniqueWork("forge-ts-crash-report-upload")
+        }
     }
 }
 
