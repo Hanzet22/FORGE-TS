@@ -37,6 +37,7 @@ fun SimulationEnvironmentLauncher() {
     var message by remember { mutableStateOf("Loading persistent runtime registry…") }
     var managerEvent by remember { mutableStateOf("Reading local event record…") }
     var installing by remember { mutableStateOf<ProotDistribution?>(null) }
+    var commandOutput by remember { mutableStateOf("") }
 
     LaunchedEffect(manager) {
         val result = manager.initialize()
@@ -79,7 +80,7 @@ fun SimulationEnvironmentLauncher() {
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("PRoot distro instances", style = MaterialTheme.typography.titleMedium)
-                    Text("Official ARM64 rootfs downloads are installed into each distro's existing private workspace. Debian remains gated pending a verified archive pipeline.",
+                    Text("Pinned ARM64 rootfs archives for Debian, Ubuntu, and Alpine are installed into each distro's existing private workspace. Runtime availability still depends on the device PRoot probe.",
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     snapshot.prootInstances.forEach { instance ->
                         Column(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -94,7 +95,7 @@ fun SimulationEnvironmentLauncher() {
                                     }
                                 }) { Text(if (instance.workspaceReady) "Refresh" else "Prepare") }
                                 Button(
-                                    enabled = installing == null && instance.distribution != ProotDistribution.DEBIAN &&
+                                    enabled = installing == null &&
                                         instance.lifecycle != RuntimeLifecycleState.RUNNING &&
                                         instance.lifecycle != RuntimeLifecycleState.STARTING &&
                                         instance.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED,
@@ -123,8 +124,36 @@ fun SimulationEnvironmentLauncher() {
                                         }
                                     }
                                 ) { Text("Start") }
+                                OutlinedButton(
+                                    enabled = instance.lifecycle == RuntimeLifecycleState.RUNNING,
+                                    onClick = {
+                                        scope.launch {
+                                            val result = manager.requestStop(RuntimeEnvironmentId.XFCE_PROOT, instance.distribution)
+                                            message = result.message; snapshot = manager.inspect()
+                                            managerEvent = manager.lastManagerEvent()
+                                        }
+                                    }
+                                ) { Text("Stop") }
+                                OutlinedButton(
+                                    enabled = instance.lifecycle == RuntimeLifecycleState.RUNNING,
+                                    onClick = {
+                                        scope.launch {
+                                            val result = manager.executeProotCommand(
+                                                instance.distribution,
+                                                listOf("/bin/sh", "-lc", "id; uname -a; cat /etc/os-release")
+                                            )
+                                            commandOutput = result.output.ifBlank { result.message }
+                                            message = result.message
+                                            snapshot = manager.inspect()
+                                        }
+                                    }
+                                ) { Text("Diagnostics") }
                             }
                         }
+                    }
+                    if (commandOutput.isNotBlank()) {
+                        Text("Guest command output", style = MaterialTheme.typography.titleSmall)
+                        Text(commandOutput, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
