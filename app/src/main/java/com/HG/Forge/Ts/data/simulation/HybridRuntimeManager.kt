@@ -348,6 +348,27 @@ class HybridRuntimeManager(
         }
     }
 
+    suspend fun writeProotTerminalInput(distribution: ProotDistribution, input: String): RuntimeInteractiveResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING || distribution !in preparedProotInstances)
+            return RuntimeInteractiveResult(false, message = "The selected PRoot instance is not confirmed RUNNING.")
+        val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
+        val workspace = File(root, distribution.directoryName)
+        if (!isSafeDirectory(workspace, root)) return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
+        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
+        val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
+        return runCatching { adapter.writeInteractive(request, input) }.getOrElse { RuntimeInteractiveResult(false, message = it.message ?: "Terminal input failed.") }
+    }
+
+    suspend fun readProotTerminalOutput(distribution: ProotDistribution): RuntimeInteractiveResult {
+        if (distribution !in preparedProotInstances) return RuntimeInteractiveResult(false, message = "PRoot workspace is not prepared.")
+        val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
+        val workspace = File(root, distribution.directoryName)
+        if (!isSafeDirectory(workspace, root)) return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
+        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
+        val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
+        return runCatching { adapter.readInteractive(request) }.getOrElse { RuntimeInteractiveResult(false, message = it.message ?: "Terminal output failed.") }
+    }
+
     suspend fun executeProotCommand(distribution: ProotDistribution, arguments: List<String>, timeoutSeconds: Long = 30): RuntimeCommandResult {
         if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING) return RuntimeCommandResult(false, null, "", "The selected PRoot instance must be confirmed RUNNING before command execution.")
         if (distribution !in preparedProotInstances) return RuntimeCommandResult(false, null, "", "The selected PRoot workspace is not registered as prepared.")
