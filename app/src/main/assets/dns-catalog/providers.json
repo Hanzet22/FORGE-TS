@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "https://www.publicdns.xyz/",
   "generatedAt": "2026-11-11",
-  "providerCount": 29,
+  "providerCount": 30,
   "providers": [
     {
       "slug": "google",
@@ -378,6 +378,21 @@
       ],
       "ipv6": [],
       "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "neustar",
+      "name": "Neustar",
+      "sourceUrl": "https://www.publicdns.xyz/public/neustar.html",
+      "ipv4": [
+        "156.154.70.1",
+        "156.154.71.1"
+      ],
+      "ipv6": [
+        "2610:a1:1018::1",
+        "2610:a1:1019::1"
+      ],
+      "source": "PublicDNS.xyz profile snapshot; address values retained from the earlier normalized provider inventory",
       "verification": "directory-listed; not live-tested"
     }
   ]
