@@ -1,0 +1,82 @@
+{
+  "batch": 12,
+  "capturedAt": "2026-11-11T10:16:41.174Z",
+  "source": "publicdns.xyz country inventory",
+  "pages": [
+    {
+      "code": "mh",
+      "name": "Marshall Islands",
+      "url": "https://www.publicdns.xyz/country/mh.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "mq",
+      "name": "Martinique",
+      "url": "https://www.publicdns.xyz/country/mq.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "mr",
+      "name": "Mauritania",
+      "url": "https://www.publicdns.xyz/country/mr.html",
+      "rawMarkdown": "DNS Server in Mauritania\n\n# DNS Server in Mauritania\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 82.151.74.36 | Arafat | 80.2432% |\n| 82.151.73.122 | | 91.6667% |\n| 82.151.90.1 bow.mauritel.mr. | | 82.449% |\n| 82.151.83.128 | | 53.5714% |\n| 82.151.70.84 82.151.70.84. | Nouakchott | 88.8889% |\n| 82.151.71.235 | Nouakchott | 96.0396% |\n| 82.151.66.178 cdisrv.cdi.mr. | Nouakchott | 89.0125% |\n\n# DNS Server in Mauritius",
+      "source": "Exa"
+    },
+    {
+      "code": "mu",
+      "name": "Mauritius",
+      "url": "https://www.publicdns.xyz/country/mu.html",
+      "rawMarkdown": "DNS Server in Mauritius\n\n# DNS Server in Mauritius\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 102.116.108.83 | Quatre Bornes | 100% |\n| 41.216.125.179 41.216.125.179.liquidtelecom.net. | | 100% |\n| 41.198.247.199 | | 100% |\n\n# DNS Server in Mexico",
+      "source": "Exa"
+    },
+    {
+      "code": "mx",
+      "name": "Mexico",
+      "url": "https://www.publicdns.xyz/country/mx.html",
+      "rawMarkdown": "DNS Server in Mexico\n\n# DNS Server in Mexico\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 207.248.57.11 dns2.telumasp.net. | Monterrey | 98.6885% |\n| 200.57.2.108 dns1.bestel.com.mx. | Ecatepec | 91.5584% |\n| 200.76.5.147 dns-cache-gdl.alestra.net.mx. | San Luis Potosí City | 99.4612% |\n| 207.248.224.72 env2.b-enlinea.mx. | Monterrey | 100% |\n| 207.248.224.71 dns-cache-mty1.alestra.net.mx. | Monterrey | 100% |\n| 187.157.46.210 customer-187-157-46-210-sta.uninet-ide.com.mx. | Centro | 100% |\n| 187.190.226.203 fixed-187-190-226-203.totalplay.net. | La Canada | 100% |\n| 201.117.254.241 customer-201-117-254-241.uninet-ide.com.mx. | León | 62.7027% |\n| 45.231.223.250 45-231-223-250.dyn.distrokom.net. | Tijuana | 100% |\n| 201.132.162.254 customer-pue-mca-162-254.megared.net.mx. | Tehuacán | 100% |\n| 45.5.92.94 mva.nrtmexico.mx. | Monclova | 100% |\n| 189.213.136.70 189-213-136-70.static.axtel.net. | San Pedro | 100% |\n| 189.208.19.247 wimax-cpe-189-208-19-247.gdljal.static.axtel.net. | Mexico City | 100% |\n| 189.165.87.125 dsl-189-165-87-125-dyn.prod-infinitum.com.mx. | Puebla City | 100% |\n| 187.189.53.110 fixed-187-189-53-110.totalplay.net. | Chihuahua City | 100% |\n| 177.241.250.250 customer-mca-urua-250-250.megared.net.mx. | Uruapan | 95.3704% |\n| 187.252.154.90 187.252.154.90.cable.dyn.cableonline.com.mx. | Mérida | 85.2941% |\n| 187.243.253.182 customer-mca-cob-253-182.megared.net.mx. | Hermosillo | 97.0588% |\n| 200.188.151.212 cablelink-200-188-151-212.hosts.cablevision.com.mx. | Mazapil | 50% |\n| 189.195.157.30 customer-scrz-157-30.megared.net.mx. | Matias Romero | 96.0474% |\n| 187.189.75.147 fixed-187-189-75-147.totalplay.net. | Querétaro City | 100% |\n| 201.140.114.161 dns4.bestel.com.mx. | León | 94.6328% |\n| 201.148.95.234 dns5.bestel.com.mx. | Mexico City | 85.7143% |\n| 189.201.189.2 ptr.reditmx.com. | Aguascalientes | 89.011% |\n| 187.193.109.209 dsl-187-193-109-209-dyn.prod-infinitum.com.mx. | Irapuato | 100% |\n| 201.148.17.110 110.201-148-17.bestelclientes.com.mx. | Mapastepec | 100% |\n| 187.190.127.136 fixed-187-190-127-136.totalplay.net. | Puerto Vallarta | 100% |\n| 187.159.158.4 dsl-187-159-158-4-dyn.prod-infinitum.com.mx. | Tula de Allende | 100% |\n| 187.151.13.221 dsl-187-151-13-221-dyn.prod-infinitum.com.mx. | Tula de Allende | 100% |\n| 201.148.17.116 116.201-148-17.bestelclientes.com.mx. | Mapastepec | 100% |\n| 187.151.76.238 dsl-187-151-76-238-dyn.prod-infinitum.com.mx. | Tula de Allende | 100% |\n| 200.95.144.4 cva2.cableonline.com.mx. | | 100% |\n| 207.248.57.10 dns1.telumasp.net. | Monterrey | 100% |\n| 204.199.192.146 204-199-192-146.dia.static.centurylink.com.cl. | Lázaro Cárdenas | 100% |\n| 204.199.194.19 204-199-194-19.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.194.20 204-199-194-20.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.194.23 204-199-194-23.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.194.24 204-199-194-24.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.194.26 204-199-194-26.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.194.27 204-199-194-27.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.194.28 204-199-194-28.dia.static.centurylink.com.cl. | Juanacatlan | 100% |\n| 204.199.197.242 204-199-197-242.dia.static.centurylink.com.cl. | Guadalupe | 100% |\n| 204.199.197.246 204-199-197-246.dia.static.centurylink.com.cl. | Guadalupe | 100% |\n| 204.199.199.110 204-199-199-110.dia.static.centurylink.com.cl. | Zapopan | 100% |\n| 204.199.204.130 204-199-204-130.dia.static.centurylink.com.cl. | Lázaro Cárdenas | 100% |\n| 204.199.204.133 204-199-204-133.dia.static.centurylink.com.cl. | Lázaro Cárdenas | 100% |\n| 204.199.204.134 204-199-204-134.dia.static.centurylink.com.cl. | Lázaro Cárdenas | 100% |\n| 4.4.186.116 ns1.esinc.net. | Mexicali | 100% |\n| 4.4.189.82 | Mexicali | 100% |\n| 8.243.217.24 | Ecatepec | 100% |\n\n# DNS Server in Moldova",
+      "source": "Exa"
+    },
+    {
+      "code": "fm",
+      "name": "Micronesia",
+      "url": "https://www.publicdns.xyz/country/fm.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "md",
+      "name": "Moldova",
+      "url": "https://www.publicdns.xyz/country/md.html",
+      "rawMarkdown": "DNS Server in Moldova\n\n# DNS Server in Moldova\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 212.0.202.80 host-static-212-0-202-80.moldtelecom.md. | | 100% |\n| 31.131.0.53 ip-31-131-0-53.ihost.md. | Chisinau | 100% |\n| 109.233.192.72 109-233-192-72.inetehno.md. | Straseni | 100% |\n| 185.46.60.235 185-46-60-235.arax.md. | Chisinau | 100% |\n| 212.56.194.238 static.212.56.194.238.mldnet.com. | Chisinau | 88.9151% |\n| 91.208.184.4 | | 61.9048% |\n| 185.162.142.81 | Drochia | 100% |\n| 5.252.168.235 | | 100% |\n| 5.252.170.116 | | 95.8333% |\n| 5.252.171.80 | | 53.0201% |\n| 5.252.171.85 | | 95.2381% |\n| 5.252.171.89 | | 89.1892% |\n| 5.252.171.98 | | 51.0121% |\n| 5.252.171.110 | | 100% |\n| 5.252.171.217 | | 80.2817% |\n| 5.252.168.13 | | 94.4444% |\n| 5.252.168.193 | | 95% |\n| 5.252.169.52 | | 95.4545% |\n| 5.252.168.46 | | 51.5419% |\n| 5.252.168.74 | | 94.4444% |\n| 5.252.168.68 | | 89.2857% |\n| 5.252.168.71 | | 89.2857% |\n| 5.252.168.20 | | 94.4444% |\n| 5.252.168.88 | | 92.8571% |\n| 5.252.168.127 | | 88.8889% |\n| 5.252.168.215 | | 91.6667% |\n| 5.252.168.239 | | 93.75% |\n| 5.252.169.27 | | 40.1961% |\n| 5.252.169.125 | | 100% |\n| 5.252.168.150 | | 100% |\n| 5.252.169.248 | | 37.7778% |\n| 5.252.170.233 | | 100% |\n| 5.252.170.235 | | 100% |\n| 5.252.171.41 | | 100% |\n| 5.252.169.239 | | 100% |\n| 5.252.168.109 | | 100% |\n| 5.252.170.89 | | 100% |\n| 5.252.170.90 | | 100% |\n| 5.252.171.66 | | 100% |\n| 5.252.171.72 | | 100% |\n| 5.252.170.234 | | 100% |\n| 5.252.170.93 | | 100% |\n| 5.252.170.139 | | 100% |\n| 5.252.170.88 | | 100% |\n| 5.252.170.86 | | 100% |\n| 5.252.170.161 | | 100% |\n| 5.252.168.201 | | 100% |\n| 5.252.168.213 | | 100% |\n| 5.252.171.68 | | 100% |\n| 5.252.170.248 | | 100% |\n\n# DNS Server in Mongolia",
+      "source": "Exa"
+    },
+    {
+      "code": "mn",
+      "name": "Mongolia",
+      "url": "https://www.publicdns.xyz/country/mn.html",
+      "rawMarkdown": "DNS Server in Mongolia\n\n# DNS Server in Mongolia\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 59.153.85.25 | Bayanhongor | 68.6636% |\n| 124.158.88.56 | | 100% |\n| 202.131.233.187 | Dund-Urt | 100% |\n| 202.5.200.8 | | 100% |\n| 202.5.192.9 ns2.erdemnet.mn. | Mörön | 100% |\n| 202.55.176.10 ns.skycc.mn. | | 100% |\n| 203.169.48.9 | | 100% |\n| 203.169.48.8 | | 100% |\n| 103.20.152.11 www.isatcom.mn. | | 100% |\n| 202.55.190.30 | | 100% |\n| 103.79.156.66 | | 97.2112% |\n| 124.158.119.29 | Ulan Bator | 75.9509% |\n| 203.169.48.10 | | 100% |\n| 192.82.65.196 | | 98.4252% |\n| 103.80.210.186 | | 97.8571% |\n| 202.55.176.11 ns1.skycc.mn. | | 100% |\n| 59.153.85.41 | Bayanhongor | 75.3333% |\n| 203.98.76.148 | | 100% |\n| 202.21.114.114 | Ulan Bator | 84.0909% |\n| 122.201.26.32 | Ulan Bator | 100% |\n| 202.21.116.206 | | 100% |\n| 64.119.29.199 | Ulan Bator | 100% |\n| 203.98.76.85 | | 100% |\n| 202.70.37.145 | Ulan Bator | 100% |\n| 66.181.166.164 | Ulan Bator | 100% |\n| 202.21.124.43 | Ulan Bator | 92.043% |\n| 203.17.23.198 | | 100% |\n| 202.70.37.79 | Ulan Bator | 100% |\n| 103.119.92.55 | | 100% |\n| 202.21.105.46 | Ulan Bator | 100% |\n| 49.0.158.90 | Ulan Bator | 100% |\n| 103.9.88.154 | | 100% |\n| 202.131.239.125 | | 100% |\n| 202.131.254.166 | | 100% |\n| 203.98.77.46 | Ulan Bator | 100% |\n| 124.158.119.10 | Ulan Bator | 100% |\n| 202.21.120.205 | Ulan Bator | 98.4694% |\n| 192.82.66.83 | Ulan Bator | 100% |\n| 124.158.126.82 | Ulan Bator | 100% |\n| 192.82.92.102 | Ulan Bator | 100% |\n| 66.181.164.249 | Ulan Bator | 17.8571% |\n| 203.98.77.50 | Ulan Bator | 71.875% |\n| 202.21.105.66 | Ulan Bator | 71.875% |\n| 192.82.64.201 | Ulan Bator | 71.875% |\n| 122.201.17.126 | Ulan Bator | 76.1905% |\n| 66.181.167.203 | Ulan Bator | 76.7442% |\n| 202.21.116.202 | | 90.9836% |\n| 202.21.101.214 | | 99.0385% |\n| 202.126.92.94 | | 98.008% |\n| 202.131.235.226 | | 97.4453% |\n\n# DNS Server in Morocco",
+      "source": "Exa"
+    },
+    {
+      "code": "ma",
+      "name": "Morocco",
+      "url": "https://www.publicdns.xyz/country/ma.html",
+      "rawMarkdown": "DNS Server in Morocco\n\n# DNS Server in Morocco\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 196.88.56.155 | Salé | 100% |\n| 197.230.74.227 | Casablanca | 100% |\n| 105.140.47.135 | Tangier | 84.375% |\n| 197.230.189.218 | Tangier | 97.5369% |\n| 41.77.116.62 | Marrakesh | 100% |\n| 197.230.128.150 | Temara | 100% |\n| 41.137.170.250 | Asilah | 100% |\n| 160.174.129.120 | Casablanca | 100% |\n| 105.139.82.251 | Casablanca | 100% |\n| 197.230.145.10 | Kenitra | 100% |\n| 194.204.223.244 srv3-cas.ac.ma. | Rabat | 77.7778% |\n| 197.230.101.66 | Tangier | 100% |\n| 197.230.103.202 | Tangier | 97.0588% |\n| 41.137.137.90 | | 88.8889% |\n| 197.230.227.18 | Casablanca | 100% |\n| 41.214.138.238 | Bouznika | 99.3548% |\n| 197.230.254.4 | Salé | 60.7143% |\n| 197.230.162.89 | Casablanca | 100% |\n| 196.200.176.2 nsa.uca.ma. | Marrakesh | 100% |\n| 196.88.148.187 | Casablanca | 100% |\n| 41.214.184.186 | Casablanca | 95.9016% |\n| 196.206.228.47 adsl196-47-228-206-196.adsl196-8.iam.net.ma. | Casablanca | 100% |\n| 105.188.45.49 | Rabat | 100% |\n| 197.230.84.1 | Casablanca | 100% |\n| 212.217.56.230 ll212-230-56-217-212.ll212.iam.net.ma. | | 100% |\n| 41.142.240.244 | Casablanca | 100% |\n| 197.230.58.17 | Rabat | 100% |\n| 197.230.245.130 | Safi | 100% |\n| 197.230.24.26 | Casablanca | 100% |\n| 81.192.193.223 adsl-223-193-192-81.adsl.iam.net.ma. | | 100% |\n| 41.87.144.65 | Casablanca | 100% |\n| 197.230.245.210 | Safi | 100% |\n| 41.87.158.170 | Casablanca | 100% |\n| 197.230.72.93 | Casablanca | 100% |\n| 41.214.150.242 | Bouznika | 91.4005% |\n| 197.230.103.49 | Tangier | 100% |\n| 41.214.150.122 | Bouznika | 100% |\n| 197.230.81.17 | Casablanca | 100% |\n| 41.87.158.142 | Casablanca | 100% |\n| 81.192.138.26 adsl-26-138-192-81.adsl2.iam.net.ma. | Salé | 100% |\n| 197.230.97.29 | Rabat | 100% |\n| 197.230.161.193 | Casablanca | 100% |\n| 197.230.174.153 | Casablanca | 93.75% |\n| 197.230.242.246 | Safi | 100% |\n| 81.192.188.141 adsl-141-188-192-81.adsl.iam.net.ma. | Casablanca | 100% |\n| 81.192.7.147 srv1-ccm.ma. | | 100% |\n| 41.87.147.158 | Casablanca | 100% |\n| 197.230.250.238 | Salé | 100% |\n| 80.250.39.59 | | 84.375% |\n| 41.214.147.112 | Bouznika | 25% |\n\n# DNS Server in Mozambique",
+      "source": "Exa"
+    },
+    {
+      "code": "mz",
+      "name": "Mozambique",
+      "url": "https://www.publicdns.xyz/country/mz.html",
+      "rawMarkdown": "DNS Server in Mozambique\n\n# DNS Server in Mozambique\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 102.67.190.73 102-67-190-73.eyazs.com. | | 100% |\n| 196.3.97.82 fdd082.uem.mz. | Maputo | 100% |\n| 197.219.229.86 dynamic-adsl.movitel.co.mz. | Maputo | 100% |\n| 197.235.15.47 | Matola | 65.8537% |\n| 196.22.60.4 ip-196-22-60-4.teledata.mz. | Maputo | 100% |\n| 197.231.216.3 ns2.cilix.co.mz. | | 100% |\n| 197.249.65.16 cust16-65-249-197.netcabo.co.mz. | Beira | 100% |\n| 197.249.87.110 cust110-87-249-197.netcabo.co.mz. | Beira | 94.1176% |\n| 169.255.135.218 | Maputo | 75% |\n| 196.10.148.37 dns02.webmasters.co.mz. | Maputo | 100% |\n| 169.255.135.190 | Maputo | 75% |\n| 197.249.6.205 cust205-6-249-197.netcabo.co.mz. | Maputo | 67.7419% |\n| 41.94.1.6 | | 100% |\n| 197.249.6.201 cust201-6-249-197.netcabo.co.mz. | Maputo | 76.087% |\n| 197.235.15.28 | Matola | 97.0803% |\n| 196.40.121.242 | Maputo Province | 92.3077% |\n\nError fetching https://www.publicdns.xyz/country/mh.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/mq.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/fm.html: CRAWL_HTTP_403",
+      "source": "Exa"
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/mh.html",
+    "https://www.publicdns.xyz/country/mq.html",
+    "https://www.publicdns.xyz/country/fm.html"
+  ]
+}
