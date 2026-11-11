@@ -8,18 +8,28 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
- * PRoot remains unavailable until the patched native engine, loader and a
- * distro rootfs are present. A prepared workspace is not an installed runtime.
+ * PRoot command execution uses ProcessBuilder for bounded one-shot commands.
+ * Long-lived interactive sessions use the native Bionic PTY bridge so the
+ * guest receives a real terminal (controlling TTY, terminal input and resize).
  */
 class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
+    private data class PtySession(
+        val handle: Long,
+        val output: StringBuilder,
+        val inputLock: Any,
+        @Volatile var reader: Thread? = null
+    )
+
     private val appContext = context.applicationContext
-    private val sessions = ConcurrentHashMap<String, Process>()
-    private val interactiveOutput = ConcurrentHashMap<String, StringBuilder>()
-    private val interactiveInputLocks = ConcurrentHashMap<String, Any>()
-    override val environmentId = RuntimeEnvironmentId.XFCE_PROOT
+    private val sessions = ConcurrentHashMap<String, PtySession>()
+    private val environmentId = RuntimeEnvironmentId.XFCE_PROOT
 
     override suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability =
         withContext(Dispatchers.IO) {
+            if (!NativePtyEngine.available) {
+                return@withContext RuntimeAdapterCapability(false,
+                    "Native PTY library is unavailable; interactive PRoot cannot start.")
+            }
             val paths = resolvePaths(request)
                 ?: return@withContext RuntimeAdapterCapability(false,
                     "Missing native PRoot engine/loader or verified rootfs; no process was launched.")
@@ -47,7 +57,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             if (process.exitValue() != 0) {
                 return@withContext RuntimeAdapterCapability(false, "PRoot probe exited " + process.exitValue() + "; inspect ptrace-probe.log.")
             }
-            RuntimeAdapterCapability(true, "PRoot engine, loader, rootfs shell and disposable child-process probe succeeded.")
+            RuntimeAdapterCapability(true, "PRoot engine, loader, rootfs shell, ptrace probe and native PTY library are available.")
         }
 
     override suspend fun start(request: RuntimeAdapterStartRequest): RuntimeAdapterStartResult =
@@ -58,49 +68,65 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 ?: return@withContext RuntimeAdapterStartResult(false, false, "PRoot paths changed after inspection.")
             val (root, engine, loader, logs, tmp) = paths
             val key = request.workspacePath
-            if (sessions[key]?.isAlive == true) {
-                return@withContext RuntimeAdapterStartResult(false, true, "A PRoot process is already active for this workspace.")
+            val current = sessions[key]
+            if (current != null && NativePtyEngine.nativeWait(current.handle) == 0) {
+                return@withContext RuntimeAdapterStartResult(false, true, "A native PTY PRoot session is already active for this workspace.")
             }
-            val process = runCatching {
-                ProcessBuilder(command(engine, root, listOf("/bin/sh", "-l")))
-                    .directory(root).redirectErrorStream(true)
-                    .apply { environment().putAll(environment(loader, tmp)) }.start()
-            }.getOrElse {
+            if (current != null) {
+                NativePtyEngine.nativeClose(current.handle, true)
+                sessions.remove(key, current)
+            }
+
+            val argv = command(engine, root, listOf("/bin/sh", "-l")).toTypedArray()
+            val envp = environment(loader, tmp).map { (name, value) -> "$name=$value" }.toTypedArray()
+            val handle = NativePtyEngine.nativeStart(argv, envp, root.absolutePath, 24, 80)
+            if (handle <= 0L) {
                 return@withContext RuntimeAdapterStartResult(false, false,
-                    "PRoot session launch failed: " + (it.message ?: "unknown error"))
+                    "Native PTY could not launch PRoot (errno ${-handle}).")
             }
-            sessions[key] = process
-            interactiveOutput[key] = StringBuilder()
-            interactiveInputLocks[key] = Any()
-            Thread({
-                val logFile = File(logs, "session.log")
-                val buffer = ByteArray(2048)
+
+            val session = PtySession(handle, StringBuilder(), Any())
+            sessions[key] = session
+            val logFile = File(logs, "session.log")
+            session.reader = Thread({
+                val bytes = ByteArray(8192)
                 try {
-                    process.inputStream.use { stream ->
-                        logFile.outputStream().buffered().use { log ->
-                            while (true) {
-                                val count = stream.read(buffer)
-                                if (count < 0) break
-                                val chunk = String(buffer, 0, count, Charsets.UTF_8)
-                                val output = interactiveOutput[key]
-                                if (output != null) synchronized(output) {
-                                    output.append(chunk)
-                                    if (output.length > 262144) output.delete(0, output.length - 262144)
-                                }
-                                log.write(buffer, 0, count)
+                    logFile.outputStream().buffered().use { log ->
+                        while (true) {
+                            val count = NativePtyEngine.nativeRead(handle, bytes, 250)
+                            if (count > 0) {
+                                log.write(bytes, 0, count)
                                 log.flush()
+                                val chunk = String(bytes, 0, count, Charsets.UTF_8)
+                                synchronized(session.output) {
+                                    session.output.append(chunk)
+                                    if (session.output.length > 262144) {
+                                        session.output.delete(0, session.output.length - 262144)
+                                    }
+                                }
+                            } else if (count < 0 || NativePtyEngine.nativeWait(handle) != 0) {
+                                break
                             }
                         }
                     }
-                } catch (_: Exception) { }
-            }, "forge-proot-output-${key.hashCode()}").apply { isDaemon = true; start() }
+                } catch (_: Exception) {
+                    // Session shutdown closes the PTY master and ends this reader.
+                }
+            }, "forge-proot-pty-${key.hashCode()}").apply {
+                isDaemon = true
+                start()
+            }
+
             Thread.sleep(150)
-            if (!process.isAlive) {
-                sessions.remove(key, process)
-                return@withContext RuntimeAdapterStartResult(false, false, "PRoot shell exited during startup; inspect session.log.")
+            val status = NativePtyEngine.nativeWait(handle)
+            if (status != 0) {
+                NativePtyEngine.nativeClose(handle, true)
+                sessions.remove(key, session)
+                return@withContext RuntimeAdapterStartResult(false, false,
+                    "PRoot shell exited during PTY startup (status=$status); inspect session.log.")
             }
             RuntimeAdapterStartResult(true, true,
-                "Pipe-backed interactive shell is active. A true PTY, terminal job control, and X11 display remain separate milestones.")
+                "PRoot is running in a native PTY session (24x80). Terminal job control and resize are now backed by the PTY.")
         }
 
     override suspend fun execute(
@@ -144,51 +170,53 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             if (input.isEmpty() || input.length > 16384 || input.indexOf('\u0000') >= 0) {
                 return@withContext RuntimeInteractiveResult(false, message = "Input is empty or exceeds the 16 KiB session limit.")
             }
-            val key = request.workspacePath
-            val process = sessions[key]
-                ?: return@withContext RuntimeInteractiveResult(false, message = "No active PRoot session exists.")
-            if (!process.isAlive) return@withContext RuntimeInteractiveResult(false, message = "PRoot session is no longer running.")
-            val lock = interactiveInputLocks[key] ?: return@withContext RuntimeInteractiveResult(false, message = "Session input channel is unavailable.")
+            val session = sessions[request.workspacePath]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+            if (NativePtyEngine.nativeWait(session.handle) != 0) {
+                return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+            }
+            val bytes = input.toByteArray(Charsets.UTF_8)
             try {
-                synchronized(lock) {
-                    process.outputStream.write(input.toByteArray(Charsets.UTF_8))
-                    process.outputStream.flush()
+                synchronized(session.inputLock) {
+                    var offset = 0
+                    while (offset < bytes.size) {
+                        val written = NativePtyEngine.nativeWrite(session.handle, bytes, offset, bytes.size - offset)
+                        if (written <= 0) {
+                            return@withContext RuntimeInteractiveResult(false,
+                                message = "PTY input stopped after $offset of ${bytes.size} bytes.")
+                        }
+                        offset += written
+                    }
                 }
-                RuntimeInteractiveResult(true, message = "Input delivered to the active guest shell.")
+                RuntimeInteractiveResult(true, message = "Input delivered through the native PTY master.")
             } catch (error: Exception) {
-                RuntimeInteractiveResult(false, message = "Could not write to the guest shell: ${error.message ?: "I/O error"}")
+                RuntimeInteractiveResult(false, message = "Could not write to the guest PTY: ${error.message ?: "I/O error"}")
             }
         }
 
     override suspend fun readInteractive(request: RuntimeAdapterStartRequest): RuntimeInteractiveResult =
         withContext(Dispatchers.IO) {
-            val key = request.workspacePath
-            val process = sessions[key]
-                ?: return@withContext RuntimeInteractiveResult(false, message = "No active PRoot session exists.")
-            val output = interactiveOutput[key]
-                ?: return@withContext RuntimeInteractiveResult(false, message = "Session output channel is unavailable.")
-            val chunk = synchronized(output) {
-                val value = output.toString()
-                output.setLength(0)
+            val session = sessions[request.workspacePath]
+                ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+            val chunk = synchronized(session.output) {
+                val value = session.output.toString()
+                session.output.setLength(0)
                 value
             }
-            RuntimeInteractiveResult(process.isAlive, chunk, if (process.isAlive) "Session output read." else "Session has exited; remaining output returned.")
+            val running = NativePtyEngine.nativeWait(session.handle) == 0
+            RuntimeInteractiveResult(running, chunk,
+                if (running) "Native PTY output read." else "PRoot PTY session exited; buffered output returned.")
         }
 
     override suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         withContext(Dispatchers.IO) {
-            val process = sessions.remove(request.workspacePath)
-                ?: return@withContext RuntimeAdapterStopResult(false, "No adapter-owned PRoot process exists for this workspace.")
-            process.destroy()
-            val graceful = runCatching { process.waitFor(3, TimeUnit.SECONDS) }.getOrDefault(false)
-            if (!graceful) process.destroyForcibly()
-            val terminated = graceful || runCatching { process.waitFor(2, TimeUnit.SECONDS) }.getOrDefault(false)
-            interactiveOutput.remove(request.workspacePath)
-            interactiveInputLocks.remove(request.workspacePath)
-            RuntimeAdapterStopResult(terminated,
-                if (graceful) "PRoot launcher stopped."
-                else if (terminated) "PRoot launcher was force-stopped after the graceful timeout."
-                else "PRoot launcher termination could not be confirmed; manual recovery is required.")
+            val session = sessions.remove(request.workspacePath)
+                ?: return@withContext RuntimeAdapterStopResult(false, "No adapter-owned native PTY session exists for this workspace.")
+            val closed = NativePtyEngine.nativeClose(session.handle, true)
+            runCatching { session.reader?.join(750) }
+            RuntimeAdapterStopResult(closed,
+                if (closed) "PRoot PTY session received SIGHUP, was reaped, and its PTY master was closed."
+                else "Native PTY session could not be closed; manual recovery is required.")
         }
 
     private data class Paths(
@@ -200,7 +228,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     )
 
     private fun resolvePaths(request: RuntimeAdapterStartRequest): Paths? {
-        if (request.environmentId != RuntimeEnvironmentId.XFCE_PROOT) return null
+        if (request.environmentId != environmentId) return null
         val appFiles = appContext.filesDir.canonicalFile
         val workspace = File(request.workspacePath).canonicalFile
         if (!workspace.path.startsWith(appFiles.path + File.separator) || !workspace.isDirectory) return null
