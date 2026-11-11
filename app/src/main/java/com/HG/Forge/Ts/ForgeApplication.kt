@@ -24,7 +24,7 @@ class ForgeApplication : Application() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             // Persist locally before delegating to Android's normal crash handler.
             runCatching { CrashReportStore.capture(this, throwable) }
-            ForgeDiagnostics.log(this, "ERROR", "UncaughtException", "process.uncaught_exception", throwable)
+            ForgeDiagnostics.log(this, "CRASH", "UncaughtException", "process.uncaught_exception", throwable)
             if (previousHandler != null) {
                 previousHandler.uncaughtException(thread, throwable)
             } else {
