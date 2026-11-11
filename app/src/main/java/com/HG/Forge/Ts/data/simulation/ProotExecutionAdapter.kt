@@ -397,6 +397,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val args = mutableListOf(
             engine.absolutePath,
             "--kill-on-exit",
+            "--link2symlink",
             "-0",
             "-r", root.absolutePath,
             "-w", "/"
@@ -414,12 +415,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     private fun environment(loader: File, tmp: File): Map<String, String> = mapOf(
         "PROOT_LOADER" to loader.absolutePath,
         "PROOT_TMP_DIR" to tmp.absolutePath,
-        "TMPDIR" to tmp.absolutePath,
+        "TMPDIR" to "/tmp",
         "LD_LIBRARY_PATH" to appContext.applicationInfo.nativeLibraryDir,
         "HOME" to "/root",
         "USER" to "root",
         "LOGNAME" to "root",
         "PATH" to "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "SHELL" to "/bin/sh",
         "TERM" to "xterm-256color",
         "LANG" to "C.UTF-8"
     )
