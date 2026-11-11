@@ -13,13 +13,13 @@ import androidx.lifecycle.ProcessLifecycleOwner
 
 class ForgeApplication : Application(), DefaultLifecycleObserver {
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
+        super<Application>.attachBaseContext(base)
         installEarlyCrashHandler()
         ForgeDiagnostics.log(this, "INFO", "Application", "application.attach_base_context")
     }
 
     override fun onCreate() {
-        super.onCreate()
+        super<Application>.onCreate()
         // Observe the whole process, not individual Activity recreation.
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         ForgeDiagnostics.log(this, "INFO", "Application", "application.on_create")
