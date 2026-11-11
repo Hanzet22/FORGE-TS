@@ -267,10 +267,15 @@
       "slug": "he",
       "name": "Hurricane Electric",
       "sourceUrl": "https://www.publicdns.xyz/public/he.html",
-      "ipv4": [],
-      "ipv6": [],
+      "ipv4": [
+        "74.82.42.42"
+      ],
+      "ipv6": [
+        "2001:470:20::2"
+      ],
       "source": "PublicDNS.xyz",
-      "verification": "directory-listed; not live-tested"
+      "verification": "directory-listed; not live-tested",
+      "addressNote": "Address values retained from the previously reviewed provider inventory; profile extraction did not expose them in a clean labeled block."
     },
     {
       "slug": "puntcat",
@@ -307,7 +312,8 @@
         "240c::6644"
       ],
       "source": "PublicDNS.xyz",
-      "verification": "directory-listed; not live-tested"
+      "verification": "directory-listed; not live-tested",
+      "addressNote": "Address values retained from the previously reviewed provider inventory; profile extraction did not expose them in a clean labeled block."
     },
     {
       "slug": "alidns",
@@ -339,10 +345,14 @@
       "slug": "dnspod",
       "name": "DNSPod Public DNS+",
       "sourceUrl": "https://www.publicdns.xyz/public/dnspod.html",
-      "ipv4": [],
+      "ipv4": [
+        "182.254.116.116",
+        "182.254.118.118"
+      ],
       "ipv6": [],
       "source": "PublicDNS.xyz",
-      "verification": "directory-listed; not live-tested"
+      "verification": "directory-listed; not live-tested",
+      "addressNote": "Address values retained from the previously reviewed provider inventory; profile extraction did not expose them in a clean labeled block."
     },
     {
       "slug": "114dns",
