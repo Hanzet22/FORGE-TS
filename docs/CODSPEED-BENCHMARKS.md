@@ -2,28 +2,30 @@
 
 ## Purpose
 
-FORGE-TS now has a separate host-Linux benchmark harness for the native PTY
-operations used by the Android runtime. It measures three concrete workloads:
+FORGE-TS has a separate host C++ benchmark harness for CPU-side helpers shared
+with the Android native PTY implementation. It currently measures:
 
-- `BM_PtySpawnAndExit`: create a PTY, launch a short-lived child process, and
-  reap it.
-- `BM_PtyEchoRoundTrip`: send and receive a small payload through a raw PTY.
-- `BM_PtyResize`: apply terminal window-size changes with `TIOCSWINSZ`.
+- `BM_PtyDimensionsValidation`: the same terminal row/column validation used
+  by the JNI PTY start and resize entry points.
+- `BM_PtyArgvEnvPointerTable`: the same string-to-`char**` pointer-table
+  preparation used before the native PTY launcher calls `execve`.
 
-The harness uses CodSpeed's Google Benchmark compatibility layer and is kept
-outside the Android app's CMake build. It does not add benchmark dependencies
-to the APK.
+The shared implementation lives in
+`app/src/main/cpp/pty_helpers.hpp`. The benchmark target is separate from the
+Android app's CMake build and adds no benchmark dependency to the APK.
 
-## Why walltime
+## Why simulation
 
-These workloads include kernel operations and process/PTY I/O. CodSpeed CPU
-simulation does not represent elapsed system-call and I/O latency, so this
-workflow uses the `walltime` instrument.
+The current workloads are CPU and memory operations. CodSpeed simulation is
+appropriate for these deterministic helpers.
 
-Walltime measures actual elapsed time. Shared GitHub-hosted runners can be
-noisy; CodSpeed's dedicated Macro Runners are recommended when available for
-high-confidence regression thresholds. Treat early results from standard
-hosted runners as trend data, not as Android-device latency.
+PTY process creation, `poll`, `read`, `write`, and `ioctl` are kernel/I/O
+operations. They are deliberately not included in this simulation suite:
+simulation does not measure elapsed syscall or I/O latency. A separate
+walltime suite should be enabled only on a suitable CodSpeed Macro Runner.
+An initial walltime attempt on a standard hosted runner built and executed the
+benchmarks but did not produce valid profiler data, so it is not used as the
+current CI measurement path.
 
 ## Run in GitHub Actions
 
@@ -32,17 +34,15 @@ The workflow is `.github/workflows/codspeed.yml`. It runs on pushes to
 runs establish the baseline used for pull-request comparisons.
 
 The benchmark job uses GitHub OIDC with job-scoped `id-token: write`; no
-long-lived CodSpeed token is committed to the repository. The repository is
-public, but OIDC is retained as the preferred authentication path.
+long-lived CodSpeed token is committed to the repository.
 
 ## Build locally
 
-On a Linux host with CMake, a C++17 compiler, Git, and the system `libutil`
-development library:
+On a Linux host with CMake, a C++17 compiler, and Git:
 
 ```sh
 cmake -S benchmarks -B build/benchmarks \
-  -DCODSPEED_MODE=walltime \
+  -DCODSPEED_MODE=simulation \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build/benchmarks --parallel 2
 ./build/benchmarks/forge_pty_bench
@@ -53,14 +53,14 @@ to avoid silently changing the benchmark toolchain.
 
 ## Measurement boundaries
 
-This is a Linux host benchmark of PTY/kernel primitives. It is not a physical
-Android benchmark and does not measure the complete Kotlin/JNI/Compose path,
-Android scheduler behavior, device-specific kernel behavior, or terminal
-rendering. The benchmark intentionally measures PTY process startup, PTY
-round-trip I/O, and resize syscalls separately.
+These are host-side measurements of two portable native helper functions.
+They do not represent Android device latency and do not measure the complete
+Kotlin/JNI/Compose path, process creation, PTY I/O, Android scheduling, or
+terminal rendering.
 
-When an Android-device benchmark runner becomes available, add a separate
-device-side suite rather than mixing its measurements with these host runs.
+When a suitable device-side or CodSpeed Macro Runner becomes available, add
+separate suites for PTY lifecycle and I/O. Keep those walltime results separate
+from the CPU-simulation baseline.
 
 ## References
 
