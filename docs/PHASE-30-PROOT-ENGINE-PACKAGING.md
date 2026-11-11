@@ -103,7 +103,7 @@ The inspected community static script currently builds AArch64 only. It is not e
 
 ### Validation boundary
 
-- The pipeline source and workflow are committed, A successful CI execution and artifact review are not yet confirmed.
+- The pipeline source and workflow are committed. A successful CI execution and artifact review are not yet confirmed.
 - The adapter must continue to report unavailable until the native build job successfully commits both payloads and the Android packaging workflow completes.
 - A successful CI build is not a device runtime test. The disposable guest-child probe, ptrace behavior, rootfs verification, and Android device execution remain mandatory before enabling PRoot.
 - The first artifact is ARM64 only; no 32-bit guest loader is generated or advertised by this phase.
