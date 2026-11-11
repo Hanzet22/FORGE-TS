@@ -85,3 +85,13 @@ Do not change rootfs provisioning, Supabase, Redis, account flows, or MikroTik/C
 - Linux TIOCSWINSZ: https://man7.org/linux/man-pages/man2/TIOCSWINSZ.2const.html
 - ConnectBot terminal emulator candidate: https://github.com/connectbot/termlib
 - Android JNI guidance: https://developer.android.com/ndk/guides/jni-tips
+
+## 10. Terminal emulator dependency assessment
+
+ConnectBot termlib is an emulator/display component, not a PTY or process supervisor. Its documented data flow is PTY bytes into TerminalEmulator and keyboard bytes back through a callback, which fits the layer separation above.
+
+The repository declares Apache-2.0 and includes libvterm under MIT. However, the currently surfaced Maven artifact metadata for org.connectbot:termlib:0.0.40 declares Kotlin 2.3.21 and Compose BOM 2026.05.01, while this app currently uses Kotlin 2.2.21 and Compose BOM 2025.10.00. Do not add this dependency blindly; first identify a compatible published version or isolate it behind a separate module after a dependency-resolution review.
+
+- termlib repository and license: https://github.com/connectbot/termlib
+- termlib API documentation: https://termlib.connectbot.org/main
+- Maven Central artifact metadata: https://central.sonatype.com/artifact/org.connectbot/termlib/0.0.40
