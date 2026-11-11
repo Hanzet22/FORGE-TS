@@ -10,7 +10,7 @@ namespace {
 static void BM_PtyDimensionsValidation(benchmark::State& state) {
     for (auto _ : state) {
         (void)_;
-        const bool valid = forge::pty::validDimensions(24, 80);
+        bool valid = forge::pty::validDimensions(24, 80);
         benchmark::DoNotOptimize(valid);
     }
 }
