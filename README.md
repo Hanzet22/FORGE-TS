@@ -114,3 +114,7 @@ Adds an offline, searchable catalog of 30 provider profiles normalized from the 
 
 ### Phase 43 — WorkStation Display Session Host
 Adds a backend-neutral display session controller for the WorkStation architecture. It serializes capability inspection, session start, Android Surface attachment, bounded input forwarding, resize and stop. A session is reported as running only after a registered adapter confirms readiness; the default backend registry remains empty. No X11 engine or XFCE desktop is claimed as integrated. See [Phase 43](docs/PHASE-43-WORKSTATION-DISPLAY-SESSION-HOST.md).
+
+
+### Phase 44 — Embedded X11 Admission Gate
+Pins the reviewed MagicDesk X11 candidate revision and adds an API 34+/ARM64 admission policy. The policy does not load native code or claim display availability; the JNI host bridge and native engine remain pending. See [Phase 44](docs/PHASE-44-EMBEDDED-X11-ADMISSION-GATE.md).
