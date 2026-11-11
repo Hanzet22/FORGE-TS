@@ -19,6 +19,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val handle: Long,
         val output: ByteArrayOutputStream,
         val inputLock: Any,
+        val readLock: java.util.concurrent.locks.ReentrantLock,
         val outputAvailable: Channel<Unit>,
         @Volatile var reader: Thread? = null
     )
@@ -99,7 +100,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Channel(Channel.CONFLATED))
+            val session = PtySession(handle, ByteArrayOutputStream(), Any(), java.util.concurrent.locks.ReentrantLock(), Channel(Channel.CONFLATED))
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
@@ -175,12 +176,19 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
             Thread.sleep(150)
             val status = NativePtyEngine.nativeWait(handle)
-            if (status != 0) {
+            if (status < 0) {
                 NativePtyEngine.nativeClose(handle, true)
                 sessions.remove(key, session)
                 runCatching { session.reader?.join(750) }
                 return@withContext RuntimeAdapterStartResult(false, false,
-                    "PRoot shell exited during PTY startup (status=$status); inspect session.log.")
+                    "Could not verify PRoot shell startup status (errno=" + (-status) + "); inspect session.log.")
+            }
+            if (status > 0) {
+                NativePtyEngine.nativeClose(handle, true)
+                sessions.remove(key, session)
+                runCatching { session.reader?.join(750) }
+                return@withContext RuntimeAdapterStartResult(false, false,
+                    "PRoot shell exited during PTY startup (status=" + status + "); inspect session.log.")
             }
             RuntimeAdapterStartResult(true, true,
                 "PRoot is running in a native PTY session (24x80). Terminal job control and resize are now backed by the PTY.")
@@ -280,34 +288,32 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         withContext(Dispatchers.IO) {
             val session = sessions[request.workspacePath]
                 ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-            val signal = session.outputAvailable.receiveCatching()
-            val bytes = synchronized(session.output) {
-                val value = session.output.toByteArray()
-                session.output.reset()
-                value
-            }
-            // Keep the UI reader alive until the native reader has drained
-            // the PTY and closed its notification channel, not merely until
-            // the PTY leader's waitpid status becomes non-zero.
-            val streamOpen = !signal.isClosed
-            if (!streamOpen) {
-                val key = request.workspacePath
-                val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
-                synchronized(sessionLock) {
-                    // The identity comparison prevents a late reader from
-                    // releasing a replacement session for the same workspace.
-                    if (sessions.remove(key, session)) {
-                        NativePtyEngine.nativeClose(session.handle, true)
-                        runCatching { session.reader?.join(750) }
+            // Serialize consumers so overlapping UI lifecycle callbacks cannot
+            // split or reorder reads from the shared output buffer.
+            session.readLock.lock()
+            try {
+                val signal = session.outputAvailable.receiveCatching()
+                val bytes = synchronized(session.output) {
+                    val value = session.output.toByteArray()
+                    session.output.reset()
+                    value
+                }
+                val streamOpen = !signal.isClosed
+                if (!streamOpen) {
+                    val key = request.workspacePath
+                    val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
+                    synchronized(sessionLock) {
+                        if (sessions.remove(key, session)) {
+                            NativePtyEngine.nativeClose(session.handle, true)
+                            runCatching { session.reader?.join(750) }
+                        }
                     }
                 }
+                RuntimeInteractiveResult(streamOpen, String(bytes, Charsets.UTF_8),
+                    if (streamOpen) "Native PTY output read." else "PRoot PTY output drained; session resources released.", bytes)
+            } finally {
+                session.readLock.unlock()
             }
-            RuntimeInteractiveResult(
-                streamOpen,
-                String(bytes, Charsets.UTF_8),
-                if (streamOpen) "Native PTY output read." else "PRoot PTY output drained; session resources released.",
-                bytes
-            )
         }
 
     override suspend fun resizeInteractive(
