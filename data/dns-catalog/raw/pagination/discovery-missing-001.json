@@ -1,0 +1,103 @@
+{
+  "batch": 1,
+  "capturedAt": "2026-11-11T10:41:16.069Z",
+  "pages": [],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/as.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ai.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/aq.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ag.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bs.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bb.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bz.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/io.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/vg.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bi.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/cv.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ck.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/dj.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/dm.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/gq.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/fj.html",
+      "error_type": "timeout",
+      "http_status_code": null,
+      "content": null
+    }
+  ]
+}
