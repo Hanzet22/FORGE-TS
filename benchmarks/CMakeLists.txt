@@ -17,5 +17,6 @@ FetchContent_MakeAvailable(google_benchmark)
 
 add_executable(forge_pty_bench pty_bench.cpp)
 target_compile_features(forge_pty_bench PRIVATE cxx_std_17)
+target_include_directories(forge_pty_bench PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../app/src/main/cpp")
 target_compile_options(forge_pty_bench PRIVATE -Wall -Wextra -Werror)
 target_link_libraries(forge_pty_bench PRIVATE benchmark::benchmark)
