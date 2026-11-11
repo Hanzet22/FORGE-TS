@@ -1,6 +1,6 @@
 # FORGE-TS WorkStation — Implementation Plan
 
-**Status:** Active; P0 lifecycle journaling delivered; P1 display adapter contract and serialized host controller delivered; no concrete display backend registered  
+**Status:** Active; P0 lifecycle journaling delivered; P1 display adapter contract, serialized host controller and MagicDesk X11 API/ABI admission gate delivered; native engine and host bridge not integrated  
 **Baseline:** [Final Architecture Specification](WORKSTATION-ARCHITECTURE.md)  
 **Date:** 2026-11-10
 
@@ -56,6 +56,8 @@ Implementation gate:
 - The MagicDesk X11 fork is the leading API 34+ candidate, but it is not integrated; its device coverage is still pending. The MIT Java X server is not demonstrated to support the complete XFCE workload, and XSDL has material rendering/input limitations.
 - Do not commit to a specific embedded X11 codebase until its Android integration, ABI, package assumptions and license are reviewed.
 - Phase 43 records the host-side controller only; it does not add an X11 server, native binary, companion app or claim XFCE desktop readiness. See [Phase 43](PHASE-43-WORKSTATION-DISPLAY-SESSION-HOST.md).
+- Phase 44 records the pinned MagicDesk X11 candidate revision and adds an API 34+/ARM64 admission gate. The gate deliberately blocks until the native library and JNI host bridge are implemented. See [Phase 44](PHASE-44-EMBEDDED-X11-ADMISSION-GATE.md).
+- FORGE-TS currently uses NDK 27.2.12479018; the candidate documents NDK 27.3.13750724. Keep the current toolchain until a complete pinned native build is integrated.
 
 ## P2 — XFCE4 PRoot Multi-Distro
 
