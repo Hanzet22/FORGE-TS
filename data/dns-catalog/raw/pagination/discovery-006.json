@@ -1,0 +1,147 @@
+{
+  "batch": 5,
+  "capturedAt": "2026-11-11T10:25:57.056Z",
+  "pages": [
+    {
+      "url": "https://www.publicdns.xyz/country/ie.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/jm.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/kz.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/kz/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/il.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/il/2.html",
+        "https://www.publicdns.xyz/country/il/3.html"
+      ],
+      "lastPage": 3
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/in.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/in/2.html",
+        "https://www.publicdns.xyz/country/in/3.html",
+        "https://www.publicdns.xyz/country/in/4.html",
+        "https://www.publicdns.xyz/country/in/5.html",
+        "https://www.publicdns.xyz/country/in/18.html"
+      ],
+      "lastPage": 18
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/iq.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/iq/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ke.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/ke/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/id.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/id/2.html",
+        "https://www.publicdns.xyz/country/id/3.html",
+        "https://www.publicdns.xyz/country/id/4.html",
+        "https://www.publicdns.xyz/country/id/5.html",
+        "https://www.publicdns.xyz/country/id/13.html"
+      ],
+      "lastPage": 13
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/kw.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/lb.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/lb/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ci.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ly.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ir.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/la.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/kg.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/it.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/it/2.html",
+        "https://www.publicdns.xyz/country/it/3.html",
+        "https://www.publicdns.xyz/country/it/4.html",
+        "https://www.publicdns.xyz/country/it/5.html",
+        "https://www.publicdns.xyz/country/it/12.html"
+      ],
+      "lastPage": 12
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/jp.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/jp/2.html",
+        "https://www.publicdns.xyz/country/jp/3.html",
+        "https://www.publicdns.xyz/country/jp/4.html",
+        "https://www.publicdns.xyz/country/jp/5.html",
+        "https://www.publicdns.xyz/country/jp/8.html"
+      ],
+      "lastPage": 8
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/lv.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/lv/2.html",
+        "https://www.publicdns.xyz/country/lv/3.html"
+      ],
+      "lastPage": 3
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/jo.html",
+      "pagination": [],
+      "lastPage": 1
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/lr.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    }
+  ]
+}
