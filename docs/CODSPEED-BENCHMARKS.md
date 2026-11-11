@@ -16,8 +16,9 @@ Android app's CMake build and adds no benchmark dependency to the APK.
 
 ## Why simulation
 
-The current workloads are CPU and memory operations. CodSpeed simulation is
-appropriate for these deterministic helpers.
+The current workloads are CPU and memory operations. The CodSpeed GitHub Action
+runs in `simulation` mode, while the pinned CodSpeed C++ v1.0.0 CMake integration
+uses its legacy `instrumentation` build flag for the same instrumented path.
 
 PTY process creation, `poll`, `read`, `write`, and `ioctl` are kernel/I/O
 operations. They are deliberately not included in this simulation suite:
@@ -42,7 +43,7 @@ On a Linux host with CMake, a C++17 compiler, and Git:
 
 ```sh
 cmake -S benchmarks -B build/benchmarks \
-  -DCODSPEED_MODE=simulation \
+  -DCODSPEED_MODE=instrumentation \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build/benchmarks --parallel 2
 ./build/benchmarks/forge_pty_bench
