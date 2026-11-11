@@ -6,6 +6,7 @@ import android.os.StatFs
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -408,8 +409,12 @@ class HybridRuntimeManager(
         if (!isSafeDirectory(workspace, root)) return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
         val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
         val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
-        val result = runCatching { adapter.readInteractive(request) }.getOrElse {
-            return RuntimeInteractiveResult(false, message = it.message ?: "Terminal output failed.")
+        val result = try {
+            adapter.readInteractive(request)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            return RuntimeInteractiveResult(false, message = error.message ?: "Terminal output failed.")
         }
         if (!result.accepted && result.message.startsWith("PRoot PTY output drained; session resources released.")) {
             setRuntimeState(RuntimeEnvironmentId.XFCE_PROOT, distribution, RuntimeLifecycleState.STOPPED)
