@@ -299,14 +299,13 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
     }
 
     private fun validateRootfs(root: File) {
-        val shell = File(root, "bin/sh")
-        val usrShell = File(root, "usr/bin/sh")
-        require((shell.exists() || java.nio.file.Files.isSymbolicLink(shell.toPath())) &&
-            (shell.isFile || java.nio.file.Files.isSymbolicLink(shell.toPath()) || usrShell.isFile)) {
-            "Rootfs validation failed: guest /bin/sh is missing."
-        }
         require(File(root, "etc").isDirectory && File(root, "usr").isDirectory) {
             "Rootfs validation failed: expected /etc and /usr trees are missing."
+        }
+        val shellCandidates = listOf("/bin/sh", "/usr/bin/sh")
+        val shell = shellCandidates.firstOrNull { RootfsGuestPath.isExecutableGuestFile(root, it) }
+        require(shell != null) {
+            "Rootfs validation failed: no readable executable guest shell was found at /bin/sh or /usr/bin/sh."
         }
     }
 }
