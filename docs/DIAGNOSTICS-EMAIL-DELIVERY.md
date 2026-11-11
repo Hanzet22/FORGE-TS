@@ -37,6 +37,6 @@ No mail-provider key is embedded in the Android app or Git repository. If either
 
 - Android first-launch consent gate and Settings control are in the app source.
 - Remote diagnostic upload remains opt-in per installation.
-- `forge-diagnostic-ingest` deployed as version 4 with `verify_jwt=false` preserved.
-- Email delivery is code-ready but remains inactive until the two Resend secrets above are configured and the sender domain is verified.
-- A successful Edge Function deployment does not prove a real email was delivered. No synthetic event or test email was sent.
+- Supabase migration `20261111220653_expand_diagnostic_device_metadata` is applied.
+- `forge-diagnostic-ingest` deployed as version 8 with `verify_jwt=false` preserved.
+- The Edge Function accepts both the plural and legacy singular sender-secret names. A successful deployment does not prove a real email was delivered; no synthetic event or test email was sent.
