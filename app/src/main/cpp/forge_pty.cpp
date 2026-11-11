@@ -1,5 +1,7 @@
 #include <jni.h>
 
+#include "pty_helpers.hpp"
+
 #include <pty.h>
 #include <poll.h>
 #include <fcntl.h>
@@ -39,10 +41,6 @@ std::shared_ptr<Session> findSession(jlong handle) {
     return found == sessions.end() ? nullptr : found->second;
 }
 
-bool validDimensions(jint rows, jint columns) {
-    return rows > 0 && rows <= 1000 && columns > 0 && columns <= 1000;
-}
-
 bool allowedSignal(jint signalValue) {
     return signalValue == SIGINT || signalValue == SIGTERM ||
            signalValue == SIGHUP || signalValue == SIGWINCH ||
@@ -71,8 +69,7 @@ bool readStringArray(JNIEnv* env, jobjectArray input,
         if (values.back().empty() || values.back().size() > 8192 ||
             values.back().find('\0') != std::string::npos) return false;
     }
-    for (auto& value : values) pointers.push_back(value.data());
-    pointers.push_back(nullptr);
+    forge::pty::buildCStringPointers(values, pointers);
     return true;
 }
 }  // namespace
@@ -81,7 +78,7 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeStart(
     JNIEnv* env, jobject, jobjectArray argvArray, jobjectArray envArray,
     jstring cwdString, jint rows, jint columns) {
-    if (!validDimensions(rows, columns) || cwdString == nullptr) return -EINVAL;
+    if (!forge::pty::validDimensions(rows, columns) || cwdString == nullptr) return -EINVAL;
 
     std::vector<std::string> argv;
     std::vector<std::string> environment;
@@ -187,7 +184,7 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeWrite(
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeResize(
     JNIEnv*, jobject, jlong handle, jint rows, jint columns) {
-    if (!validDimensions(rows, columns)) return JNI_FALSE;
+    if (!forge::pty::validDimensions(rows, columns)) return JNI_FALSE;
     auto session = findSession(handle);
     if (!session) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(session->ioMutex);
