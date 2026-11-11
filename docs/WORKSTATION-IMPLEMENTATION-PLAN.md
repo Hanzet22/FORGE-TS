@@ -109,7 +109,7 @@ Acceptance:
 
 ## P5 — RouterOS MikroTik
 
-Status: Coming Soon; not part of initial implementation. The existing `RouterOsImageImporter` only stages a user-selected CHR ARM64 RAW image after comparing a user-provided SHA-256; it does not authenticate the hash source or boot a guest. Keep its UI clearly marked Coming Soon or hidden until the RouterOS module is formally released.
+Status: Coming Soon; not part of initial implementation. The UI is an informational version catalog listing RouterOS 7.25.1 (Stable), 7.24.6 (Long-term), 7.26beta5 (Development), 7.25rc3 (Testing) and 6.49.23 (Legacy), with every entry marked Coming Soon. Download, import, installation and runtime controls are not exposed. The existing `RouterOsImageImporter` remains deferred and is not reachable from the UI.
 
 Entry criteria:
 - Official distribution/deployment method confirmed.
