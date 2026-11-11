@@ -1,0 +1,97 @@
+{
+  "batch": 42,
+  "capturedAt": "2026-11-11T10:44:56.045Z",
+  "pages": [
+    {
+      "code": "th",
+      "page": 6,
+      "url": "https://www.publicdns.xyz/country/th/6.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 7,
+      "url": "https://www.publicdns.xyz/country/th/7.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 8,
+      "url": "https://www.publicdns.xyz/country/th/8.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 9,
+      "url": "https://www.publicdns.xyz/country/th/9.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 10,
+      "url": "https://www.publicdns.xyz/country/th/10.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 11,
+      "url": "https://www.publicdns.xyz/country/th/11.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 12,
+      "url": "https://www.publicdns.xyz/country/th/12.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 13,
+      "url": "https://www.publicdns.xyz/country/th/13.html",
+      "rawMarkdown": "DNS Server in Thailand\n\n# DNS Server in Thailand\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 1.2.185.205 node-bf1.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.187.72 node-bpk.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.185.226 node-bfm.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.185.224 node-bfk.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.186.127 node-bjz.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.15 node-bnz.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.30 node-boe.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.49 node-box.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.55 node-bp3.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.66 node-bpe.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.58 node-bp6.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.69 node-bph.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.67 node-bpf.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.97 node-bq9.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.106 node-bqi.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.65 node-bpd.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.92 node-bq4.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.126 node-br2.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.63 node-bpb.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.141 node-brh.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.145 node-brl.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.149 node-brp.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.155 node-brv.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.158 node-bry.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.165 node-bs5.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.188 node-bss.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.195 node-bsz.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.202 node-bt6.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.206 node-bta.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.205 node-bt9.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.236 node-bu4.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.187.253 node-bul.pool-1-2.dynamic.totinternet.net. | Ratchaburi | 100% |\n| 1.2.194.12 node-d1o.pool-1-2.dynamic.totinternet.net. | Kao Liao | 100% |\n| 1.2.194.30 node-d26.pool-1-2.dynamic.totinternet.net. | Kao Liao | 100% |\n| 1.2.194.155 node-d5n.pool-1-2.dynamic.totinternet.net. | Kao Liao | 100% |\n| 1.2.194.117 node-d4l.pool-1-2.dynamic.totinternet.net. | Kao Liao | 100% |\n| 1.2.195.183 node-ddj.pool-1-2.dynamic.totinternet.net. | Phitsanulok | 100% |\n| 1.2.195.208 node-de8.pool-1-2.dynamic.totinternet.net. | Phitsanulok | 100% |\n| 1.2.196.47 node-dgv.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.196.158 node-djy.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.197.9 node-dmx.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.197.173 node-drh.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.197.169 node-drd.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.197.221 node-dst.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.197.229 node-dt1.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.198.46 node-dv2.pool-1-2.dynamic.totinternet.net. | Nakhon Sawan | 100% |\n| 1.2.198.76 node-dvw.pool-1-2.dynamic.totinternet.net. | Nakhon Sawan | 100% |\n| 1.2.198.103 node-dwn.pool-1-2.dynamic.totinternet.net. | Nakhon Sawan | 100% |\n| 1.2.198.123 node-dx7.pool-1-2.dynamic.totinternet.net. | Nakhon Sawan | 100% |\n| 1.2.198.225 node-e01.pool-1-2.dynamic.totinternet.net. | Nakhon Sawan | 100% |\n\nError fetching https://www.publicdns.xyz/country/th/6.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/7.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/8.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/9.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/10.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/11.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/12.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/14.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/15.html: CRAWL_HTTP_403",
+      "source": "Exa",
+      "rawChars": 4694
+    },
+    {
+      "code": "th",
+      "page": 14,
+      "url": "https://www.publicdns.xyz/country/th/14.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 15,
+      "url": "https://www.publicdns.xyz/country/th/15.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/th/6.html",
+    "https://www.publicdns.xyz/country/th/7.html",
+    "https://www.publicdns.xyz/country/th/8.html",
+    "https://www.publicdns.xyz/country/th/9.html",
+    "https://www.publicdns.xyz/country/th/10.html",
+    "https://www.publicdns.xyz/country/th/11.html",
+    "https://www.publicdns.xyz/country/th/12.html",
+    "https://www.publicdns.xyz/country/th/14.html",
+    "https://www.publicdns.xyz/country/th/15.html"
+  ]
+}
