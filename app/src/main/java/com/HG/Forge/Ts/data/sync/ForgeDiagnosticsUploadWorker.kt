@@ -19,19 +19,19 @@ class ForgeDiagnosticsUploadWorker(context: Context, params: WorkerParameters) :
             val all = ForgeDiagnostics.read(applicationContext)
             if (all.length() == 0) return@withContext Result.success()
 
-            // Four bounded events keep the request below the Edge Function body limit,
-            // even when one event contains a useful exception stack trace.
-            val batch = JSONArray()
+            // Send the complete bounded local journal as one diagnostic envelope.
+            // The local journal is capped below the Edge Function request-size limit.
             val uploadedIds = mutableSetOf<String>()
-            for (index in 0 until minOf(all.length(), 4)) {
-                val event = all.optJSONObject(index) ?: continue
-                batch.put(event)
-                uploadedIds.add(event.optString("eventId"))
+            for (index in 0 until all.length()) {
+                all.optJSONObject(index)?.let { uploadedIds.add(it.optString("eventId")) }
             }
-            if (batch.length() == 0) return@withContext Result.success()
+            if (uploadedIds.isEmpty()) return@withContext Result.success()
 
             try {
-                val payload = JSONObject().put("events", batch)
+                val payload = JSONObject()
+                    .put("schemaVersion", 1)
+                    .put("deliveryMode", "app_background_session")
+                    .put("events", all)
                 val connection = URL(ForgeDiagnosticsBackendConfig.INGEST_URL)
                     .openConnection() as HttpURLConnection
                 val code = try {
