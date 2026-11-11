@@ -15,6 +15,15 @@
 - Android Gradle packaging extracts native runtime payloads into the installed native-library directory.
 - No new DataStore keys, database, migration, Supabase project, Redis resource, rootfs download or archive extraction was added.
 
+## Guest DNS resolver integration
+
+- The adapter registers an Android default-network callback and refreshes a private per-distro `dns/resolv.conf` file when the default network's link properties change.
+- The resolver file is bound into the guest at `/etc/resolv.conf`; it is refreshed again before disposable probes and one-shot guest commands.
+- DNS server addresses come from the active default network's `LinkProperties.getDnsServers()`; no public DNS provider is hardcoded.
+- When Android Private DNS is active, or no usable default-network DNS configuration is available, the guest resolver file is deliberately left empty. The adapter does not send plaintext DNS directly to servers while Android requires Private DNS.
+- This is a fail-closed compatibility boundary, not full encrypted-DNS forwarding. Guest name resolution under Private DNS remains unsupported until an Android-backed encrypted resolver/proxy is implemented.
+- Network callback delivery, resolver-file binding and actual DNS queries still require device-level validation; source implementation alone does not establish working guest networking.
+
 ## Runtime requirements not yet satisfied
 
 The ARM64 native build and APK packaging workflow is now present, including the separate PRoot loader and payload checksum/license handoff. However, no successful native workflow run, APK containing the payload, or physical-device shell session has been confirmed yet. Consequently:
