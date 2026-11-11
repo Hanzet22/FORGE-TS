@@ -1,0 +1,52 @@
+{
+  "batch": 43,
+  "part": 2,
+  "capturedAt": "2026-11-11T10:45:28.015Z",
+  "pages": [
+    {
+      "code": "th",
+      "page": 21,
+      "url": "https://www.publicdns.xyz/country/th/21.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 22,
+      "url": "https://www.publicdns.xyz/country/th/22.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 23,
+      "url": "https://www.publicdns.xyz/country/th/23.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "tw",
+      "page": 2,
+      "url": "https://www.publicdns.xyz/country/tw/2.html",
+      "rawMarkdown": "DNS Server in Taiwan\n\n# DNS Server in Taiwan\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 211.75.158.220 211-75-158-220.hinet-ip.hinet.net. | New Taipei | 100% |\n| 211.75.71.229 211-75-71-229.hinet-ip.hinet.net. | Taichung | 100% |\n| 211.76.166.1 tndns.nhri.org.tw. | Hsinchu | 100% |\n| 211.76.174.109 ib02.nhri.edu.tw. | Hsinchu | 100% |\n| 218.161.118.51 218-161-118-51.hinet-ip.hinet.net. | Kaohsiung City | 100% |\n| 218.32.187.102 | | 100% |\n| 219.87.72.1 219-87-72-1.static.tfn.net.tw. | Taipei | 100% |\n| 219.87.72.2 219-87-72-2.static.tfn.net.tw. | Taipei | 100% |\n| 220.128.70.66 220-128-70-66.twgate-ip.twgate.net. | | 100% |\n| 220.130.142.130 hsinten.com.tw. | Taipei | 100% |\n| 220.130.153.130 ns3.ucloudhosting.com.tw. | Taipei | 100% |\n| 59.120.77.163 59-120-77-163.hinet-ip.hinet.net. | Taichung | 100% |\n| 59.124.0.180 59-124-0-180.hinet-ip.hinet.net. | Taipei | 100% |\n| 59.124.195.244 dns.go715.com.tw. | Tamsui | 100% |\n| 59.124.26.210 59-124-26-210.hinet-ip.hinet.net. | New Taipei | 100% |\n| 59.124.46.89 59-124-46-89.hinet-ip.hinet.net. | New Taipei | 100% |\n| 59.125.10.126 mail.shy.idv.tw. | Taichung | 100% |\n| 59.125.160.221 ebmtech.com. | New Taipei | 100% |\n| 59.125.25.42 59-125-25-42.hinet-ip.hinet.net. | Taichung | 100% |\n| 59.125.47.118 redai.com.tw. | Taichung | 100% |\n| 59.126.58.204 59-126-58-204.hinet-ip.hinet.net. | Taichung | 100% |\n| 59.127.128.96 59-127-128-96.hinet-ip.hinet.net. | Nantou City | 100% |\n| 60.248.224.205 mail.ednoland.com.tw. | Taichung | 100% |\n| 60.249.5.77 60-249-5-77.hinet-ip.hinet.net. | Taichung | 100% |\n| 60.250.109.243 60-250-109-243.hinet-ip.hinet.net. | New Taipei | 100% |\n| 60.250.132.102 smtp.robot.com.tw. | Ankeng | 100% |\n| 60.250.84.108 60-250-84-108.hinet-ip.hinet.net. | New Taipei | 100% |\n| 60.250.9.222 60-250-9-222.hinet-ip.hinet.net. | Taipei | 100% |\n| 60.251.102.36 60-251-102-36.hinet-ip.hinet.net. | Taipei | 100% |\n| 60.251.138.182 www.shacom.com.tw. | New Taipei | 100% |\n| 60.251.42.154 60-251-42-154.hinet-ip.hinet.net. | New Taipei | 100% |\n| 60.251.65.49 www.yesmall.com.tw. | Taipei | 100% |\n| 61.216.168.145 ns.chixing.tw. | Nantou City | 100% |\n| 61.216.24.137 61-216-24-137.hinet-ip.hinet.net. | New Taipei | 100% |\n| 61.220.40.118 61-220-40-118.hinet-ip.hinet.net. | Taipei | 100% |\n| 61.220.40.119 61-220-40-119.hinet-ip.hinet.net. | Taipei | 100% |\n| 61.221.23.93 lyons.com.tw. | Yunlin | 100% |\n| 61.222.214.225 61-222-214-225.hinet-ip.hinet.net. | New Taipei | 100% |\n| 61.222.56.86 61-222-56-86.hinet-ip.hinet.net. | New Taipei | 100% |\n| 61.30.172.173 61-30-172-173.static.tfn.net.tw. | Taipei | 100% |\n| 61.57.229.1 picns1.piinet.net. | | 100% |\n| 61.57.229.2 picns2.piinet.net. | | 100% |\n| 61.60.129.37 37-129-60-61-savecom. | Toufen Township | 100% |\n| 1.34.4.229 1-34-4-229.hinet-ip.hinet.net. | New Taipei | 100% |\n| 1.34.29.58 1-34-29-58.hinet-ip.hinet.net. | Taoyuan District | 100% |\n| 1.34.24.49 bigdataiot.com.tw. | Taoyuan District | 100% |\n| 1.34.58.188 1-34-58-188.hinet-ip.hinet.net. | New Taipei | 100% |\n| 1.34.61.74 1-34-61-74.hinet-ip.hinet.net. | New Taipei | 100% |\n| 1.34.98.253 1-34-98-253.hinet-ip.hinet.net. | Hsinchu County | 100% |\n| 1.34.84.25 1-34-84-25.hinet-ip.hinet.net. | Taipei | 100% |\n\n# DNS Server in Taiwan",
+      "source": "Exa",
+      "rawChars": 3267
+    },
+    {
+      "code": "tw",
+      "page": 3,
+      "url": "https://www.publicdns.xyz/country/tw/3.html",
+      "rawMarkdown": "DNS Server in Taiwan\n\n# DNS Server in Taiwan\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 1.34.107.86 1-34-107-86.hinet-ip.hinet.net. | Ankeng | 100% |\n| 1.34.182.42 1-34-182-42.hinet-ip.hinet.net. | Hsinchu | 94.9721% |\n| 1.34.240.250 1-34-240-250.hinet-ip.hinet.net. | New Taipei | 70.8738% |\n| 1.34.253.240 1-34-253-240.hinet-ip.hinet.net. | Taipei City | 95.3642% |\n| 1.160.11.233 1-160-11-233.dynamic-ip.hinet.net. | Taipei | 100% |\n| 1.160.11.112 1-160-11-112.dynamic-ip.hinet.net. | Taipei | 100% |\n| 1.160.47.1 1-160-47-1.dynamic-ip.hinet.net. | Taipei | 100% |\n| 1.160.52.247 1-160-52-247.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.59.62 1-160-59-62.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.62.33 1-160-62-33.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.63.106 1-160-63-106.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.78.67 1-160-78-67.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.66.155 1-160-66-155.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.124.99 1-160-124-99.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.139.140 1-160-139-140.dynamic-ip.hinet.net. | Taipei | 100% |\n| 1.160.130.192 1-160-130-192.dynamic-ip.hinet.net. | Taipei | 100% |\n| 1.160.139.54 1-160-139-54.dynamic-ip.hinet.net. | Taipei | 100% |\n| 1.160.152.52 1-160-152-52.dynamic-ip.hinet.net. | Hsinchu | 100% |\n| 1.160.182.195 1-160-182-195.dynamic-ip.hinet.net. | Buxin | 100% |\n| 1.160.192.184 1-160-192-184.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.198.243 1-160-198-243.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.203.160 1-160-203-160.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.208.251 1-160-208-251.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.160.210.38 1-160-210-38.dynamic-ip.hinet.net. | Hsinchu | 100% |\n| 1.160.236.166 1-160-236-166.dynamic-ip.hinet.net. | Taoyuan District | 100% |\n| 1.160.236.147 1-160-236-147.dynamic-ip.hinet.net. | Taoyuan District | 100% |\n| 1.161.3.165 1-161-3-165.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.17.193 1-161-17-193.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.26.96 1-161-26-96.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.29.200 1-161-29-200.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.48.227 1-161-48-227.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.65.241 1-161-65-241.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.67.235 1-161-67-235.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.73.49 1-161-73-49.dynamic-ip.hinet.net. | Xinzhuang District | 100% |\n| 1.161.74.82 1-161-74-82.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.76.193 1-161-76-193.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.76.240 1-161-76-240.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.77.224 1-161-77-224.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.78.48 1-161-78-48.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.90.84 1-161-90-84.dynamic-ip.hinet.net. | Taoyuan District | 100% |\n| 1.161.95.108 1-161-95-108.dynamic-ip.hinet.net. | Xinzhuang District | 100% |\n| 1.161.98.204 1-161-98-204.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.106.141 1-161-106-141.dynamic-ip.hinet.net. | Dake | 100% |\n| 1.161.107.209 1-161-107-209.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.107.217 1-161-107-217.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.116.85 1-161-116-85.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.122.88 1-161-122-88.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.124.140 1-161-124-140.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.126.94 1-161-126-94.dynamic-ip.hinet.net. | New Taipei | 100% |\n| 1.161.138.16 1-161-138-16.dynamic-ip.hinet.net. | Taipei | 100% |\n\nError fetching https://www.publicdns.xyz/country/th/21.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/22.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/23.html: CRAWL_HTTP_403",
+      "source": "Exa",
+      "rawChars": 3921
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/th/21.html",
+    "https://www.publicdns.xyz/country/th/22.html",
+    "https://www.publicdns.xyz/country/th/23.html"
+  ]
+}
