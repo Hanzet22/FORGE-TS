@@ -10,6 +10,8 @@ const json = (body: Record<string, unknown>, status = 200) =>
 const MAX_BODY = 64 * 1024;
 const RATE_LIMIT_SCRIPT =
   "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],86400) end; return n";
+const EMAIL_RATE_LIMIT_SCRIPT =
+  "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],1800) end; return n";
 
 function cleanText(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
@@ -223,7 +225,7 @@ Deno.serve(async (req: Request) => {
         const emailLimitResponse = await fetch(redisEndpoint, {
           method: "POST",
           headers: { Authorization: "Bearer " + redisToken, "Content-Type": "application/json" },
-          body: JSON.stringify(["EVAL", RATE_LIMIT_SCRIPT, "1", emailRateKey]),
+          body: JSON.stringify(["EVAL", EMAIL_RATE_LIMIT_SCRIPT, "1", emailRateKey]),
           signal: AbortSignal.timeout(4000),
         });
         const emailLimitPayload = emailLimitResponse.ok
