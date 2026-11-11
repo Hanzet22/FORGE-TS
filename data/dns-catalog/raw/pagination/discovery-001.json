@@ -1,0 +1,36 @@
+{
+  "capturedAt": "2026-11-11T10:23:29.055Z",
+  "source": "Parallel pagination discovery",
+  "pages": [
+    {
+      "url": "https://www.publicdns.xyz/country/dz.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ad.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/af.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/al.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/al/2.html"
+      ],
+      "lastPage": 2
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/as.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    }
+  ]
+}
