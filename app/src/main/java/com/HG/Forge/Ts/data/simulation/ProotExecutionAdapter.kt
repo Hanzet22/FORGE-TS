@@ -25,6 +25,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
     private val appContext = context.applicationContext
     private val sessions = ConcurrentHashMap<String, PtySession>()
+    private val sessionLocks = ConcurrentHashMap<String, Any>()
     override val environmentId = RuntimeEnvironmentId.XFCE_PROOT
 
     override suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability =
@@ -71,6 +72,8 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 ?: return@withContext RuntimeAdapterStartResult(false, false, "PRoot paths changed after inspection.")
             val (root, engine, loader, logs, tmp) = paths
             val key = request.workspacePath
+            val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
+            synchronized(sessionLock) {
             val current = sessions[key]
             if (current != null) {
                 val currentStatus = NativePtyEngine.nativeWait(current.handle)
@@ -176,6 +179,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             }
             RuntimeAdapterStartResult(true, true,
                 "PRoot is running in a native PTY session (24x80). Terminal job control and resize are now backed by the PTY.")
+            }
         }
 
     override suspend fun execute(
@@ -318,13 +322,17 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
     override suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         withContext(Dispatchers.IO) {
-            val session = sessions.remove(request.workspacePath)
-                ?: return@withContext RuntimeAdapterStopResult(false, "No adapter-owned native PTY session exists for this workspace.")
-            val closed = NativePtyEngine.nativeClose(session.handle, true)
-            runCatching { session.reader?.join(750) }
-            RuntimeAdapterStopResult(closed,
-                if (closed) "PRoot PTY session received SIGHUP, was reaped, and its PTY master was closed."
-                else "Native PTY session could not be closed; manual recovery is required.")
+            val key = request.workspacePath
+            val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
+            synchronized(sessionLock) {
+                val session = sessions.remove(key)
+                    ?: return@withContext RuntimeAdapterStopResult(false, "No adapter-owned native PTY session exists for this workspace.")
+                val closed = NativePtyEngine.nativeClose(session.handle, true)
+                runCatching { session.reader?.join(750) }
+                RuntimeAdapterStopResult(closed,
+                    if (closed) "PRoot PTY session received SIGHUP, was reaped, and its PTY master was closed."
+                    else "Native PTY session could not be closed; manual recovery is required.")
+            }
         }
 
     private data class Paths(
