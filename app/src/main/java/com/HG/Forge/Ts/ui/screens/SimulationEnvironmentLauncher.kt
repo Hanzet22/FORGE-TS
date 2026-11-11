@@ -124,6 +124,8 @@ fun SimulationEnvironmentLauncher() {
                                         }
                                     }
                                 ) { Text("Start") }
+                            }
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 OutlinedButton(
                                     enabled = instance.lifecycle == RuntimeLifecycleState.RUNNING,
                                     onClick = {
