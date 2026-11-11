@@ -24,9 +24,10 @@ This directory contains raw, checkpointed snapshots collected from PublicDNS.xyz
 
 - Provider profiles: 30/30 raw page snapshots saved.
 - Country/region first pages: 195/195 raw page snapshots saved across primary and fallback checkpoints.
-- Pagination URLs discovered: 619.
+- Pagination URLs discovered: 619 from 149 country pages whose pagination navigation was successfully read.
 - Pagination page bodies successfully saved: 543.
 - Pagination page bodies not returned by the extraction providers at the time of this snapshot: 76. See each batch JSON's `missing` array; retry those URLs later.
+- Pagination navigation could not be read for 46 additional country pages; the failed discovery attempts are saved under `raw/pagination/discovery-missing-*.json`. Those pages may have additional pagination URLs not yet inventoried.
 
 ## Checkpointing policy
 
