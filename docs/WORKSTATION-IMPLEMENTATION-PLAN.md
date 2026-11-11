@@ -37,7 +37,8 @@ Acceptance:
 Reuse the existing Linux-userland and Native runtime foundation code where it fits; do not interpret workspace readiness as an installed runtime.
 
 Deliverables:
-- Embedded X11 feasibility and licensing decision.
+- Embedded X11 feasibility and licensing decision (review recorded).
+- Backend-neutral DisplaySessionAdapter/Registry contract for readiness, Android Surface attachment, bounded pointer/touch/scroll/key/text input, resize and stop. No concrete backend is registered yet.
 - In-app display host and backend interface.
 - Input and resize bridge.
 - Native Linux capability detector.
