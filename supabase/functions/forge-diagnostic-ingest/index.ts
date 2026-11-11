@@ -95,12 +95,22 @@ Deno.serve(async (req: Request) => {
       const exceptionType = cleanText(event.exceptionType, 200);
       const stackTrace = cleanText(event.stackTrace, 12000);
       const sdk = Number(event.androidSdk);
+      const deviceBrand = cleanText(event.deviceBrand, 48);
+      const deviceModel = cleanText(event.deviceModel, 80);
+      const deviceRamMb = Number(event.deviceRamMb);
+      const displayResolution = cleanText(event.displayResolution, 32);
+      const cpuChipset = cleanText(event.cpuChipset, 80);
+      const cpuArchitecture = cleanText(event.cpuArchitecture, 40);
 
       if (!/^[0-9a-fA-F-]{36}$/.test(eventId) ||
           !/^[0-9a-fA-F-]{36}$/.test(currentInstallationId) ||
           !Number.isFinite(Date.parse(occurredAt)) ||
           !appVersion || !androidRelease ||
-          !["DEBUG", "INFO", "WARNING", "ERROR"].includes(level) ||
+          !["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", "CRASH"].includes(level) ||
+          !deviceBrand || !deviceModel ||
+          !Number.isInteger(deviceRamMb) || deviceRamMb < 128 || deviceRamMb > 1048576 ||
+          !/^\d{2,5}x\d{2,5}$/.test(displayResolution) ||
+          !cpuChipset || !cpuArchitecture ||
           !tag || !eventName || !Number.isInteger(sdk) || sdk < 1 || sdk > 100) {
         return json({ ok: false, error: "invalid_event_payload" }, 400);
       }
@@ -114,6 +124,12 @@ Deno.serve(async (req: Request) => {
         app_version: appVersion,
         android_sdk: sdk,
         android_release: androidRelease,
+        device_brand: deviceBrand,
+        device_model: deviceModel,
+        device_ram_mb: deviceRamMb,
+        display_resolution: displayResolution,
+        cpu_chipset: cpuChipset,
+        cpu_architecture: cpuArchitecture,
         level,
         tag,
         event_name: eventName,
@@ -214,9 +230,10 @@ Deno.serve(async (req: Request) => {
     // installation IDs, credentials, terminal data, or message contents.
     let emailAlert = "not_configured";
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const emailFrom = Deno.env.get("DIAGNOSTICS_EMAIL_FROM");
+    const emailFrom = Deno.env.get("DIAGNOSTICS_EMAIL_FROM") ||
+      Deno.env.get("DIAGNOSTIC_EMAIL_FROM");
     const importantEvents = normalized.filter((event) =>
-      event.level === "WARNING" || event.level === "ERROR"
+      ["WARNING", "ERROR", "CRITICAL", "CRASH"].includes(String(event.level))
     );
     if (resendKey && emailFrom && importantEvents.length > 0) {
       stage = "admin_email_rate_limit";
@@ -237,7 +254,14 @@ Deno.serve(async (req: Request) => {
           const summary = importantEvents.slice(0, 10).map((event) => ({
             occurredAt: event.occurred_at,
             appVersion: event.app_version,
+            androidVersion: event.android_release,
             androidSdk: event.android_sdk,
+            deviceBrand: event.device_brand,
+            deviceModel: event.device_model,
+            deviceRamMb: event.device_ram_mb,
+            displayResolution: event.display_resolution,
+            cpuChipset: event.cpu_chipset,
+            cpuArchitecture: event.cpu_architecture,
             level: event.level,
             component: event.tag,
             event: event.event_name,
@@ -252,7 +276,7 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify({
               from: emailFrom,
               to: ["papakjamsutnoruu@gmail.com"],
-              subject: "[FORGE-TS] Diagnostic warning/error summary",
+              subject: "[FORGE-TS] Diagnostic alert summary",
               text: "FORGE-TS received important diagnostic events.\n\n" +
                 JSON.stringify(summary, null, 2) +
                 "\n\nFull event records remain in the protected FORGE-TS diagnostics backend.",
