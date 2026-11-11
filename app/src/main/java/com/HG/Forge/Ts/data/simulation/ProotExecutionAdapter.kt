@@ -208,6 +208,25 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 if (running) "Native PTY output read." else "PRoot PTY session exited; buffered output returned.")
         }
 
+    override suspend fun resizeInteractive(
+        request: RuntimeAdapterStartRequest,
+        rows: Int,
+        columns: Int
+    ): RuntimeInteractiveResult = withContext(Dispatchers.IO) {
+        if (rows !in 1..1000 || columns !in 1..1000) {
+            return@withContext RuntimeInteractiveResult(false, message = "Terminal dimensions must be between 1 and 1000.")
+        }
+        val session = sessions[request.workspacePath]
+            ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+        if (NativePtyEngine.nativeWait(session.handle) != 0) {
+            return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+        }
+        val resized = NativePtyEngine.nativeResize(session.handle, rows, columns)
+        RuntimeInteractiveResult(resized,
+            message = if (resized) "PTY window size updated to ${rows}x${columns}."
+            else "Native PTY rejected the window-size update.")
+    }
+
     override suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         withContext(Dispatchers.IO) {
             val session = sessions.remove(request.workspacePath)
