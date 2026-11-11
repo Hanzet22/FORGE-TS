@@ -1,13 +1,13 @@
 # FORGE-TS Native PTY Engine Architecture
 
-Status: architecture baseline; native implementation is staged separately.
+Status: native PTY is integrated into the PRoot adapter and runtime manager; on-device behavioral acceptance remains pending.
 Target: Android API 29+, ARM64 first, Kotlin + JNI + Android Bionic.
 
 ## 1. Objective
 
 Replace the current pipe-backed PRoot interactive shell with a real pseudo-terminal (PTY). A PTY provides terminal semantics required by shells and interactive programs: isatty(), line discipline, foreground process groups, terminal-generated signals, and terminal window dimensions.
 
-The current pipe-backed session remains a compatibility fallback until the native path is integrated and verified. Do not report it as a PTY.
+The interactive PRoot adapter now launches its long-lived guest shell through the native PTY bridge. One-shot commands and the disposable ptrace probe still use ProcessBuilder. The terminal emulator/UI integration and on-device behavioral acceptance remain separate milestones.
 
 ## 2. Evidence and platform baseline
 
@@ -24,15 +24,15 @@ The current pipe-backed session remains a compatibility fallback until the nativ
 4. JNI PTY engine — owns native handles, master FD, child PID, polling, resize, signals, and cleanup.
 5. PRoot launcher — runs the existing packaged PRoot binary with the selected rootfs and guest shell.
 
-The terminal emulator is not the PTY process manager. Keep these responsibilities separate.
+The terminal emulator is not the PTY process manager. Keep these responsibilities separate. Native PTY integration is present; the emulator dependency remains deferred pending compatibility review.
 
 ## 4. Native session contract
 
 - nativeStart(argv, envp, cwd, rows, cols): Long — allocate PTY, spawn child, return opaque session handle or a negative errno-style result.
-- nativeRead(handle, buffer, timeoutMs): Int — poll-backed master read; positive byte count, zero timeout/no data, negative error/EOF contract documented.
-- nativeWrite(handle, bytes, offset, length): Int — write to master with partial-write handling.
+- nativeRead(handle, buffer, timeoutMs): Int — poll-backed master read; positive byte count, zero timeout/no data/closed-slave indication, negative errno-style failure.
+- nativeWrite(handle, bytes, offset, length): Int — write to master; Kotlin loops over partial writes and treats zero as a non-progress condition.
 - nativeResize(handle, rows, cols): Boolean — apply TIOCSWINSZ to master; terminal driver delivers window-size change to the foreground process group.
-- nativeWait(handle, timeoutMs): Int — inspect/reap child status without blocking the UI.
+- nativeWait(handle): Int — non-blocking waitpid(WNOHANG); zero means running, positive values encode an exited/signaled child, and negative values are errno-style failures.
 - nativeSignal(handle, signal): Boolean — signal the child process group under a narrow allowlist.
 - nativeClose(handle, graceful): Boolean — close master, request graceful shutdown, reap child, and release all native resources.
 
@@ -51,7 +51,7 @@ Validate array bounds, dimensions, environment entries, command length, and hand
 
 ## 6. PRoot integration
 
-The native PTY child should execute the existing PRoot launcher with the same validated rootfs, loader, tmp directory, and guest command already used by ProotExecutionAdapter. PRoot must inherit the PTY slave descriptors so the guest shell sees a TTY.
+ProotExecutionAdapter now passes the validated PRoot launcher command, loader environment, tmp paths, and selected rootfs to NativePtyEngine.nativeStart(). forkpty() attaches the PTY slave to the child process standard streams, so PRoot and the guest shell inherit terminal descriptors. The adapter retains ProcessBuilder for bounded one-shot commands and the ptrace probe.
 
 Do not change rootfs provisioning, Supabase, Redis, account flows, or MikroTik/CHR as part of this PTY work.
 
