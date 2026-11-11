@@ -1,0 +1,73 @@
+{
+  "batch": 1,
+  "capturedAt": "2026-11-11T10:09:00.214Z",
+  "pages": [
+    {
+      "url": "https://www.publicdns.xyz/country/af.html",
+      "name": "Afghanistan",
+      "rawMarkdown": "\n\nDNS Server in Afghanistan\n\n# DNS Server in Afghanistan\n\n#### Public DNS Server\n\n#### Most Visited Country/Region\n\nDNS Server in Afghanistan\n* [Home](https://www.publicdns.xyz/)\n* [Country/Region](https://www.publicdns.xyz/country/)\n* Afghanistan\n# DNS Server in Afghanistan\n|DNS Server|Location|Reliability|\n|[116.204.243.9](javascript:void(0))||100%|\n|[116.204.243.130](javascript:void(0))||82.8897%|\n|[103.146.146.91](javascript:void(0))|Herat|98.2456%|\n|[64.207.209.178](javascript:void(0))||93.75%|\n|[116.204.243.81](javascript:void(0))||68.595%|\n|[180.94.94.195](javascript:void(0))|Kabul|100%|\n|[74.118.82.29](javascript:void(0))||100%|\n|[103.53.26.2](javascript:void(0))||100%|\n|[137.59.123.50](javascript:void(0))|Herat|90.566%|\n|[111.125.158.42](javascript:void(0))||100%|\n|[74.118.82.20](javascript:void(0))||100%|\n|[103.13.65.210](javascript:void(0))|Kabul|96.2963%|\n|[149.54.9.154](javascript:void(0))||84.6154%|\n|[180.94.91.90](javascript:void(0))|Kabul|97.6%|\n|[116.204.242.33](javascript:void(0))||3.08989%|\n#### Public DNS Server\n* [Google Public DNS](https://www.publicdns.xyz/public/google.html)\n* [OpenDNS](https://www.publicdns.xyz/public/opendns.html)\n* [Cloudflare](https://www.publicdns.xyz/public/cloudflare.html)\n* [Level 3](https://www.publicdns.xyz/public/level3.html)\n* [Verisign](https://www.publicdns.xyz/public/verisign.html)\n* [Quad9](https://www.publicdns.xyz/public/quad9.html)\n* [Comodo Secure DNS](https://www.publicdns.xyz/public/comodo-secure.html)\n* [DNS.WATCH](https://www.publicdns.xyz/public/dns-watch.html)\n* [Norton ConnectSafe](https://www.publicdns.xyz/public/norton-connectsafe.html)\n* [GreenTeamDNS](https://www.publicdns.xyz/public/greenteamdns.html)\n* [SafeDNS](https://www.publicdns.xyz/public/safedns.html)\n* [OpenNIC](https://www.publicdns.xyz/public/opennic.html)\n* [SmartViper](https://www.publicdns.xyz/public/smartviper.html)\n* [Freenom World](https://www.publicdns.xyz/public/freenom-world.html)\n* [Dyn](https://www.publicdns.xyz/public/dyn.html)\n* [FreeDNS](https://www.publicdns.xyz/public/freedns.html)\n* [Alternate DNS](https://www.publicdns.xyz/public/alternate.html)\n* [Yandex.DNS](https://www.publicdns.xyz/public/yandex.html)\n* [UncensoredDNS](https://www.publicdns.xyz/public/uncensoreddns.html)\n* [Hurricane Electric](https://www.publicdns.xyz/public/he.html)\n* [puntCAT](https://www.publicdns.xyz/public/puntcat.html)\n* [Neustar](https://www.publicdns.xyz/public/neustar.html)\n* [CNNIC SDNS](https://www.publicdns.xyz/public/cnnic-sdns.html)\n* [CFIEC IPv6 Public DNS](https://www.publicdns.xyz/public/cfiec-ipv6.html)\n* [AliDNS](https://www.publicdns.xyz/public/alidns.html)\n* [Baidu Public DNS](https://www.publicdns.xyz/public/baidu.html)\n* [DNSPod Public DNS+](https://www.publicdns.xyz/public/dnspod.html)\n* [114DNS](https://www.publicdns.xyz/public/114dns.html)\n* [OneDNS](https://www.publicdns.xyz/public/onedns.html)\n* [DNSpai](https://www.publicdns.xyz/public/dnspai.html)\n#### Most Visited Country/Region\n* [United States](https://www.publicdns.xyz/country/us.html)\n* [Philippines](https://www.publicdns.xyz/country/ph.html)\n* [Russia](https://www.publicdns.xyz/country/ru.html)\n* [South Korea](https://www.publicdns.xyz/country/kr.html)\n* [Indonesia](https://www.publicdns.xyz/country/id.html)\n* [Japan](https://www.publicdns.xyz/country/jp.html)\n* [Germany](https://www.publicdns.xyz/country/de.html)\n* [Brazil](https://www.publicdns.xyz/country/br.html)\n* [Taiwan](https://www.publicdns.xyz/country/tw.html)\n* [Canada](https://www.publicdns.xyz/country/ca.html)\n* [Turkey](https://www.publicdns.xyz/country/tr.html)\n* [France](https://www.publicdns.xyz/country/fr.html)\n* [India](https://www.publicdns.xyz/country/in.html)\n* [United Kingdom](https://www.publicdns.xyz/country/gb.html)\n* [Thailand](https://www.publicdns.xyz/country/th.html)\n* [Singapore](https://www.publicdns.xyz/country/sg.html)\n* [Poland](https://www.publicdns.xyz/country/pl.html)\n* [Iran](https://www.publicdns.xyz/country/ir.html)\n* [Iraq](https://www.publicdns.xyz/country/iq.html)\n* [Ukraine](https://www.publicdns.xyz/country/ua.html)\n*\n*\n**\n\n# DNS Server in Albania",
+      "provider": "Exa/Geekflare"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/al.html",
+      "name": "Albania",
+      "rawMarkdown": "\n\nDNS Server in Albania\n\n# DNS Server in Albania\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 91.226.220.250 ans1.domains-watch.com. | | 100% |\n| 45.90.80.14 | | 100% |\n| 87.238.209.126 | | 100% |\n| 92.119.237.45 | | 96.1165% |\n| 82.114.94.58 | | 100% |\n| 46.19.226.106 | | 100% |\n| 146.0.23.67 | | 100% |\n| 185.66.131.239 | Durrës | 100% |\n| 46.183.120.75 | Tirana | 82.9268% |\n| 109.69.4.82 mail.factoringalbania.al. | | 100% |\n| 192.109.219.158 | Korçë | 96.7742% |\n| 185.66.131.108 | Durrës | 92.3077% |\n| 77.247.89.154 | | 88.4615% |\n| 80.78.64.83 | Tirana | 100% |\n| 217.21.147.72 | | 93.1818% |\n| 188.164.222.191 | Tirana | 99.0196% |\n| 185.221.253.109 ptr.abcom.al. | Korçë | 94.6429% |\n| 79.106.5.5 | Tirana | 100% |\n| 84.20.68.210 210.68.20.84.in-addr.arpa. | Tirana | 100% |\n| 80.90.93.192 ip-80-90-93-192.digicom.al. | Tirana | 100% |\n| 92.119.237.143 | Tirana | 100% |\n| 109.69.161.2 unknown.tring.al. | | 100% |\n| 92.119.238.69 | Tirana | 100% |\n| 80.91.116.169 ip-80-91-116-169.net.abissnet.al. | Durrës | 100% |\n| 77.242.18.5 ip-77-242-18-5.net.abissnet.al. | Tirana | 74.2857% |\n| 79.106.30.96 | | 97.0588% |\n| 80.91.116.252 ip-80-91-116-252.net.abissnet.al. | Durrës | 100% |\n| 79.106.166.66 | Tirana | 100% |\n| 92.119.237.149 | Tirana | 100% |\n| 213.207.48.214 | | 100% |\n| 79.106.108.148 | Tepelenë | 100% |\n| 80.91.116.209 ip-80-91-116-209.net.abissnet.al. | Durrës | 100% |\n| 79.106.172.70 | Durrës | 100% |\n| 79.106.130.11 | Tirana | 100% |\n| 80.78.77.124 | Tirana | 100% |\n| 213.207.48.238 | | 100% |\n| 79.106.96.66 | Lushnje | 100% |\n| 79.106.169.66 | Durrës | 100% |\n| 185.212.190.35 ip-185-212-190-35.digicom-al.net. | Tirana | 100% |\n| 92.119.236.131 | Tirana | 100% |\n| 79.106.133.123 | | 100% |\n| 80.78.73.13 | Tirana | 100% |\n| 80.78.74.188 | Tirana | 100% |\n| 79.106.18.83 | Tirana | 100% |\n| 94.125.118.42 | | 100% |\n| 80.78.73.74 | Tirana | 100% |\n| 79.171.50.165 | | 100% |\n| 92.119.237.184 | Tirana | 100% |\n| 80.91.116.245 ip-80-91-116-245.net.abissnet.al. | Durrës | 100% |\n| 79.106.231.170 | | 100% |\n\n# DNS Server in Algeria",
+      "provider": "Exa/Geekflare"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/dz.html",
+      "name": "Algeria",
+      "rawMarkdown": "\n\nDNS Server in Algeria\n\n# DNS Server in Algeria\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 105.96.43.54 | Annaba | 96.7341% |\n| 196.41.255.10 | | 100% |\n| 193.194.89.2 usthbie.usthb.dz. | | 33.1269% |\n| 193.194.79.194 ns1.esi-sba.dz. | | 100% |\n| 41.100.61.49 | | 100% |\n| 41.111.153.93 | Algiers | 99.7886% |\n| 41.111.135.226 | | 60% |\n| 41.111.137.138 | | 100% |\n| 80.246.15.4 | 'Ain Merane | 100% |\n| 41.111.138.162 mail.pharmalliance.dz. | | 100% |\n| 197.201.224.51 | Ech Chettia | 100% |\n| 197.201.224.49 | Ech Chettia | 50% |\n| 80.246.2.151 | 'Ain Merane | 83.7535% |\n| 80.249.72.60 | Reghaia | 99.6591% |\n| 41.110.223.6 | | 95.6757% |\n\n# DNS Server in Angola",
+      "provider": "Exa/Geekflare"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/as.html",
+      "name": "American Samoa",
+      "rawMarkdown": "",
+      "provider": "unavailable"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ad.html",
+      "name": "Andorra",
+      "rawMarkdown": "",
+      "provider": "unavailable"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ao.html",
+      "name": "Angola",
+      "rawMarkdown": "\n\nDNS Server in Angola\n\n# DNS Server in Angola\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 105.174.40.238 | Luanda | 100% |\n| 105.174.30.162 | Luanda | 65.4045% |\n| 154.127.150.168 cust168-150.127.154.tvcabo.ao. | Luanda | 100% |\n| 41.63.165.22 mail.cpcafrica.com. | | 100% |\n| 197.148.52.180 cust180-52.148.197.tvcabo.ao. | Luanda | 92.3729% |\n| 154.127.234.250 cust250-234.127.154.tvcabo.ao. | | 100% |\n| 41.205.48.104 cust104-48.205.41.tvcabo.ao. | | 71.8704% |\n| 41.63.182.2 cust2-182.63.41.tvcabo.ao. | Cacuaco | 100% |\n| 192.12.111.30 ns3.bpc.ao. | | 100% |\n| 41.63.188.109 cust109-188.63.41.tvcabo.ao. | Benguela | 100% |\n| 154.127.218.57 cust57-218.127.154.tvcabo.ao. | Luanda | 66.6667% |\n| 41.205.62.29 cust29-62.205.41.tvcabo.ao. | | 93.4066% |\n| 154.127.144.1 cust1-144.127.154.tvcabo.ao. | | 93.2331% |\n| 196.249.202.174 | Luanda | 48.9796% |\n| 197.216.105.90 | | 100% |\n| 196.29.194.146 | Luanda | 100% |\n| 41.218.114.72 c19137.cust.ao.afrisp.net. | Luanda | 83.3333% |\n| 196.13.243.20 rdns1.lisluanda.com. | | 96.6667% |\n| 196.29.204.226 | Luanda | 100% |\n| 102.130.194.86 cust-102-130-194-86.zapfibra.co.ao. | Luanda | 53.7849% |\n| 41.205.51.194 cust194-51.205.41.tvcabo.ao. | Camabatela | 95.4667% |\n\n# DNS Server in Argentina",
+      "provider": "Exa/Geekflare"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ai.html",
+      "name": "Anguilla",
+      "rawMarkdown": "",
+      "provider": "unavailable"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/aq.html",
+      "name": "Antarctica",
+      "rawMarkdown": "",
+      "provider": "unavailable"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ag.html",
+      "name": "Antigua and Barbuda",
+      "rawMarkdown": "",
+      "provider": "unavailable"
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ar.html",
+      "name": "Argentina",
+      "rawMarkdown": "\n\nDNS Server in Argentina\n\n# DNS Server in Argentina\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 200.69.193.2 dns1.iplanisp.com.ar. | Buenos Aires | 99.0244% |\n| 190.192.166.130 130-166-192-190.cab.prima.net.ar. | Buenos Aires | 0.316456% |\n| 190.246.38.135 135-38-246-190.fibertel.com.ar. | Quilmes | 59.5615% |\n| 200.16.208.187 host187.advance.com.ar. | | 100% |\n| 190.210.8.69 customer-static-210-8-69.iplannetworks.net. | Buenos Aires | 100% |\n| 190.210.8.90 customer-static-210-8-90.iplannetworks.net. | Buenos Aires | 100% |\n| 190.122.20.30 | Marcos Paz | 61.5385% |\n| 181.10.117.254 host254.181-10-117.telecom.net.ar. | Banado de Ovanta | 57.1885% |\n| 200.0.228.118 host118.advance.com.ar. | Belen de Escobar | 100% |\n| 200.32.51.179 | Buenos Aires | 100% |\n| 190.183.246.27 | Posadas | 100% |\n| 181.209.105.154 154.105.209.181.in-addr.arpa. | | 100% |\n| 190.211.81.221 221-81-211-190.patagoniagreen.com. | Rivadavia | 61.6114% |\n| 186.182.242.173 | Olivos | 100% |\n| 190.185.150.101 101.150.185.190.unassigned.ridsa.com.ar. | Federal | 100% |\n| 190.193.87.143 143-87-193-190.cab.prima.net.ar. | La Plata | 100% |\n| 181.47.115.8 cpe-181-47-115-8.telecentro-reversos.com.ar. | Buenos Aires | 100% |\n| 181.46.31.244 cpe-181-46-31-244.telecentro-reversos.com.ar. | Buenos Aires | 100% |\n| 190.194.38.238 238-38-194-190.cab.prima.net.ar. | Buenos Aires | 100% |\n| 181.118.176.23 host23.181-118-176.nodosud.com.ar. | Justiniano Posse | 100% |\n| 181.170.95.20 20-95-170-181.fibertel.com.ar. | Berisso | 100% |\n| 200.10.111.176 176.host.advance.com.ar. | Buenos Aires | 100% |\n| 181.116.218.63 | Avellaneda | 100% |\n| 177.136.84.254 | Puerto Eldorado | 100% |\n| 200.0.183.39 | | 100% |\n| 200.45.79.40 host40.200-45-79.telecom.net.ar. | Canada Martel | 100% |\n| 152.168.88.69 69-88-168-152.fibertel.com.ar. | Rosario | 100% |\n| 181.117.203.77 host77.181-117-203.telmex.net.ar. | Rosario | 100% |\n| 152.171.101.103 103-101-171-152.fibertel.com.ar. | Lomas de Zamora | 100% |\n| 190.14.170.109 customer-109.tpp.com.ar.170.14.190.in-addr.arpa. | Comodoro Rivadavia | 100% |\n| 170.210.4.222 unab-riu-500m.almirante-brown.riu.edu.ar. | Buenos Aires | 51.7241% |\n| 181.209.105.156 156.105.209.181.in-addr.arpa. | | 22.2222% |\n| 45.230.8.20 | Formosa | 100% |\n| 181.230.166.209 209-166-230-181.cab.prima.com.ar. | General Roca | 40% |\n| 190.210.62.152 customer-static-210-62-152.iplannetworks.net. | Buenos Aires | 100% |\n| 190.210.211.70 customer-static-210-211-70.iplannetworks.net. | Buenos Aires | 81.1594% |\n| 190.220.1.173 | Tres de Febrero | 100% |\n| 181.174.205.62 | San Justo | 100% |\n| 170.79.183.130 | Maipu | 100% |\n| 181.209.82.154 154.82.209.181.in-addr.arpa. | Caleta Olivia | 37.0079% |\n| 186.13.38.191 host191.186-13-38.telmex.net.ar. | Córdoba | 100% |\n| 190.103.86.147 host147.86.103.190.datalinksrl.com.ar. | Totoras | 100% |\n| 190.216.65.166 | | 25% |\n| 190.216.68.130 | | 100% |\n| 190.216.7.209 190-216-7-209.static.impsat.net.ar. | Buenos Aires | 100% |\n| 200.0.194.78 ns3.gblx.net.ar. | | 100% |\n| 200.32.110.90 200-32-110-90.static.impsat.net.ar. | Córdoba | 100% |\n| 200.32.111.203 200-32-111-203.static.impsat.net.ar. | Córdoba | 100% |\n| 200.41.61.242 mail.limansky.com. | Córdoba | 100% |\n| 200.41.61.243 200-41-61-243.static.impsat.net.ar. | Córdoba | 100% |\n\nError fetching https://www.publicdns.xyz/country/as.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/ad.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/ai.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/aq.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/ag.html: CRAWL_HTTP_403",
+      "provider": "Exa/Geekflare"
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/as.html",
+    "https://www.publicdns.xyz/country/ad.html",
+    "https://www.publicdns.xyz/country/ai.html",
+    "https://www.publicdns.xyz/country/aq.html",
+    "https://www.publicdns.xyz/country/ag.html"
+  ]
+}
