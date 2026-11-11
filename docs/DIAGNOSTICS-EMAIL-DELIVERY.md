@@ -10,9 +10,9 @@
 
 ## Data boundaries
 
-Remote diagnostic events may contain app version, Android version/SDK, a per-installation pseudonymous identifier, event severity/name, component label, exception class and technical stack trace. They must not contain passwords, terminal input/output, message contents, or network payloads.
+Remote diagnostic events may contain the agreed categories: Info, Warning, Error, Crash, Critical error, Device Specs (manufacturer/model, total RAM and display resolution), CPU Type (chipset model and ABI architecture), and Android Version (release and SDK). Event metadata also includes app version, timestamp, component/event labels, exception class, a per-installation pseudonymous identifier, and technical stack trace. This path does not collect IMEI, serial number, advertising ID, location, account activity, files, network payloads, terminal input/output, passwords, or message contents.
 
-Admin email alerts are deliberately narrower: only WARNING/ERROR summaries are sent. The email omits installation identifiers and stack traces. The complete accepted event records remain in the protected Supabase diagnostics store.
+Admin email alerts are limited to WARNING, ERROR, CRITICAL, and CRASH events. Alerts include device specifications, CPU type, Android version, app version, event name, component, and exception class; they omit installation identifiers and stack traces. INFO events remain stored remotely when consented but do not generate email.
 
 ## Email delivery configuration
 
@@ -23,13 +23,13 @@ The Edge Function `forge-diagnostic-ingest` supports optional Resend delivery to
 The Supabase project owner must configure these Edge Function secrets before email delivery can work:
 
 - `RESEND_API_KEY` — Resend API key, stored only as a Supabase secret.
-- `DIAGNOSTICS_EMAIL_FROM` — sender address on a domain verified with Resend.
+- `DIAGNOSTICS_EMAIL_FROM` — sender address on a domain verified with Resend. The function also accepts the legacy singular spelling `DIAGNOSTIC_EMAIL_FROM`.
 
 No mail-provider key is embedded in the Android app or Git repository. If either secret is absent, diagnostics still upload to Supabase and the function reports `emailAlert: not_configured`.
 
 ## Alert volume
 
-- Email is sent only when an accepted batch contains WARNING or ERROR events.
+- Email is sent only when an accepted batch contains WARNING, ERROR, CRITICAL, or CRASH events.
 - Email alerts are throttled to at most one per installation every 30 minutes.
 - Ordinary app-open INFO events are stored remotely (when consented) but do not generate email. This prevents one email per student per app launch.
 
