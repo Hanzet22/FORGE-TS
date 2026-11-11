@@ -45,6 +45,9 @@ class DisplaySessionController(
         request: DisplaySessionRequest,
         backendId: String? = null
     ): DisplaySessionInspection = mutex.withLock {
+        if (activeAdapter != null) {
+            return@withLock DisplaySessionInspection(null, "A display session is already active; use snapshot() to inspect its lifecycle.")
+        }
         lifecycle = DisplaySessionLifecycle.INSPECTING
         val adapter = backendId?.let(registry::find)
             ?: if (backendId == null) registry.all().firstOrNull() else null
@@ -105,6 +108,7 @@ class DisplaySessionController(
 
         lifecycle = DisplaySessionLifecycle.STARTING
         val result = runCatching { adapter.start(request) }.getOrElse { error ->
+            runCatching { adapter.stop() }
             lifecycle = DisplaySessionLifecycle.FAILED
             detail = "Display start failed: ${error.message ?: error.javaClass.simpleName}"
             return@withLock snapshotUnsafe()
