@@ -118,3 +118,6 @@ Adds a backend-neutral display session controller for the WorkStation architectu
 
 ### Phase 44 — Embedded X11 Admission Gate
 Pins the reviewed MagicDesk X11 candidate revision and adds an API 34+/ARM64 admission policy. The policy does not load native code or claim display availability; the JNI host bridge and native engine remain pending. See [Phase 44](docs/PHASE-44-EMBEDDED-X11-ADMISSION-GATE.md).
+
+### Phase 45 — Multi-Distro Rootfs Compatibility Recovery
+Fixes guest-rootfs symlink interpretation shared by Alpine, Debian and Ubuntu. Absolute and relative Linux guest symlinks are resolved inside the selected rootfs rather than against Android's host filesystem; provisioning and PRoot startup now use the same bounded resolver to validate a readable executable shell. This is a source-level compatibility fix, not a claim of physical-device distro startup verification. See [Phase 45](docs/PHASE-45-MULTIDISTRO-ROOTFS-COMPATIBILITY.md).
