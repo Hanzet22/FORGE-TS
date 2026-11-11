@@ -47,9 +47,17 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
         ProotDistribution.UBUNTU to Source(
             ProotDistribution.UBUNTU, "24.04-noble",
             "https://partner-images.canonical.com/oci/noble/current/ubuntu-noble-oci-arm64-root.tar.gz",
-            "https://partner-images.canonical.com/oci/noble/current/SHA256SUMS",
+            "",
             "ubuntu-noble-oci-arm64-root.tar.gz", "gzip",
-            null,
+            "c5a6798b238c14d4714ea0b2db40e83af7c86008e7e31c90ca44355dc36933db",
+            maxArchiveBytes = 256L * 1024 * 1024
+        ),
+        ProotDistribution.DEBIAN to Source(
+            ProotDistribution.DEBIAN, "12-bookworm-20261104",
+            "https://raw.githubusercontent.com/debuerreotype/docker-debian-artifacts/3b26c3995c7fae47d95ba678632a3520e97054f7/bookworm/oci/blobs/rootfs.tar.gz",
+            "",
+            "rootfs.tar.gz", "gzip",
+            "f59e747f549eda321051637e213896378a19033924e1bfa7ae23a6572729c23c",
             maxArchiveBytes = 256L * 1024 * 1024
         )
     )
@@ -72,11 +80,16 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
         val rootfs = File(workspace, "rootfs")
         val backup = File(workspace, "rootfs.backup-$token")
         try {
-            val checksumText = downloadText(source.checksumUrl, 256 * 1024)
-            val publishedDigest = parseChecksum(checksumText, source.archiveName)
-            val digest = source.checksumPinned ?: publishedDigest
-            if (!publishedDigest.equals(digest, ignoreCase = true)) {
-                throw IllegalStateException("Pinned digest does not match the official upstream checksum metadata.")
+            val digest = if (source.checksumUrl.isNotBlank()) {
+                val checksumText = downloadText(source.checksumUrl, 256 * 1024)
+                val publishedDigest = parseChecksum(checksumText, source.archiveName)
+                val pinned = source.checksumPinned
+                if (pinned != null && !publishedDigest.equals(pinned, ignoreCase = true)) {
+                    throw IllegalStateException("Pinned digest does not match the official upstream checksum metadata.")
+                }
+                publishedDigest
+            } else {
+                source.checksumPinned ?: throw IllegalStateException("No pinned or published SHA-256 digest is configured.")
             }
             if (!digest.matches(Regex("[0-9a-fA-F]{64}"))) {
                 throw IllegalStateException("Official checksum metadata did not contain a valid SHA-256 digest.")
