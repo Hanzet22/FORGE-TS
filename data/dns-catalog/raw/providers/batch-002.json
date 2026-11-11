@@ -1,0 +1,67 @@
+{
+  "batch": 2,
+  "capturedAt": "2026-11-11T10:39:29.761Z",
+  "pages": [
+    {
+      "slug": "safedns",
+      "url": "https://www.publicdns.xyz/public/safedns.html",
+      "rawMarkdown": "SafeDNS\n\n# SafeDNS\n\nhttps://www.safedns.com/\n\nIPv4 DNS Server:\n\n195.46.39.39\n\n195.46.39.40\n\nSafeDNS is a cloud service, which means that you do not have to buy any hardware or install additional software. Those users protected by SafeDNS are walled against cybercriminals trying to steal important data. Block all dangerous websites, such as pornography, violence, alcohol & smoking and other categories which you choose. See more in the SafeDNS FAQ.\n\n# OpenNIC",
+      "source": "Exa"
+    },
+    {
+      "slug": "opennic",
+      "url": "https://www.publicdns.xyz/public/opennic.html",
+      "rawMarkdown": "OpenNIC\n\n# OpenNIC\n\nhttps://www.opennic.org/\n\nIPv4 DNS Server:\n\n185.121.177.177\n\n169.239.202.202\n\nIPv6 DNS Server:\n\n2a05:dfc7:5::53\n\n2a05:dfc7:5353::53\n\nThe DNS servers listed here for OpenNIC are just two of many in the US and across the globe. Instead of using the OpenNIC DNS servers listed above, see their complete list of public DNS servers here and use two that are close to you or, better yet, let them tell you that automatically here. OpenNIC also offers some IPv6 public DNS servers.\n\n# SmartViper",
+      "source": "Exa"
+    },
+    {
+      "slug": "smartviper",
+      "url": "https://www.publicdns.xyz/public/smartviper.html",
+      "rawMarkdown": "SmartViper\n\n# SmartViper\n\nhttp://www.markosweb.com/free-dns/\n\nIPv4 DNS Server:\n\n208.76.50.50\n\n208.76.51.51\n\nSmartViper is a web mining company dedicated to analyze web pages. They let anyone use their DNS servers for free. They log personal information with their website but it’s not clear what they log with their DNS service. They don’t share that information with third parties. See more in the SmartViper Public DNS.\n\n#### Public DNS Server\n\n# Freenom World",
+      "source": "Exa"
+    },
+    {
+      "slug": "freenom-world",
+      "url": "https://www.publicdns.xyz/public/freenom-world.html",
+      "rawMarkdown": "Freenom World\n\n# Freenom World\n\nhttp://www.freenom.world/\n\nIPv4 DNS Server:\n\n80.80.80.80\n\n80.80.81.81\n\nFreenom World is free to use by everyone in the world. Millions of internet users are already using Freenom World. Freenom is about domains and DNS. As the second largest domain provider Freenom operates a large AnyCast infrastructure providing authoritative DNS services for TK, ML, GA, CF and GQ domains. This infrastructure is already in place and it's a no-brainer to offer also resolving DNS services on this large infrastructure. See more in the Freenom World FAQ.\n\n# Dyn",
+      "source": "Exa"
+    },
+    {
+      "slug": "dyn",
+      "url": "https://www.publicdns.xyz/public/dyn.html",
+      "rawMarkdown": "Dyn\n\n# Dyn\n\nhttps://help.dyn.com/internet-guide-setup/\n\nIPv4 DNS Server:\n\n216.146.35.35\n\n216.146.36.36\n\nDyn is the next best free third-party DNS server in the list. It provides amazing web experiences and protects your information from most phishing attacks. Set up your network settings with the below DNS IP addresses to use Dyn DNS server. See more in the Dyn Internet Guide Setup.\n\n# FreeDNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "freedns",
+      "url": "https://www.publicdns.xyz/public/freedns.html",
+      "rawMarkdown": "FreeDNS\n\n# FreeDNS\n\nhttps://freedns.zone/\n\nIPv4 DNS Server:\n\n37.235.1.174\n\n37.235.1.177\n\nFreeDNS is an open, free and public DNS Server. No DNS redirects, No logging, Use the internet without restrictions. FreeDNS protect your privacy. See more in the FreeDNS.\n\n# Alternate DNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "alternate",
+      "url": "https://www.publicdns.xyz/public/alternate.html",
+      "rawMarkdown": "Alternate DNS\n\n# Alternate DNS\n\nhttps://alternate-dns.com/\n\nIPv4 DNS Server:\n\n198.101.242.72\n\n23.253.163.53\n\nAlternate DNS is an affordable, global Domain Name System (DNS) resolution service, that you can use as an alternative to your current DNS provider. Alternate DNS maintains a regularly updated database of known ad serving domain names. When a website you visit requests anything from a known ad server, Alternate DNS sends a null response blocking ads before they even touch your network. See more in the Alternate DNS FAQ.\n\n#### Public DNS Server\n\n# Yandex.DNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "yandex",
+      "url": "https://www.publicdns.xyz/public/yandex.html",
+      "rawMarkdown": "Yandex.DNS\n\n# Yandex.DNS\n\nhttps://dns.yandex.com/\n\nIPv4 DNS Server:\n\n77.88.8.8\n\n77.88.8.1\n\nIPv6 DNS Server:\n\n2a02:6b8::feed:0ff\n\n2a02:6b8:0:1::feed:0ff\n\nYandex.DNS is a free, recursive DNS service. Yandex.DNS' servers are located in Russia, CIS countries, and Western Europe. Users' requests are processed by the nearest data center which provides high connection speeds. Yandex.DNS' speed is the same in all three modes. In \"Basic\" mode, there is no traffic filtering. In \"Safe\" mode, protection from infected and fraudulent sites is provided. \"Family\" mode enables protection from dangerous sites and blocks sites with adult content. See more in the Yandex.DNS.\n\n# UncensoredDNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "uncensoreddns",
+      "url": "https://www.publicdns.xyz/public/uncensoreddns.html",
+      "rawMarkdown": "UncensoredDNS\n\n# UncensoredDNS\n\nhttps://blog.uncensoreddns.org/\n\nIPv4 DNS Server:\n\n91.239.100.100\n\n89.233.43.71\n\nIPv6 DNS Server:\n\n2001:67c:28a4::\n\n2a01:3a0:53:53::\n\nUncensoredDNS is the name of a DNS service which consists of two uncensored DNS servers. The servers are available for use by anyone, free of charge. See more in the UncensoredDNS FAQ.\n\n# Hurricane Electric",
+      "source": "Exa"
+    },
+    {
+      "slug": "he",
+      "url": "https://www.publicdns.xyz/public/he.html",
+      "rawMarkdown": "Hurricane Electric\n\n# Hurricane Electric\n\nIPv4 DNS Server:\n\nIPv6 DNS Server:\n\nHurricane Electric operates its own global IPv4 and IPv6 network and is considered the largest IPv6 backbone in the world as measured by number of networks connected. Within its global network, Hurricane Electric is connected to over 165 major exchange points and exchanges traffic directly with more than 6,500 different networks. Employing a resilient fiber-optic topology, Hurricane Electric has no less than five redundant 100G paths crossing North America, four separate 100G paths between the U.S. and Europe, and 100G rings in Europe and Asia. Hurricane also has a ring around Africa, and a PoP in Australia. See more in the Hurricane Electric.\n\n#### Public DNS Server\n\n#### Most Visited Country/Region",
+      "source": "Exa"
+    }
+  ],
+  "missing": []
+}
