@@ -1,0 +1,38 @@
+name: CodSpeed PTY Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmarks:
+    name: Native PTY benchmarks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure CodSpeed C++ benchmarks
+        run: >-
+          cmake -S benchmarks -B build/benchmarks
+          -DCODSPEED_MODE=walltime
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build benchmark executable
+        run: cmake --build build/benchmarks --parallel 2
+
+      - name: Run and upload PTY benchmarks
+        uses: CodSpeedHQ/action@v5
+        with:
+          mode: walltime
+          run: ./build/benchmarks/forge_pty_bench
