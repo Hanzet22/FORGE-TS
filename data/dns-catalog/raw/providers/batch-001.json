@@ -1,0 +1,67 @@
+{
+  "batch": 1,
+  "capturedAt": "2026-11-11T10:39:26.619Z",
+  "pages": [
+    {
+      "slug": "google",
+      "url": "https://www.publicdns.xyz/public/google.html",
+      "rawMarkdown": "Google Public DNS\n\n# Google Public DNS\n\nhttps://developers.google.com/speed/public-dns/\n\nIPv4 DNS Server:\n\n8.8.8.8\n\n8.8.4.4\n\nIPv6 DNS Server:\n\n2001:4860:4860::8888\n\n2001:4860:4860::8844\n\nA free, global DNS resolution service that you can use as an alternative to your current DNS provider. In addition to traditional DNS over UDP or TCP, Google also provide DNS-over-HTTPS API. See more in the Google FAQ.\n\n#### Public DNS Server\n\n# OpenDNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "opendns",
+      "url": "https://www.publicdns.xyz/public/opendns.html",
+      "rawMarkdown": "OpenDNS\n\n# OpenDNS\n\nhttps://www.opendns.com/\n\nIPv4 DNS Server:\n\n208.67.222.222\n\n208.67.220.220\n\nIPv6 DNS Server:\n\n2620:0:ccc::2\n\n2620:0:ccd::2\n\nOpenDNS also offers DNS servers that block adult content, called OpenDNS Family Shield. Those DNS servers are 208.67.222.123 and 208.67.220.123. A premium DNS offering is also available, called OpenDNS Home Internet Security. See more in the OpenDNS Knowledge Base.\n\n#### Public DNS Server\n\n- Google Public DNS\n- OpenDNS\n- Cloudflare\n- Level 3\n- Verisign\n- Quad9\n- Comodo Secure DNS\n- DNS.WATCH\n- Norton ConnectSafe\n- GreenTeamDNS\n- SafeDNS\n- OpenNIC\n- SmartViper\n- Freenom World\n- Dyn\n- FreeDNS\n- Alternate DNS\n- Yandex.DNS\n- UncensoredDNS\n- Hurricane Electric\n- puntCAT\n- Neustar\n- CNNIC SDNS\n- CFIEC IPv6 Public DNS\n- AliDNS\n- Baidu Public DNS\n- DNSPod Public DNS+\n- 114DNS\n- OneDNS\n- DNSpai\n\n# Cloudflare",
+      "source": "Exa"
+    },
+    {
+      "slug": "cloudflare",
+      "url": "https://www.publicdns.xyz/public/cloudflare.html",
+      "rawMarkdown": "Cloudflare\n\n# Cloudflare\n\nhttps://1.1.1.1/\n\nIPv4 DNS Server:\n\n1.1.1.1\n\n1.0.0.1\n\nIPv6 DNS Server:\n\n2606:4700:4700::1111\n\n2606:4700:4700::1001\n\n1.1.1.1 is a partnership between Cloudflare and APNIC. Cloudflare runs one of the world’s largest, fastest networks. APNIC is a non-profit organization managing IP address allocation for the Asia Pacific and Oceania regions. Cloudflare had the network. APNIC had the IP address (1.1.1.1). Both of us were motivated by a mission to help build a better Internet. You can read more about each organization’s motivations on our respective posts: Cloudflare Blog / APNIC Blog. Visit Cloudflare Community Forum.\n\n# Level 3",
+      "source": "Exa"
+    },
+    {
+      "slug": "level3",
+      "url": "https://www.publicdns.xyz/public/level3.html",
+      "rawMarkdown": "Level 3\n\n# Level 3\n\nhttp://www.level3.com/en/\n\nIPv4 DNS Server:\n\n209.244.0.3\n\n209.244.0.4\n\nThe free DNS servers listed above as Level 3 will automatically route to the nearest DNS server operated by Level 3 Communications, the company that provides most of the ISPs in the US their access to the internet backbone. Alternatives include 4.2.2.1, 4.2.2.2, 4.2.2.3, 4.2.2.4, 4.2.2.5, 4.2.2.6. These servers are often given as Verizon DNS servers but that is not technically the case.\n\n# Verisign",
+      "source": "Exa"
+    },
+    {
+      "slug": "verisign",
+      "url": "https://www.publicdns.xyz/public/verisign.html",
+      "rawMarkdown": "Verisign\n\n# Verisign\n\nhttps://www.verisign.com/en_US/security-services/public-dns/index.xhtml\n\nIPv4 DNS Server:\n\n64.6.64.6\n\n64.6.65.6\n\nIPv6 DNS Server:\n\n2620:74:1b::1:1\n\n2620:74:1c::2:2\n\nVerisign Public DNS is a free DNS service that offers improved DNS stability and security over other alternatives. And, unlike many of the other DNS services out there, Verisign respects your privacy. We will not sell your public DNS data to third parties nor redirect your queries to serve you any ads. See more in the Verisign Public DNS FAQ.\n\n#### Public DNS Server\n\n# Quad9",
+      "source": "Exa"
+    },
+    {
+      "slug": "quad9",
+      "url": "https://www.publicdns.xyz/public/quad9.html",
+      "rawMarkdown": "Quad9\n\n# Quad9\n\nhttps://www.quad9.net/\n\nIPv4 DNS Server:\n\n9.9.9.9\n\n149.112.112.112\n\nIPv6 DNS Server:\n\n2620:fe::fe\n\n2620:fe::9\n\nQuad9 routes your DNS queries through a secure network of servers around the globe. The system uses threat intelligence from more than a dozen of the industry's leading cyber security companies to give a real-time perspective on what websites are safe and what sites are known to include malware or other threats. If the system detects that the site you want to reach is known to be infected, you'll automatically be blocked from entry – keeping your data and computer safe. See more in the Quad9 FAQ.\n\n# Comodo Secure DNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "comodo-secure",
+      "url": "https://www.publicdns.xyz/public/comodo-secure.html",
+      "rawMarkdown": "Comodo Secure DNS\n\n# Comodo Secure DNS\n\nhttps://www.comodo.com/secure-dns/\n\nIPv4 DNS Server:\n\n8.26.56.26\n\n8.20.247.20\n\nComodo Secure DNS is a domain name resolution service that resolves your DNS requests through Comodo worldwide network of redundant DNS servers. This can provide a much faster and more reliable Internet browsing experience than using the DNS servers provided by your ISP and does not require any hardware or software installation. When you choose to use Comodo SecureDNS, your computer's network settings will be changed so that all applications that access the internet will use Comodo SecureDNS servers. Comodo Secure DNS gives you a safer, smarter and faster Internet. See more in the Comodo Secure DNS FAQ.\n\n# DNS.WATCH",
+      "source": "Exa"
+    },
+    {
+      "slug": "dns-watch",
+      "url": "https://www.publicdns.xyz/public/dns-watch.html",
+      "rawMarkdown": "DNS.WATCH\n\n# DNS.WATCH\n\nhttps://dns.watch/\n\nIPv4 DNS Server:\n\n84.200.69.80\n\n84.200.70.40\n\nIPv6 DNS Server:\n\n2001:1608:10:25::1c04:b12f\n\n2001:1608:10:25::9249:d69b\n\nDNS.WATCH is a fast, free and uncensored DNS-Server (or more specific, a DNS resolver). Service is provided world-wide and free-of-charge for everyone.\n\n# Norton ConnectSafe",
+      "source": "Exa"
+    },
+    {
+      "slug": "norton-connectsafe",
+      "url": "https://www.publicdns.xyz/public/norton-connectsafe.html",
+      "rawMarkdown": "Norton ConnectSafe\n\n# Norton ConnectSafe\n\nhttps://dns.norton.com/\n\nIPv4 DNS Server:\n\n199.85.126.10\n\n199.85.127.10\n\nNorton ConnectSafe is a free service that provides a first layer of defense by blocking unsafe sites automatically. On a computer, Norton ConnectSafe does not replace the comprehensive protection of a full security product such as Norton Internet Security or Norton 360. Instead, Norton ConnectSafe provides basic browsing protection and content filtering for all Web-enabled devices on your home network. See more in the Norton ConnectSafe FAQ.\n\n# GreenTeamDNS",
+      "source": "Exa"
+    },
+    {
+      "slug": "greenteamdns",
+      "url": "https://www.publicdns.xyz/public/greenteamdns.html",
+      "rawMarkdown": "GreenTeamDNS\n\n# GreenTeamDNS\n\nhttp://www.greentm.co.uk/\n\nIPv4 DNS Server:\n\n81.218.119.11\n\n209.88.198.133\n\nGreenTeamDNS is a 100% cloud-based cyber security filtering service that protects you from malware and phishing sites and /or unwanted or offensive content – all based on simple filtering policies you set. Making this simple DNS switch on routers (preferred), computers, tablets or mobile devices will allow you, your children or employees to avoid accidental or deliberate exposure to adult content, gambling sites, malware and phishing sites. See more in the GreenTeamDNS FAQ.\n\n#### Public DNS Server",
+      "source": "Exa"
+    }
+  ],
+  "missing": []
+}
