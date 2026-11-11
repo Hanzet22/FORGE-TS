@@ -271,6 +271,20 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeClose(
                 session->waitStatus = status;
             }
             session->exited = true;
+        } else if (graceful == JNI_TRUE) {
+            // The leader may already be reaped while descendants remain in
+            // its process group. Give SIGHUP a bounded grace period, then
+            // terminate any remaining group members before closing the PTY.
+            bool groupAlive = false;
+            for (int attempt = 0; attempt < 50; ++attempt) {
+                if (kill(-session->child, 0) != 0 && errno == ESRCH) {
+                    groupAlive = false;
+                    break;
+                }
+                groupAlive = true;
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+            if (groupAlive) kill(-session->child, SIGKILL);
         }
     }
     if (session->master >= 0) {
