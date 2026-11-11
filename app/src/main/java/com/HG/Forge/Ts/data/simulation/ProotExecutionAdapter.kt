@@ -72,8 +72,15 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val (root, engine, loader, logs, tmp) = paths
             val key = request.workspacePath
             val current = sessions[key]
-            if (current != null && NativePtyEngine.nativeWait(current.handle) == 0) {
-                return@withContext RuntimeAdapterStartResult(false, true, "A native PTY PRoot session is already active for this workspace.")
+            if (current != null) {
+                val currentStatus = NativePtyEngine.nativeWait(current.handle)
+                if (currentStatus == 0) {
+                    return@withContext RuntimeAdapterStartResult(false, true, "A native PTY PRoot session is already active for this workspace.")
+                }
+                if (currentStatus < 0) {
+                    return@withContext RuntimeAdapterStartResult(false, true,
+                        "Existing native PTY session status could not be verified (errno=" + (-currentStatus) + "); refusing to replace it.")
+                }
             }
             if (current != null) {
                 NativePtyEngine.nativeClose(current.handle, true)
@@ -125,7 +132,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                     // is running. After leader exit, allow a bounded
                                     // quiet-drain window for descendants' final output
                                     // before closing a potentially orphaned PTY session.
-                                    if (NativePtyEngine.nativeWait(handle) != 0) {
+                                    if (NativePtyEngine.nativeWait(handle) > 0) {
                                         consecutivePostExitIdlePolls++
                                         if (consecutivePostExitIdlePolls >= 10) break
                                     } else {
@@ -136,7 +143,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                 count == -5 -> {
                                     // Linux PTYs may briefly report EIO while the
                                     // slave line discipline is still flushing data.
-                                    if (NativePtyEngine.nativeWait(handle) != 0) {
+                                    if (NativePtyEngine.nativeWait(handle) > 0) {
                                         consecutiveEofSignals++
                                         if (consecutiveEofSignals >= 10) break
                                     } else {
@@ -219,8 +226,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         }
         val session = sessions[request.workspacePath]
             ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-        if (NativePtyEngine.nativeWait(session.handle) != 0) {
+        val processStatus = NativePtyEngine.nativeWait(session.handle)
+        if (processStatus > 0) {
             return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+        }
+        if (processStatus < 0) {
+            return@withContext RuntimeInteractiveResult(false,
+                message = "Could not verify PRoot PTY process status (errno=" + (-processStatus) + ").")
         }
         val bytes = input.copyOf()
         try {
@@ -290,8 +302,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         }
         val session = sessions[request.workspacePath]
             ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-        if (NativePtyEngine.nativeWait(session.handle) != 0) {
+        val processStatus = NativePtyEngine.nativeWait(session.handle)
+        if (processStatus > 0) {
             return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+        }
+        if (processStatus < 0) {
+            return@withContext RuntimeInteractiveResult(false,
+                message = "Could not verify PRoot PTY process status (errno=" + (-processStatus) + ").")
         }
         val resized = NativePtyEngine.nativeResize(session.handle, rows, columns)
         RuntimeInteractiveResult(resized,
