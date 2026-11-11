@@ -42,5 +42,5 @@ jobs:
       - name: Run and upload PTY setup benchmarks
         uses: CodSpeedHQ/action@v5
         with:
-          mode: simulation
+          mode: simulation,walltime
           run: ./build/benchmarks/forge_pty_bench

@@ -1,13 +1,13 @@
 # FORGE-TS Native PTY Engine Architecture
 
-Status: native PTY and ConnectBot VT terminal emulator are integrated; on-device behavioral acceptance remains pending.
+Status: native PTY, ConnectBot VT terminal emulator, and event-driven output delivery are integrated; on-device behavioral acceptance remains pending.
 Target: Android API 29+, ARM64 first, Kotlin + JNI + Android Bionic.
 
 ## 1. Objective
 
 Replace the current pipe-backed PRoot interactive shell with a real pseudo-terminal (PTY). A PTY provides terminal semantics required by shells and interactive programs: isatty(), line discipline, foreground process groups, terminal-generated signals, and terminal window dimensions.
 
-The interactive PRoot adapter now launches its long-lived guest shell through the native PTY bridge. One-shot commands and the disposable ptrace probe still use ProcessBuilder. The Compose terminal view forwards PTY output bytes into the emulator, keyboard bytes back to the PTY, and terminal size changes to the runtime manager. On-device behavioral acceptance remains pending.
+The interactive PRoot adapter now launches its long-lived guest shell through the native PTY bridge. One-shot commands and the disposable ptrace probe still use ProcessBuilder. The Compose terminal view forwards PTY output bytes into the emulator, keyboard bytes back to the PTY, and terminal size changes to the runtime manager. PTY output availability is signaled through a conflated Channel so the UI suspends while idle rather than waking on a fixed polling interval. On-device behavioral acceptance remains pending.
 
 ## 2. Evidence and platform baseline
 
@@ -83,14 +83,14 @@ Do not change rootfs provisioning, Supabase, Redis, account flows, or MikroTik/C
 - Linux PTY overview: https://man7.org/linux/man-pages/man7/pty.7.html
 - Linux poll(2): https://man7.org/linux/man-pages/man2/poll.2.html
 - Linux TIOCSWINSZ: https://man7.org/linux/man-pages/man2/TIOCSWINSZ.2const.html
-- ConnectBot terminal emulator candidate: https://github.com/connectbot/termlib
+- ConnectBot terminal emulator release 0.0.12: https://github.com/connectbot/termlib/tree/0.0.12
 - Android JNI guidance: https://developer.android.com/ndk/guides/jni-tips
 
 ## 10. Terminal emulator dependency assessment
 
 ConnectBot termlib is an emulator/display component, not a PTY or process supervisor. Its documented data flow is PTY bytes into TerminalEmulator and keyboard bytes back through a callback, which fits the layer separation above.
 
-The repository declares Apache-2.0 and includes libvterm under MIT. The pinned org.connectbot:termlib:0.0.12 artifact declares Kotlin 2.2.21 and Compose BOM 2025.12.00. FORGE-TS uses Kotlin 2.2.21 and aligns its Compose BOM to 2025.12.00. The terminal view is connected to the native PTY using byte-preserving input/output callbacks and the PTY resize callback.
+The repository declares Apache-2.0 and includes libvterm under MIT. The pinned org.connectbot:termlib:0.0.12 artifact declares Kotlin 2.2.21 and Compose BOM 2025.12.00. FORGE-TS uses Kotlin 2.2.21 and aligns its Compose BOM to 2025.12.00. The terminal view is connected to the native PTY using byte-preserving input/output callbacks and the PTY resize callback. The adapter reader signals new buffered output through a conflated Channel, and the UI awaits data instead of polling.
 
 - termlib repository and license: https://github.com/connectbot/termlib
 - termlib API documentation: https://termlib.connectbot.org/main

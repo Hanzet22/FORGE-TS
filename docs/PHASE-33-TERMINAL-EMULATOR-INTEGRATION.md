@@ -15,7 +15,7 @@ Connect the existing Android Bionic PTY transport to a real VT terminal emulator
 
 ## Runtime behavior
 
-- The terminal panel polls the adapter's bounded output buffer while the selected PRoot session is RUNNING.
+- The PTY reader signals output availability through a conflated coroutine Channel; the terminal panel suspends until bytes arrive instead of polling on a fixed 60 ms timer.
 - PTY output is capped at 256 KiB between reads; session logs continue to be written under the selected workspace.
 - Keyboard writes remain capped at 16 KiB per input operation and reject NUL bytes.
 - The terminal emulator maintains VT screen state, cursor, ANSI colors, and scrollback; it does not launch or supervise processes.

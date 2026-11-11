@@ -2,6 +2,7 @@ package com.HG.Forge.Ts.data.simulation
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -18,6 +19,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val handle: Long,
         val output: ByteArrayOutputStream,
         val inputLock: Any,
+        val outputAvailable: Channel<Unit>,
         @Volatile var reader: Thread? = null
     )
 
@@ -86,7 +88,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, ByteArrayOutputStream(), Any())
+            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Channel(Channel.CONFLATED))
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
@@ -110,6 +112,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                         )
                                     }
                                 }
+                                session.outputAvailable.trySend(Unit)
                             } else if (count < 0 || NativePtyEngine.nativeWait(handle) != 0) {
                                 break
                             }
@@ -117,6 +120,8 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     }
                 } catch (_: Exception) {
                     // Session shutdown closes the PTY master and ends this reader.
+                } finally {
+                    session.outputAvailable.close()
                 }
             }, "forge-proot-pty-${key.hashCode()}").apply {
                 isDaemon = true
@@ -209,6 +214,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         withContext(Dispatchers.IO) {
             val session = sessions[request.workspacePath]
                 ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+            session.outputAvailable.receiveCatching()
             val bytes = synchronized(session.output) {
                 val value = session.output.toByteArray()
                 session.output.reset()

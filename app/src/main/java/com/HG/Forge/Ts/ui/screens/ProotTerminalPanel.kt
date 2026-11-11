@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.HG.Forge.Ts.data.simulation.HybridRuntimeManager
 import com.HG.Forge.Ts.data.simulation.ProotDistribution
 import com.HG.Forge.Ts.data.simulation.RuntimeEnvironmentId
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.connectbot.terminal.Terminal
 import org.connectbot.terminal.TerminalEmulatorFactory
@@ -91,7 +90,6 @@ fun ProotTerminalPanel() {
                     status = result.message
                     break
                 }
-                delay(60)
             }
         }
     }
