@@ -1,6 +1,6 @@
 # FORGE-TS WorkStation — Implementation Plan
 
-**Status:** Planned; no implementation started  
+**Status:** Active; P0 lifecycle journaling delivered; P1 embedded-display feasibility reviewed  
 **Baseline:** [Final Architecture Specification](WORKSTATION-ARCHITECTURE.md)  
 **Date:** 2026-11-10
 
@@ -25,7 +25,7 @@ Deliverables:
 - Integrate adapter capability reports with the existing persistent manager.
 - Preserve the existing `RuntimeLifecycleState` values and DataStore records; document any required state migration before changing them.
 - Separate workspace-prepared state from runtime-installed and runtime-running state.
-- Add resource policy and bounded local diagnostic events.
+- Add resource policy and bounded local diagnostic events. A 64 KiB app-private lifecycle journal is now wired to Hybrid Manager and per-distro PRoot state changes; it records state metadata only, not terminal output or credentials.
 
 Acceptance:
 - UI can enumerate runtime adapters and display their real state.
@@ -49,6 +49,8 @@ Acceptance:
 - Native mode never silently falls back to PRoot.
 
 Implementation gate:
+- Feasibility review: [Embedded Display Feasibility](WORKSTATION-DISPLAY-FEASIBILITY.md).
+- The MagicDesk X11 fork is the leading API 34+ candidate, but it is not integrated; its device coverage is still pending. The MIT Java X server is not demonstrated to support the complete XFCE workload, and XSDL has material rendering/input limitations.
 - Do not commit to a specific embedded X11 codebase until its Android integration, ABI, package assumptions and license are reviewed.
 
 ## P2 — XFCE4 PRoot Multi-Distro
