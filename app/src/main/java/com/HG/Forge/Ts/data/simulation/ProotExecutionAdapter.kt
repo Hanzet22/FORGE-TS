@@ -96,12 +96,14 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 val bytes = ByteArray(8192)
                 try {
                     var consecutiveEofSignals = 0
+                    var consecutivePostExitIdlePolls = 0
                     logFile.outputStream().buffered().use { log ->
                         while (true) {
                             val count = NativePtyEngine.nativeRead(handle, bytes, 250)
                             when {
                                 count > 0 -> {
                                     consecutiveEofSignals = 0
+                                    consecutivePostExitIdlePolls = 0
                                     log.write(bytes, 0, count)
                                     log.flush()
                                     synchronized(session.output) {
@@ -119,9 +121,16 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                     session.outputAvailable.trySend(Unit)
                                 }
                                 count == 0 -> {
-                                    // A poll timeout is not EOF. The PTY leader
-                                    // may have exited while a descendant still
-                                    // owns the slave and can produce final output.
+                                    // A poll timeout is not EOF while the leader
+                                    // is running. After leader exit, allow a bounded
+                                    // quiet-drain window for descendants' final output
+                                    // before closing a potentially orphaned PTY session.
+                                    if (NativePtyEngine.nativeWait(handle) != 0) {
+                                        consecutivePostExitIdlePolls++
+                                        if (consecutivePostExitIdlePolls >= 10) break
+                                    } else {
+                                        consecutivePostExitIdlePolls = 0
+                                    }
                                     continue
                                 }
                                 count == -5 -> {
