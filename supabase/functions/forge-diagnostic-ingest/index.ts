@@ -208,7 +208,73 @@ Deno.serve(async (req: Request) => {
       return json({ ok: false, error: "diagnostic_storage_unavailable" }, 502);
     }
 
-    return json({ ok: true, accepted: normalized.length });
+    // Optional admin email alert: only WARNING/ERROR summaries, never raw stack traces,
+    // installation IDs, credentials, terminal data, or message contents.
+    let emailAlert = "not_configured";
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    const emailFrom = Deno.env.get("DIAGNOSTICS_EMAIL_FROM");
+    const importantEvents = normalized.filter((event) =>
+      event.level === "WARNING" || event.level === "ERROR"
+    );
+    if (resendKey && emailFrom && importantEvents.length > 0) {
+      stage = "admin_email_rate_limit";
+      const emailRateKey = "forge-ts:diagnostic-email:" + installHash;
+      try {
+        const emailLimitResponse = await fetch(redisEndpoint, {
+          method: "POST",
+          headers: { Authorization: "Bearer " + redisToken, "Content-Type": "application/json" },
+          body: JSON.stringify(["EVAL", RATE_LIMIT_SCRIPT, "1", emailRateKey]),
+          signal: AbortSignal.timeout(4000),
+        });
+        const emailLimitPayload = emailLimitResponse.ok
+          ? await emailLimitResponse.json()
+          : null;
+        const emailCount = Number(emailLimitPayload?.result);
+        if (Number.isFinite(emailCount) && emailCount === 1) {
+          stage = "admin_email_send";
+          const summary = importantEvents.slice(0, 10).map((event) => ({
+            occurredAt: event.occurred_at,
+            appVersion: event.app_version,
+            androidSdk: event.android_sdk,
+            level: event.level,
+            component: event.tag,
+            event: event.event_name,
+            exceptionType: event.exception_type,
+          }));
+          const mailResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + resendKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: emailFrom,
+              to: ["papakjamsutnoruu@gmail.com"],
+              subject: "[FORGE-TS] Diagnostic warning/error summary",
+              text: "FORGE-TS received important diagnostic events.\n\n" +
+                JSON.stringify(summary, null, 2) +
+                "\n\nFull event records remain in the protected FORGE-TS diagnostics backend.",
+            }),
+            signal: AbortSignal.timeout(7000),
+          });
+          if (mailResponse.ok) emailAlert = "sent";
+          else {
+            console.error("diagnostic_admin_email_rejected", { status: mailResponse.status });
+            emailAlert = "provider_rejected";
+          }
+        } else if (Number.isFinite(emailCount) && emailCount > 1) {
+          emailAlert = "throttled";
+        } else {
+          console.error("diagnostic_admin_email_rate_limit_unavailable");
+          emailAlert = "rate_limit_unavailable";
+        }
+      } catch (error) {
+        console.error("diagnostic_admin_email_failed", { error_name: errorName(error) });
+        emailAlert = "delivery_failed";
+      }
+    }
+
+    return json({ ok: true, accepted: normalized.length, emailAlert });
   } catch (error) {
     console.error("diagnostic_ingest_unhandled_error", {
       stage,
