@@ -20,6 +20,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,6 +43,7 @@ import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
 import com.HG.Forge.Ts.data.remote.SupabaseAuthException
 import com.HG.Forge.Ts.data.remote.SupabaseAuthUserProfile
 import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
+import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsConsent
 import com.HG.Forge.Ts.ui.components.PasswordVisibilityField
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,6 +57,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
+    var diagnosticsUploadsEnabled by remember { mutableStateOf(ForgeDiagnosticsConsent.isEnabled(context)) }
 
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
@@ -76,8 +79,34 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text("Crash recovery & diagnostics", style = MaterialTheme.typography.titleMedium)
         Text(
-            "FORGE-TS automatically uploads technical crash reports and INFO, WARNING, ERROR and DEBUG diagnostic events to the FORGE-TS Supabase backend when an internet connection is available. Uploads are queued and retried after temporary network or server errors. Reports include app/Android versions, an installation identifier, event labels and technical stack traces; they do not intentionally include message contents or passwords. A local copy is retained until the backend confirms receipt. You can also share a local report from the recovery screen.",
+            "Local technical logging starts automatically whenever FORGE-TS opens. Remote upload is optional and only runs after permission is granted. Uploaded diagnostics can include app/Android versions, a pseudonymous installation ID, event labels and technical exception traces. They exclude passwords, terminal input/output, message contents and network payloads. You can turn remote uploads off at any time.",
             style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Automatic remote diagnostics", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    if (diagnosticsUploadsEnabled) "Uploads enabled when connected"
+                    else "On-device logging only",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = diagnosticsUploadsEnabled,
+                onCheckedChange = { enabled ->
+                    ForgeDiagnosticsConsent.setEnabled(context, enabled)
+                    diagnosticsUploadsEnabled = enabled
+                }
+            )
+        }
+        Text(
+            "Admin email destination is not configured in the backend yet. Remote events are currently stored in the FORGE-TS Supabase diagnostics service.",
+            style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         OutlinedButton(onClick = { showAboutApps = true }) { Text("About Apps") }
