@@ -84,11 +84,11 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     return@withContext RuntimeAdapterStartResult(false, true,
                         "Existing native PTY session status could not be verified (errno=" + (-currentStatus) + "); refusing to replace it.")
                 }
-            }
-            if (current != null) {
-                NativePtyEngine.nativeClose(current.handle, true)
-                sessions.remove(key, current)
-                runCatching { current.reader?.join(750) }
+                // Do not replace an exited session until its reader has closed
+                // the notification channel and readInteractive() has delivered
+                // the remaining buffered bytes to the terminal.
+                return@withContext RuntimeAdapterStartResult(false, true,
+                    "The previous PRoot PTY session has exited; drain its remaining terminal output before restarting.")
             }
 
             val argv = command(engine, root, listOf("/bin/sh", "-l")).toTypedArray()
@@ -133,28 +133,33 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                 count == 0 -> {
                                     // A poll timeout is not EOF while the leader
                                     // is running. After leader exit, allow a bounded
-                                    // quiet-drain window for descendants' final output
-                                    // before closing a potentially orphaned PTY session.
-                                    if (NativePtyEngine.nativeWait(handle) > 0) {
-                                        consecutivePostExitIdlePolls++
-                                        if (consecutivePostExitIdlePolls >= 10) break
-                                    } else {
-                                        consecutivePostExitIdlePolls = 0
+                                    // quiet-drain window for descendants' final output.
+                                    val processStatus = NativePtyEngine.nativeWait(handle)
+                                    when {
+                                        processStatus > 0 -> {
+                                            consecutivePostExitIdlePolls++
+                                            if (consecutivePostExitIdlePolls >= 10) break
+                                        }
+                                        processStatus == 0 -> consecutivePostExitIdlePolls = 0
+                                        else -> break
                                     }
                                     continue
                                 }
                                 count == -5 -> {
                                     // Linux PTYs may briefly report EIO while the
                                     // slave line discipline is still flushing data.
-                                    if (NativePtyEngine.nativeWait(handle) > 0) {
-                                        consecutiveEofSignals++
-                                        if (consecutiveEofSignals >= 10) break
-                                    } else {
-                                        consecutiveEofSignals = 0
+                                    val processStatus = NativePtyEngine.nativeWait(handle)
+                                    when {
+                                        processStatus > 0 -> {
+                                            consecutiveEofSignals++
+                                            if (consecutiveEofSignals >= 10) break
+                                        }
+                                        processStatus == 0 -> consecutiveEofSignals = 0
+                                        else -> break
                                     }
                                     Thread.sleep(10)
                                 }
-                                count < 0 || NativePtyEngine.nativeWait(handle) != 0 -> break
+                                count < 0 -> break
                             }
                         }
                     }
@@ -285,8 +290,17 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             // the PTY and closed its notification channel, not merely until
             // the PTY leader's waitpid status becomes non-zero.
             val streamOpen = !signal.isClosed
-            if (!streamOpen && sessions.remove(request.workspacePath, session)) {
-                NativePtyEngine.nativeClose(session.handle, true)
+            if (!streamOpen) {
+                val key = request.workspacePath
+                val sessionLock = sessionLocks.computeIfAbsent(key) { Any() }
+                synchronized(sessionLock) {
+                    // The identity comparison prevents a late reader from
+                    // releasing a replacement session for the same workspace.
+                    if (sessions.remove(key, session)) {
+                        NativePtyEngine.nativeClose(session.handle, true)
+                        runCatching { session.reader?.join(750) }
+                    }
+                }
             }
             RuntimeInteractiveResult(
                 streamOpen,
