@@ -14,18 +14,19 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun ToolsScreen(modifier: Modifier = Modifier, initialSelectedTool: Int = 0) {
-    var selectedTool by remember(initialSelectedTool) { mutableIntStateOf(initialSelectedTool.coerceIn(0, 4)) }
+    var selectedTool by remember(initialSelectedTool) { mutableIntStateOf(initialSelectedTool.coerceIn(0, 5)) }
     Column(modifier = modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = selectedTool) {
-            listOf("DNS & Protocols", "Repositories", "Security", "Diagnostics", "OSINT Web").forEachIndexed { index, title ->
+            listOf("DNS & Protocols", "DNS Catalog", "Repositories", "Security", "Diagnostics", "OSINT Web").forEachIndexed { index, title ->
                 Tab(selected = selectedTool == index, onClick = { selectedTool = index }, text = { Text(title) })
             }
         }
         when (selectedTool) {
             0 -> DnsProtocolsScreen(modifier = Modifier.weight(1f))
-            1 -> RepositoryExplorerScreen(modifier = Modifier.weight(1f))
-            2 -> SecurityPrivacyScreen(modifier = Modifier.weight(1f))
-            3 -> DiagnosticsScreen(modifier = Modifier.weight(1f))
+            1 -> DnsCatalogScreen(modifier = Modifier.weight(1f))
+            2 -> RepositoryExplorerScreen(modifier = Modifier.weight(1f))
+            3 -> SecurityPrivacyScreen(modifier = Modifier.weight(1f))
+            4 -> DiagnosticsScreen(modifier = Modifier.weight(1f))
             else -> OsintWebScreen(modifier = Modifier.weight(1f))
         }
     }
