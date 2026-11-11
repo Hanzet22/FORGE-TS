@@ -1,0 +1,46 @@
+{
+  "batch": 20,
+  "capturedAt": "2026-11-11T10:18:36.779Z",
+  "source": "publicdns.xyz country inventory",
+  "pages": [
+    {
+      "code": "vn",
+      "name": "Vietnam",
+      "url": "https://www.publicdns.xyz/country/vn.html",
+      "rawMarkdown": "DNS Server in Vietnam\n\n# DNS Server in Vietnam\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 203.119.36.106 nscache2.vnnic.net.vn. | | 99.827% |\n| 103.74.113.28 vetc-public-dns-b.vetc.com.vn. | | 79.6358% |\n| 222.252.24.180 static.vnpt-hanoi.com.vn. | Hanoi | 77.8689% |\n| 203.113.132.171 | Hanoi | 98.503% |\n| 113.191.251.66 static.vnpt.vn. | | 100% |\n| 183.91.184.14 ns1.gtelmiennam.vn. | | 100% |\n| 14.160.3.78 static.vnpt.vn. | Hanoi | 100% |\n| 210.245.54.97 lebrothers.com. | Hanoi | 100% |\n| 180.93.32.190 | Da Nang | 73.4266% |\n| 117.103.228.101 hn.vtc.vn. | | 100% |\n| 27.71.237.148 | | 100% |\n| 103.199.16.71 | Hanoi | 100% |\n| 42.112.38.56 | | 100% |\n| 103.90.220.81 | | 100% |\n| 45.122.221.222 | | 100% |\n| 118.70.12.18 | Hanoi | 100% |\n| 103.82.198.10 static.econetvn.com. | | 100% |\n| 103.82.198.11 static.econetvn.com. | | 100% |\n| 14.226.240.39 static.vnpt.vn. | Ho Chi Minh City | 100% |\n| 103.15.48.210 sv48d210.emailserver.vn. | | 100% |\n| 203.113.172.62 | | 100% |\n| 115.79.42.39 | Ho Chi Minh City | 100% |\n| 119.17.215.64 static.netnam.vn. | Hanoi | 100% |\n| 112.197.12.40 | Ho Chi Minh City | 100% |\n| 123.30.164.136 fecredit.com.vn. | | 100% |\n| 103.149.172.88 dc254.etrustcloud.com. | | 100% |\n| 61.28.238.20 | | 100% |\n| 103.149.172.87 dc254.etrustcloud.com. | | 100% |\n| 115.75.177.224 | Ho Chi Minh City | 100% |\n| 14.160.32.23 | Hanoi | 82.3529% |\n| 115.77.191.25 | Ho Chi Minh City | 67.8571% |\n| 123.25.116.228 static.vdc.vn. | Huế | 92% |\n| 14.161.252.185 static.vnpt.vn. | Ho Chi Minh City | 75% |\n| 117.2.28.235 localhost. | Nha Trang | 97.3684% |\n| 171.233.151.214 dynamic-ip-adsl.viettel.vn. | Ho Chi Minh City | 96% |\n| 103.21.120.86 | | 99.4475% |\n| 103.21.120.85 | | 100% |\n| 103.151.56.2 dns.vietdns.vn. | | 100% |\n| 103.151.57.2 dns.vietdns.vn. | | 100% |\n| 103.151.56.56 ns.vietdns.vn. | | 100% |\n| 103.151.57.57 ns.vietdns.vn. | | 100% |\n| 14.225.24.83 static.vnpt.vn. | | 97.9675% |\n| 14.225.24.84 static.vnpt.vn. | | 96.1538% |\n| 123.30.184.141 ns2.vmms.vn. | | 79.0179% |\n| 210.245.87.16 ns1.vmms.vn. | | 96% |\n| 14.225.232.26 static.vnpt.vn. | Ho Chi Minh City | 100% |\n| 123.30.187.240 static.vnpt.vn. | Hanoi | 90.9408% |\n| 14.225.232.19 static.vnpt.vn. | Ho Chi Minh City | 100% |\n| 103.48.78.156 ns1.thegioididong.com. | | 99.3031% |\n| 103.48.78.157 ns.thegioididong.com. | | 100% |\n\n# DNS Server in Yemen",
+      "source": "Exa"
+    },
+    {
+      "code": "wf",
+      "name": "Wallis and Futuna",
+      "url": "https://www.publicdns.xyz/country/wf.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "ye",
+      "name": "Yemen",
+      "url": "https://www.publicdns.xyz/country/ye.html",
+      "rawMarkdown": "DNS Server in Yemen\n\n# DNS Server in Yemen\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 5.255.14.136 | Sanaa | 16.9118% |\n| 5.255.14.12 | Sanaa | 6.87332% |\n| 5.255.14.128 | Aden | 100% |\n| 5.255.19.163 | Aden | 100% |\n| 5.255.19.115 | Aden | 100% |\n| 5.255.19.114 | Aden | 100% |\n| 5.255.23.98 | Sanaa | 11.7647% |\n| 5.255.31.85 | Aden | 100% |\n| 5.255.2.96 | Sanaa | 100% |\n| 5.255.8.180 | Sanaa | 100% |\n| 5.255.8.33 | Sanaa | 100% |\n| 5.255.3.138 | Sanaa | 100% |\n| 5.255.8.76 | Sanaa | 100% |\n| 5.255.10.33 | Sanaa | 100% |\n| 5.255.10.149 | Sanaa | 100% |\n| 5.255.10.23 | Sanaa | 100% |\n| 5.255.11.205 | Sanaa | 100% |\n| 5.255.10.251 | Sanaa | 100% |\n| 5.255.12.215 | Sanaa | 100% |\n| 5.255.12.79 | Sanaa | 100% |\n| 5.255.11.206 | Sanaa | 100% |\n| 5.255.23.246 | Sanaa | 100% |\n| 5.255.12.13 | Sanaa | 100% |\n| 5.255.15.13 | Sanaa | 100% |\n| 5.255.14.253 | Sanaa | 100% |\n| 5.255.12.166 | Sanaa | 100% |\n| 5.255.15.32 | Sanaa | 100% |\n| 5.255.15.35 | Sanaa | 100% |\n| 5.255.16.224 | Sanaa | 100% |\n| 5.255.16.43 | Sanaa | 100% |\n| 5.255.9.232 | Sanaa | 100% |\n| 5.255.14.30 | Sanaa | 100% |\n| 5.255.9.226 | Sanaa | 100% |\n| 5.255.10.249 | Sanaa | 100% |\n| 5.255.15.8 | Sanaa | 100% |\n| 5.255.16.20 | Sanaa | 100% |\n| 5.255.17.149 | Sanaa | 100% |\n| 5.255.18.233 | Sanaa | 100% |\n| 5.255.17.69 | Sanaa | 100% |\n| 5.255.28.209 | Sanaa | 100% |\n| 5.255.16.106 | Sanaa | 100% |\n| 5.255.20.3 | Sanaa | 100% |\n| 5.255.17.43 | Sanaa | 100% |\n| 5.255.21.74 | Sanaa | 100% |\n| 5.255.21.194 | Sanaa | 100% |\n| 5.255.23.173 | Sanaa | 100% |\n| 5.255.20.14 | Sanaa | 100% |\n| 5.255.12.221 | Sanaa | 100% |\n| 5.255.21.238 | Sanaa | 100% |\n| 5.255.23.170 | Sanaa | 100% |\n\n# DNS Server in Zimbabwe",
+      "source": "Exa"
+    },
+    {
+      "code": "zm",
+      "name": "Zambia",
+      "url": "https://www.publicdns.xyz/country/zm.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "zw",
+      "name": "Zimbabwe",
+      "url": "https://www.publicdns.xyz/country/zw.html",
+      "rawMarkdown": "DNS Server in Zimbabwe\n\n# DNS Server in Zimbabwe\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 196.27.105.130 718407.customer.zol.co.zw. | | 100% |\n| 197.155.230.206 cust-ce.liquidtelecom.net. | Harare | 100% |\n| 197.211.207.18 stanchart-zitf-site2.zol.co.zw. | Harare | 100% |\n| 197.211.221.90 197.211.221.90.liquidtelecom.net. | Harare | 50% |\n| 41.174.104.223 | Harare | 75% |\n| 196.43.199.61 z0udns1.zou.ac.zw. | | 82.6667% |\n| 168.253.46.137 | | 90.085% |\n| 168.253.47.70 | | 100% |\n| 41.174.180.212 | Harare | 100% |\n| 196.27.107.192 517291.customer.zol.co.zw. | Harare | 100% |\n| 197.211.217.72 518646.customer.zol.co.zw. | Harare | 100% |\n| 41.174.182.214 | Harare | 67.7419% |\n| 41.174.181.206 | Harare | 99.1573% |\n| 197.221.227.246 19.246.telone.co.zw. | Harare | 93.8389% |\n| 197.211.220.104 197.211.220.104.liquidtelecom.net. | Harare | 93.3873% |\n\nError fetching https://www.publicdns.xyz/country/wf.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/zm.html: CRAWL_HTTP_403",
+      "source": "Exa"
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/wf.html",
+    "https://www.publicdns.xyz/country/zm.html"
+  ]
+}
