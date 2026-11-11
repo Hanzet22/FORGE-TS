@@ -1,10 +1,13 @@
 package com.HG.Forge.Ts.data.simulation
 
 /**
- * Low-level Android Bionic PTY bridge.
+ * Low-level Android Bionic PTY bridge used by ProotExecutionAdapter for
+ * long-lived interactive PRoot sessions. One-shot guest commands continue
+ * to use ProcessBuilder; this object owns only the native PTY boundary.
  *
- * This facade is intentionally not selected by ProotExecutionAdapter yet.
- * The pipe-backed adapter remains the fallback until PTY integration is verified.
+ * Native availability means the JNI library loaded successfully. It does not
+ * prove that a PRoot payload, loader, rootfs, or device ptrace capability is
+ * usable; ProotExecutionAdapter performs those runtime checks separately.
  */
 internal object NativePtyEngine {
     val available: Boolean by lazy {
