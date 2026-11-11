@@ -25,12 +25,13 @@ fun DiagnosticConsentGate() {
             text = {
                 Text(
                     "FORGE-TS always keeps a limited technical log on this device. " +
-                        "You can optionally allow automatic upload of technical diagnostics to the FORGE-TS service " +
-                        "when the app opens and when important warnings or errors occur. " +
-                        "Uploaded data may include app and Android versions, event labels, installation pseudonymous ID, " +
-                        "and technical exception traces. It does not include passwords, terminal input/output, message " +
-                        "contents, or network payloads. Diagnostics are used for reliability and troubleshooting. " +
-                        "You can change this choice later in Settings."
+                        "If you allow remote diagnostics, the app automatically uploads one bounded report when it " +
+                        "moves to the background, and retries later if the network is unavailable. Reports can include " +
+                        "Info, Warning, Error, Crash and Critical Error events; app and Android versions; device " +
+                        "brand/model, RAM, display resolution, CPU chipset and architecture; event labels; and a " +
+                        "pseudonymous installation ID. Technical exception traces are bounded. It does not collect " +
+                        "IMEI or serial numbers, location, passwords, terminal input/output, message contents, files, " +
+                        "or network payloads. Remote upload is optional and can be turned off in Settings at any time."
                 )
             },
             confirmButton = {
