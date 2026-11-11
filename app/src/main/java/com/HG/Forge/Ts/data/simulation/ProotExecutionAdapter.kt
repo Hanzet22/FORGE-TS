@@ -20,6 +20,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val output: ByteArrayOutputStream,
         val inputLock: Any,
         val readLock: java.util.concurrent.locks.ReentrantLock,
+        var droppedOutputBytes: Long = 0L,
         val outputAvailable: Channel<Unit>,
         @Volatile var reader: Thread? = null
     )
@@ -100,7 +101,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, ByteArrayOutputStream(), Any(), java.util.concurrent.locks.ReentrantLock(), Channel(Channel.CONFLATED))
+            val session = PtySession(handle, ByteArrayOutputStream(), Any(), java.util.concurrent.locks.ReentrantLock(), 0L, Channel(Channel.CONFLATED))
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
@@ -122,11 +123,9 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                         if (session.output.size() > 262144) {
                                             val buffered = session.output.toByteArray()
                                             session.output.reset()
-                                            session.output.write(
-                                                buffered,
-                                                buffered.size - 262144,
-                                                262144
-                                            )
+                                            val dropped = buffered.size - 262144
+                                            session.droppedOutputBytes += dropped.toLong()
+                                            session.output.write(buffered, dropped, 262144)
                                         }
                                     }
                                     session.outputAvailable.trySend(Unit)
@@ -286,10 +285,12 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             session.readLock.lock()
             try {
                 val signal = session.outputAvailable.receiveCatching()
-                val bytes = synchronized(session.output) {
+                val (bytes, droppedOutputBytes) = synchronized(session.output) {
                     val value = session.output.toByteArray()
+                    val dropped = session.droppedOutputBytes
                     session.output.reset()
-                    value
+                    session.droppedOutputBytes = 0L
+                    value to dropped
                 }
                 val streamOpen = !signal.isClosed
                 if (!streamOpen) {
@@ -302,8 +303,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                         }
                     }
                 }
-                RuntimeInteractiveResult(streamOpen, String(bytes, Charsets.UTF_8),
-                    if (streamOpen) "Native PTY output read." else "PRoot PTY output drained; session resources released.", bytes)
+                val message = when {
+                    droppedOutputBytes > 0L -> "Terminal output buffer reached its 256 KiB limit; " +
+                        droppedOutputBytes + " older bytes were omitted."
+                    streamOpen -> "Native PTY output read."
+                    else -> "PRoot PTY output drained; session resources released."
+                }
+                RuntimeInteractiveResult(streamOpen, String(bytes, Charsets.UTF_8), message, bytes)
             } finally {
                 session.readLock.unlock()
             }
