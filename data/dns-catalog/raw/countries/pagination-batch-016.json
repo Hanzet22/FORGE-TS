@@ -1,6 +1,6 @@
 {
   "batch": 16,
-  "capturedAt": "2026-11-11T10:32:16.007Z",
+  "capturedAt": "2026-11-11T10:32:43.013Z",
   "pages": [],
   "missing": [
     {
@@ -53,5 +53,6 @@
       "page": 7,
       "url": "https://www.publicdns.xyz/country/de/7.html"
     }
-  ]
+  ],
+  "failed": []
 }
