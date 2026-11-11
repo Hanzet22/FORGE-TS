@@ -318,7 +318,10 @@ class HybridRuntimeManager(
         val state = if (distribution == null) states.getValue(id) else prootInstanceStates.getValue(distribution)
         if (state == RuntimeLifecycleState.UNAVAILABLE) return RuntimeOperationResult(false, "This environment is gated and cannot be started.")
         if (state == RuntimeLifecycleState.RECOVERY_REQUIRED) return RuntimeOperationResult(false, "Resolve the previous session state before requesting a start.")
-        if (state != RuntimeLifecycleState.READY) return RuntimeOperationResult(false, "Runtime must be installed and READY before start; current state is $state. Workspace preparation alone is insufficient.")
+        if (state != RuntimeLifecycleState.READY && state != RuntimeLifecycleState.STOPPED) {
+            return RuntimeOperationResult(false,
+                "Runtime must be installed and READY or STOPPED before start; current state is $state. Workspace preparation alone is insufficient.")
+        }
         val root = roots.getValue(id)
         val workspace = if (distribution == null) root else File(root, distribution.directoryName)
         val workspaceReady = if (distribution == null) id in prepared && isSafeDirectory(workspace, runtimeRoot)
