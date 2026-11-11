@@ -1,6 +1,6 @@
 # FORGE-TS WorkStation — Implementation Plan
 
-**Status:** Active; P0 lifecycle journaling delivered; P1 embedded-display feasibility reviewed  
+**Status:** Active; P0 lifecycle journaling delivered; P1 display adapter contract and serialized host controller delivered; no concrete display backend registered  
 **Baseline:** [Final Architecture Specification](WORKSTATION-ARCHITECTURE.md)  
 **Date:** 2026-11-10
 
@@ -39,8 +39,10 @@ Reuse the existing Linux-userland and Native runtime foundation code where it fi
 Deliverables:
 - Embedded X11 feasibility and licensing decision (review recorded).
 - Backend-neutral DisplaySessionAdapter/Registry contract for readiness, Android Surface attachment, bounded pointer/touch/scroll/key/text input, resize and stop. No concrete backend is registered yet.
-- In-app display host and backend interface.
-- Input and resize bridge.
+- Backend-neutral `DisplaySessionController` serializes inspect/start/Surface attach/input/resize/stop and permits only one active display session.
+- Start is marked RUNNING only after the adapter confirms readiness; partial starts are stopped best-effort and never reported as running.
+- Surface dimensions and density are bounded before forwarding; host retains Surface ownership.
+- Android Compose display host and native input bridge remain pending until a backend is pinned.
 - Native Linux capability detector.
 - Native runtime adapter and session lifecycle.
 
@@ -53,6 +55,7 @@ Implementation gate:
 - Feasibility review: [Embedded Display Feasibility](WORKSTATION-DISPLAY-FEASIBILITY.md).
 - The MagicDesk X11 fork is the leading API 34+ candidate, but it is not integrated; its device coverage is still pending. The MIT Java X server is not demonstrated to support the complete XFCE workload, and XSDL has material rendering/input limitations.
 - Do not commit to a specific embedded X11 codebase until its Android integration, ABI, package assumptions and license are reviewed.
+- Phase 43 records the host-side controller only; it does not add an X11 server, native binary, companion app or claim XFCE desktop readiness. See [Phase 43](PHASE-43-WORKSTATION-DISPLAY-SESSION-HOST.md).
 
 ## P2 — XFCE4 PRoot Multi-Distro
 
