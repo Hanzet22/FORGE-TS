@@ -78,6 +78,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             if (current != null) {
                 NativePtyEngine.nativeClose(current.handle, true)
                 sessions.remove(key, current)
+                runCatching { current.reader?.join(750) }
             }
 
             val argv = command(engine, root, listOf("/bin/sh", "-l")).toTypedArray()
@@ -117,6 +118,12 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                     }
                                     session.outputAvailable.trySend(Unit)
                                 }
+                                count == 0 -> {
+                                    // A poll timeout is not EOF. The PTY leader
+                                    // may have exited while a descendant still
+                                    // owns the slave and can produce final output.
+                                    continue
+                                }
                                 count == -5 -> {
                                     // Linux PTYs may briefly report EIO while the
                                     // slave line discipline is still flushing data.
@@ -147,6 +154,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             if (status != 0) {
                 NativePtyEngine.nativeClose(handle, true)
                 sessions.remove(key, session)
+                runCatching { session.reader?.join(750) }
                 return@withContext RuntimeAdapterStartResult(false, false,
                     "PRoot shell exited during PTY startup (status=$status); inspect session.log.")
             }
@@ -242,17 +250,23 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         withContext(Dispatchers.IO) {
             val session = sessions[request.workspacePath]
                 ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-            session.outputAvailable.receiveCatching()
+            val signal = session.outputAvailable.receiveCatching()
             val bytes = synchronized(session.output) {
                 val value = session.output.toByteArray()
                 session.output.reset()
                 value
             }
-            val running = NativePtyEngine.nativeWait(session.handle) == 0
+            // Keep the UI reader alive until the native reader has drained
+            // the PTY and closed its notification channel, not merely until
+            // the PTY leader's waitpid status becomes non-zero.
+            val streamOpen = !signal.isClosed
+            if (!streamOpen && sessions.remove(request.workspacePath, session)) {
+                NativePtyEngine.nativeClose(session.handle, true)
+            }
             RuntimeInteractiveResult(
-                running,
+                streamOpen,
                 String(bytes, Charsets.UTF_8),
-                if (running) "Native PTY output read." else "PRoot PTY session exited; buffered output returned.",
+                if (streamOpen) "Native PTY output read." else "PRoot PTY output drained; session resources released.",
                 bytes
             )
         }
