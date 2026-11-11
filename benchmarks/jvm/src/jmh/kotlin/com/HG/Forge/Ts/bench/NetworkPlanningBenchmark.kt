@@ -11,16 +11,32 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
 
+// Parameters are labels rather than raw addresses: IPv6 colons would make the
+// benchmark names hard to read in reports.
+private val CIDR_INPUTS = mapOf(
+    "ipv4-24" to "192.168.1.10/24",
+    "ipv4-31" to "10.0.0.1/31",
+    "ipv6-64" to "2001:db8:85a3::8a2e:370:7334/64",
+    "ipv4-mapped-ipv6-120" to "::ffff:192.0.2.128/120"
+)
+
+private val ADDRESS_INPUTS = mapOf(
+    "ipv4" to "172.16.254.1",
+    "ipv6" to "2001:db8:85a3::8a2e:370:7334"
+)
+
 @State(Scope.Benchmark)
 open class CidrCalculatorBenchmark {
 
-    @Param(
-        "192.168.1.10/24",
-        "10.0.0.1/31",
-        "2001:db8:85a3::8a2e:370:7334/64",
-        "::ffff:192.0.2.128/120"
-    )
-    var cidr: String = ""
+    @Param("ipv4-24", "ipv4-31", "ipv6-64", "ipv4-mapped-ipv6-120")
+    var input: String = ""
+
+    private lateinit var cidr: String
+
+    @Setup
+    fun setup() {
+        cidr = CIDR_INPUTS.getValue(input)
+    }
 
     @Benchmark
     fun calculate(): CidrResult = CidrCalculator.calculate(cidr)
@@ -29,8 +45,15 @@ open class CidrCalculatorBenchmark {
 @State(Scope.Benchmark)
 open class AddressBinaryBenchmark {
 
-    @Param("172.16.254.1", "2001:db8:85a3::8a2e:370:7334")
-    var address: String = ""
+    @Param("ipv4", "ipv6")
+    var input: String = ""
+
+    private lateinit var address: String
+
+    @Setup
+    fun setup() {
+        address = ADDRESS_INPUTS.getValue(input)
+    }
 
     @Benchmark
     fun toBinary(): String = CidrCalculator.toBinary(address)
