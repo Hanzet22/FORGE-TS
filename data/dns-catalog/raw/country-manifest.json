@@ -1,9 +1,985 @@
 {
   "source": "https://www.publicdns.xyz/country/",
-  "capturedAt": "2026-11-11T10:07:00.482Z",
-  "countryPageCount": 0,
-  "countryCodes": [],
+  "capturedAt": "2026-11-11T10:07:22.493Z",
+  "countryPageCount": 195,
+  "countries": [
+    {
+      "name": "Afghanistan",
+      "code": "af",
+      "url": "https://www.publicdns.xyz/country/af.html"
+    },
+    {
+      "name": "Albania",
+      "code": "al",
+      "url": "https://www.publicdns.xyz/country/al.html"
+    },
+    {
+      "name": "Algeria",
+      "code": "dz",
+      "url": "https://www.publicdns.xyz/country/dz.html"
+    },
+    {
+      "name": "American Samoa",
+      "code": "as",
+      "url": "https://www.publicdns.xyz/country/as.html"
+    },
+    {
+      "name": "Andorra",
+      "code": "ad",
+      "url": "https://www.publicdns.xyz/country/ad.html"
+    },
+    {
+      "name": "Angola",
+      "code": "ao",
+      "url": "https://www.publicdns.xyz/country/ao.html"
+    },
+    {
+      "name": "Anguilla",
+      "code": "ai",
+      "url": "https://www.publicdns.xyz/country/ai.html"
+    },
+    {
+      "name": "Antarctica",
+      "code": "aq",
+      "url": "https://www.publicdns.xyz/country/aq.html"
+    },
+    {
+      "name": "Antigua and Barbuda",
+      "code": "ag",
+      "url": "https://www.publicdns.xyz/country/ag.html"
+    },
+    {
+      "name": "Argentina",
+      "code": "ar",
+      "url": "https://www.publicdns.xyz/country/ar.html"
+    },
+    {
+      "name": "Armenia",
+      "code": "am",
+      "url": "https://www.publicdns.xyz/country/am.html"
+    },
+    {
+      "name": "Australia",
+      "code": "au",
+      "url": "https://www.publicdns.xyz/country/au.html"
+    },
+    {
+      "name": "Austria",
+      "code": "at",
+      "url": "https://www.publicdns.xyz/country/at.html"
+    },
+    {
+      "name": "Azerbaijan",
+      "code": "az",
+      "url": "https://www.publicdns.xyz/country/az.html"
+    },
+    {
+      "name": "Bahamas",
+      "code": "bs",
+      "url": "https://www.publicdns.xyz/country/bs.html"
+    },
+    {
+      "name": "Bahrain",
+      "code": "bh",
+      "url": "https://www.publicdns.xyz/country/bh.html"
+    },
+    {
+      "name": "Bangladesh",
+      "code": "bd",
+      "url": "https://www.publicdns.xyz/country/bd.html"
+    },
+    {
+      "name": "Barbados",
+      "code": "bb",
+      "url": "https://www.publicdns.xyz/country/bb.html"
+    },
+    {
+      "name": "Belarus",
+      "code": "by",
+      "url": "https://www.publicdns.xyz/country/by.html"
+    },
+    {
+      "name": "Belgium",
+      "code": "be",
+      "url": "https://www.publicdns.xyz/country/be.html"
+    },
+    {
+      "name": "Belize",
+      "code": "bz",
+      "url": "https://www.publicdns.xyz/country/bz.html"
+    },
+    {
+      "name": "Benin",
+      "code": "bj",
+      "url": "https://www.publicdns.xyz/country/bj.html"
+    },
+    {
+      "name": "Bermuda",
+      "code": "bm",
+      "url": "https://www.publicdns.xyz/country/bm.html"
+    },
+    {
+      "name": "Bhutan",
+      "code": "bt",
+      "url": "https://www.publicdns.xyz/country/bt.html"
+    },
+    {
+      "name": "Bolivia",
+      "code": "bo",
+      "url": "https://www.publicdns.xyz/country/bo.html"
+    },
+    {
+      "name": "Bosnia and Herzegovina",
+      "code": "ba",
+      "url": "https://www.publicdns.xyz/country/ba.html"
+    },
+    {
+      "name": "Botswana",
+      "code": "bw",
+      "url": "https://www.publicdns.xyz/country/bw.html"
+    },
+    {
+      "name": "Brazil",
+      "code": "br",
+      "url": "https://www.publicdns.xyz/country/br.html"
+    },
+    {
+      "name": "British Indian Ocean Territory",
+      "code": "io",
+      "url": "https://www.publicdns.xyz/country/io.html"
+    },
+    {
+      "name": "British Virgin Islands",
+      "code": "vg",
+      "url": "https://www.publicdns.xyz/country/vg.html"
+    },
+    {
+      "name": "Brunei",
+      "code": "bn",
+      "url": "https://www.publicdns.xyz/country/bn.html"
+    },
+    {
+      "name": "Bulgaria",
+      "code": "bg",
+      "url": "https://www.publicdns.xyz/country/bg.html"
+    },
+    {
+      "name": "Burkina Faso",
+      "code": "bf",
+      "url": "https://www.publicdns.xyz/country/bf.html"
+    },
+    {
+      "name": "Burundi",
+      "code": "bi",
+      "url": "https://www.publicdns.xyz/country/bi.html"
+    },
+    {
+      "name": "Cambodia",
+      "code": "kh",
+      "url": "https://www.publicdns.xyz/country/kh.html"
+    },
+    {
+      "name": "Cameroon",
+      "code": "cm",
+      "url": "https://www.publicdns.xyz/country/cm.html"
+    },
+    {
+      "name": "Canada",
+      "code": "ca",
+      "url": "https://www.publicdns.xyz/country/ca.html"
+    },
+    {
+      "name": "Cape Verde",
+      "code": "cv",
+      "url": "https://www.publicdns.xyz/country/cv.html"
+    },
+    {
+      "name": "Cayman Islands",
+      "code": "ky",
+      "url": "https://www.publicdns.xyz/country/ky.html"
+    },
+    {
+      "name": "Chile",
+      "code": "cl",
+      "url": "https://www.publicdns.xyz/country/cl.html"
+    },
+    {
+      "name": "China",
+      "code": "cn",
+      "url": "https://www.publicdns.xyz/country/cn.html"
+    },
+    {
+      "name": "Colombia",
+      "code": "co",
+      "url": "https://www.publicdns.xyz/country/co.html"
+    },
+    {
+      "name": "Cook Islands",
+      "code": "ck",
+      "url": "https://www.publicdns.xyz/country/ck.html"
+    },
+    {
+      "name": "Costa Rica",
+      "code": "cr",
+      "url": "https://www.publicdns.xyz/country/cr.html"
+    },
+    {
+      "name": "Croatia",
+      "code": "hr",
+      "url": "https://www.publicdns.xyz/country/hr.html"
+    },
+    {
+      "name": "Cuba",
+      "code": "cu",
+      "url": "https://www.publicdns.xyz/country/cu.html"
+    },
+    {
+      "name": "Cyprus",
+      "code": "cy",
+      "url": "https://www.publicdns.xyz/country/cy.html"
+    },
+    {
+      "name": "Czech Republic",
+      "code": "cz",
+      "url": "https://www.publicdns.xyz/country/cz.html"
+    },
+    {
+      "name": "Denmark",
+      "code": "dk",
+      "url": "https://www.publicdns.xyz/country/dk.html"
+    },
+    {
+      "name": "Djibouti",
+      "code": "dj",
+      "url": "https://www.publicdns.xyz/country/dj.html"
+    },
+    {
+      "name": "Dominica",
+      "code": "dm",
+      "url": "https://www.publicdns.xyz/country/dm.html"
+    },
+    {
+      "name": "Dominican Republic",
+      "code": "do",
+      "url": "https://www.publicdns.xyz/country/do.html"
+    },
+    {
+      "name": "Ecuador",
+      "code": "ec",
+      "url": "https://www.publicdns.xyz/country/ec.html"
+    },
+    {
+      "name": "Egypt",
+      "code": "eg",
+      "url": "https://www.publicdns.xyz/country/eg.html"
+    },
+    {
+      "name": "El Salvador",
+      "code": "sv",
+      "url": "https://www.publicdns.xyz/country/sv.html"
+    },
+    {
+      "name": "Equatorial Guinea",
+      "code": "gq",
+      "url": "https://www.publicdns.xyz/country/gq.html"
+    },
+    {
+      "name": "Estonia",
+      "code": "ee",
+      "url": "https://www.publicdns.xyz/country/ee.html"
+    },
+    {
+      "name": "Ethiopia",
+      "code": "et",
+      "url": "https://www.publicdns.xyz/country/et.html"
+    },
+    {
+      "name": "Fiji",
+      "code": "fj",
+      "url": "https://www.publicdns.xyz/country/fj.html"
+    },
+    {
+      "name": "Finland",
+      "code": "fi",
+      "url": "https://www.publicdns.xyz/country/fi.html"
+    },
+    {
+      "name": "France",
+      "code": "fr",
+      "url": "https://www.publicdns.xyz/country/fr.html"
+    },
+    {
+      "name": "French Polynesia",
+      "code": "pf",
+      "url": "https://www.publicdns.xyz/country/pf.html"
+    },
+    {
+      "name": "Gabon",
+      "code": "ga",
+      "url": "https://www.publicdns.xyz/country/ga.html"
+    },
+    {
+      "name": "Gambia",
+      "code": "gm",
+      "url": "https://www.publicdns.xyz/country/gm.html"
+    },
+    {
+      "name": "Georgia",
+      "code": "ge",
+      "url": "https://www.publicdns.xyz/country/ge.html"
+    },
+    {
+      "name": "Germany",
+      "code": "de",
+      "url": "https://www.publicdns.xyz/country/de.html"
+    },
+    {
+      "name": "Ghana",
+      "code": "gh",
+      "url": "https://www.publicdns.xyz/country/gh.html"
+    },
+    {
+      "name": "Greece",
+      "code": "gr",
+      "url": "https://www.publicdns.xyz/country/gr.html"
+    },
+    {
+      "name": "Greenland",
+      "code": "gl",
+      "url": "https://www.publicdns.xyz/country/gl.html"
+    },
+    {
+      "name": "Grenada",
+      "code": "gd",
+      "url": "https://www.publicdns.xyz/country/gd.html"
+    },
+    {
+      "name": "Guadeloupe",
+      "code": "gp",
+      "url": "https://www.publicdns.xyz/country/gp.html"
+    },
+    {
+      "name": "Guam",
+      "code": "gu",
+      "url": "https://www.publicdns.xyz/country/gu.html"
+    },
+    {
+      "name": "Guatemala",
+      "code": "gt",
+      "url": "https://www.publicdns.xyz/country/gt.html"
+    },
+    {
+      "name": "Guinea",
+      "code": "gn",
+      "url": "https://www.publicdns.xyz/country/gn.html"
+    },
+    {
+      "name": "Guyana",
+      "code": "gy",
+      "url": "https://www.publicdns.xyz/country/gy.html"
+    },
+    {
+      "name": "Haiti",
+      "code": "ht",
+      "url": "https://www.publicdns.xyz/country/ht.html"
+    },
+    {
+      "name": "Honduras",
+      "code": "hn",
+      "url": "https://www.publicdns.xyz/country/hn.html"
+    },
+    {
+      "name": "Hong Kong",
+      "code": "hk",
+      "url": "https://www.publicdns.xyz/country/hk.html"
+    },
+    {
+      "name": "Hungary",
+      "code": "hu",
+      "url": "https://www.publicdns.xyz/country/hu.html"
+    },
+    {
+      "name": "Iceland",
+      "code": "is",
+      "url": "https://www.publicdns.xyz/country/is.html"
+    },
+    {
+      "name": "India",
+      "code": "in",
+      "url": "https://www.publicdns.xyz/country/in.html"
+    },
+    {
+      "name": "Indonesia",
+      "code": "id",
+      "url": "https://www.publicdns.xyz/country/id.html"
+    },
+    {
+      "name": "Iran",
+      "code": "ir",
+      "url": "https://www.publicdns.xyz/country/ir.html"
+    },
+    {
+      "name": "Iraq",
+      "code": "iq",
+      "url": "https://www.publicdns.xyz/country/iq.html"
+    },
+    {
+      "name": "Ireland",
+      "code": "ie",
+      "url": "https://www.publicdns.xyz/country/ie.html"
+    },
+    {
+      "name": "Israel",
+      "code": "il",
+      "url": "https://www.publicdns.xyz/country/il.html"
+    },
+    {
+      "name": "Italy",
+      "code": "it",
+      "url": "https://www.publicdns.xyz/country/it.html"
+    },
+    {
+      "name": "Ivory Coast",
+      "code": "ci",
+      "url": "https://www.publicdns.xyz/country/ci.html"
+    },
+    {
+      "name": "Jamaica",
+      "code": "jm",
+      "url": "https://www.publicdns.xyz/country/jm.html"
+    },
+    {
+      "name": "Japan",
+      "code": "jp",
+      "url": "https://www.publicdns.xyz/country/jp.html"
+    },
+    {
+      "name": "Jordan",
+      "code": "jo",
+      "url": "https://www.publicdns.xyz/country/jo.html"
+    },
+    {
+      "name": "Kazakhstan",
+      "code": "kz",
+      "url": "https://www.publicdns.xyz/country/kz.html"
+    },
+    {
+      "name": "Kenya",
+      "code": "ke",
+      "url": "https://www.publicdns.xyz/country/ke.html"
+    },
+    {
+      "name": "Kuwait",
+      "code": "kw",
+      "url": "https://www.publicdns.xyz/country/kw.html"
+    },
+    {
+      "name": "Kyrgyzstan",
+      "code": "kg",
+      "url": "https://www.publicdns.xyz/country/kg.html"
+    },
+    {
+      "name": "Laos",
+      "code": "la",
+      "url": "https://www.publicdns.xyz/country/la.html"
+    },
+    {
+      "name": "Latvia",
+      "code": "lv",
+      "url": "https://www.publicdns.xyz/country/lv.html"
+    },
+    {
+      "name": "Lebanon",
+      "code": "lb",
+      "url": "https://www.publicdns.xyz/country/lb.html"
+    },
+    {
+      "name": "Liberia",
+      "code": "lr",
+      "url": "https://www.publicdns.xyz/country/lr.html"
+    },
+    {
+      "name": "Libya",
+      "code": "ly",
+      "url": "https://www.publicdns.xyz/country/ly.html"
+    },
+    {
+      "name": "Liechtenstein",
+      "code": "li",
+      "url": "https://www.publicdns.xyz/country/li.html"
+    },
+    {
+      "name": "Lithuania",
+      "code": "lt",
+      "url": "https://www.publicdns.xyz/country/lt.html"
+    },
+    {
+      "name": "Luxembourg",
+      "code": "lu",
+      "url": "https://www.publicdns.xyz/country/lu.html"
+    },
+    {
+      "name": "Macao",
+      "code": "mo",
+      "url": "https://www.publicdns.xyz/country/mo.html"
+    },
+    {
+      "name": "Macedonia",
+      "code": "mk",
+      "url": "https://www.publicdns.xyz/country/mk.html"
+    },
+    {
+      "name": "Malawi",
+      "code": "mw",
+      "url": "https://www.publicdns.xyz/country/mw.html"
+    },
+    {
+      "name": "Malaysia",
+      "code": "my",
+      "url": "https://www.publicdns.xyz/country/my.html"
+    },
+    {
+      "name": "Maldives",
+      "code": "mv",
+      "url": "https://www.publicdns.xyz/country/mv.html"
+    },
+    {
+      "name": "Mali",
+      "code": "ml",
+      "url": "https://www.publicdns.xyz/country/ml.html"
+    },
+    {
+      "name": "Malta",
+      "code": "mt",
+      "url": "https://www.publicdns.xyz/country/mt.html"
+    },
+    {
+      "name": "Marshall Islands",
+      "code": "mh",
+      "url": "https://www.publicdns.xyz/country/mh.html"
+    },
+    {
+      "name": "Martinique",
+      "code": "mq",
+      "url": "https://www.publicdns.xyz/country/mq.html"
+    },
+    {
+      "name": "Mauritania",
+      "code": "mr",
+      "url": "https://www.publicdns.xyz/country/mr.html"
+    },
+    {
+      "name": "Mauritius",
+      "code": "mu",
+      "url": "https://www.publicdns.xyz/country/mu.html"
+    },
+    {
+      "name": "Mexico",
+      "code": "mx",
+      "url": "https://www.publicdns.xyz/country/mx.html"
+    },
+    {
+      "name": "Micronesia",
+      "code": "fm",
+      "url": "https://www.publicdns.xyz/country/fm.html"
+    },
+    {
+      "name": "Moldova",
+      "code": "md",
+      "url": "https://www.publicdns.xyz/country/md.html"
+    },
+    {
+      "name": "Mongolia",
+      "code": "mn",
+      "url": "https://www.publicdns.xyz/country/mn.html"
+    },
+    {
+      "name": "Morocco",
+      "code": "ma",
+      "url": "https://www.publicdns.xyz/country/ma.html"
+    },
+    {
+      "name": "Mozambique",
+      "code": "mz",
+      "url": "https://www.publicdns.xyz/country/mz.html"
+    },
+    {
+      "name": "Myanmar",
+      "code": "mm",
+      "url": "https://www.publicdns.xyz/country/mm.html"
+    },
+    {
+      "name": "Namibia",
+      "code": "na",
+      "url": "https://www.publicdns.xyz/country/na.html"
+    },
+    {
+      "name": "Nauru",
+      "code": "nr",
+      "url": "https://www.publicdns.xyz/country/nr.html"
+    },
+    {
+      "name": "Nepal",
+      "code": "np",
+      "url": "https://www.publicdns.xyz/country/np.html"
+    },
+    {
+      "name": "Netherlands",
+      "code": "nl",
+      "url": "https://www.publicdns.xyz/country/nl.html"
+    },
+    {
+      "name": "New Caledonia",
+      "code": "nc",
+      "url": "https://www.publicdns.xyz/country/nc.html"
+    },
+    {
+      "name": "New Zealand",
+      "code": "nz",
+      "url": "https://www.publicdns.xyz/country/nz.html"
+    },
+    {
+      "name": "Nicaragua",
+      "code": "ni",
+      "url": "https://www.publicdns.xyz/country/ni.html"
+    },
+    {
+      "name": "Nigeria",
+      "code": "ng",
+      "url": "https://www.publicdns.xyz/country/ng.html"
+    },
+    {
+      "name": "Niue",
+      "code": "nu",
+      "url": "https://www.publicdns.xyz/country/nu.html"
+    },
+    {
+      "name": "North Korea",
+      "code": "kp",
+      "url": "https://www.publicdns.xyz/country/kp.html"
+    },
+    {
+      "name": "Norway",
+      "code": "no",
+      "url": "https://www.publicdns.xyz/country/no.html"
+    },
+    {
+      "name": "Pakistan",
+      "code": "pk",
+      "url": "https://www.publicdns.xyz/country/pk.html"
+    },
+    {
+      "name": "Palestine",
+      "code": "ps",
+      "url": "https://www.publicdns.xyz/country/ps.html"
+    },
+    {
+      "name": "Panama",
+      "code": "pa",
+      "url": "https://www.publicdns.xyz/country/pa.html"
+    },
+    {
+      "name": "Papua New Guinea",
+      "code": "pg",
+      "url": "https://www.publicdns.xyz/country/pg.html"
+    },
+    {
+      "name": "Paraguay",
+      "code": "py",
+      "url": "https://www.publicdns.xyz/country/py.html"
+    },
+    {
+      "name": "Peru",
+      "code": "pe",
+      "url": "https://www.publicdns.xyz/country/pe.html"
+    },
+    {
+      "name": "Philippines",
+      "code": "ph",
+      "url": "https://www.publicdns.xyz/country/ph.html"
+    },
+    {
+      "name": "Poland",
+      "code": "pl",
+      "url": "https://www.publicdns.xyz/country/pl.html"
+    },
+    {
+      "name": "Portugal",
+      "code": "pt",
+      "url": "https://www.publicdns.xyz/country/pt.html"
+    },
+    {
+      "name": "Puerto Rico",
+      "code": "pr",
+      "url": "https://www.publicdns.xyz/country/pr.html"
+    },
+    {
+      "name": "Qatar",
+      "code": "qa",
+      "url": "https://www.publicdns.xyz/country/qa.html"
+    },
+    {
+      "name": "Reunion",
+      "code": "re",
+      "url": "https://www.publicdns.xyz/country/re.html"
+    },
+    {
+      "name": "Romania",
+      "code": "ro",
+      "url": "https://www.publicdns.xyz/country/ro.html"
+    },
+    {
+      "name": "Russia",
+      "code": "ru",
+      "url": "https://www.publicdns.xyz/country/ru.html"
+    },
+    {
+      "name": "Rwanda",
+      "code": "rw",
+      "url": "https://www.publicdns.xyz/country/rw.html"
+    },
+    {
+      "name": "Saint Kitts and Nevis",
+      "code": "kn",
+      "url": "https://www.publicdns.xyz/country/kn.html"
+    },
+    {
+      "name": "Saint Lucia",
+      "code": "lc",
+      "url": "https://www.publicdns.xyz/country/lc.html"
+    },
+    {
+      "name": "Saint Pierre and Miquelon",
+      "code": "pm",
+      "url": "https://www.publicdns.xyz/country/pm.html"
+    },
+    {
+      "name": "Saint Vincent and the Grenadines",
+      "code": "vc",
+      "url": "https://www.publicdns.xyz/country/vc.html"
+    },
+    {
+      "name": "Samoa",
+      "code": "ws",
+      "url": "https://www.publicdns.xyz/country/ws.html"
+    },
+    {
+      "name": "Sao Tome and Principe",
+      "code": "st",
+      "url": "https://www.publicdns.xyz/country/st.html"
+    },
+    {
+      "name": "Saudi Arabia",
+      "code": "sa",
+      "url": "https://www.publicdns.xyz/country/sa.html"
+    },
+    {
+      "name": "Senegal",
+      "code": "sn",
+      "url": "https://www.publicdns.xyz/country/sn.html"
+    },
+    {
+      "name": "Seychelles",
+      "code": "sc",
+      "url": "https://www.publicdns.xyz/country/sc.html"
+    },
+    {
+      "name": "Singapore",
+      "code": "sg",
+      "url": "https://www.publicdns.xyz/country/sg.html"
+    },
+    {
+      "name": "Slovakia",
+      "code": "sk",
+      "url": "https://www.publicdns.xyz/country/sk.html"
+    },
+    {
+      "name": "Slovenia",
+      "code": "si",
+      "url": "https://www.publicdns.xyz/country/si.html"
+    },
+    {
+      "name": "South Africa",
+      "code": "za",
+      "url": "https://www.publicdns.xyz/country/za.html"
+    },
+    {
+      "name": "South Korea",
+      "code": "kr",
+      "url": "https://www.publicdns.xyz/country/kr.html"
+    },
+    {
+      "name": "Spain",
+      "code": "es",
+      "url": "https://www.publicdns.xyz/country/es.html"
+    },
+    {
+      "name": "Sri Lanka",
+      "code": "lk",
+      "url": "https://www.publicdns.xyz/country/lk.html"
+    },
+    {
+      "name": "Sudan",
+      "code": "sd",
+      "url": "https://www.publicdns.xyz/country/sd.html"
+    },
+    {
+      "name": "Suriname",
+      "code": "sr",
+      "url": "https://www.publicdns.xyz/country/sr.html"
+    },
+    {
+      "name": "Swaziland",
+      "code": "sz",
+      "url": "https://www.publicdns.xyz/country/sz.html"
+    },
+    {
+      "name": "Sweden",
+      "code": "se",
+      "url": "https://www.publicdns.xyz/country/se.html"
+    },
+    {
+      "name": "Switzerland",
+      "code": "ch",
+      "url": "https://www.publicdns.xyz/country/ch.html"
+    },
+    {
+      "name": "Syria",
+      "code": "sy",
+      "url": "https://www.publicdns.xyz/country/sy.html"
+    },
+    {
+      "name": "Taiwan",
+      "code": "tw",
+      "url": "https://www.publicdns.xyz/country/tw.html"
+    },
+    {
+      "name": "Tajikistan",
+      "code": "tj",
+      "url": "https://www.publicdns.xyz/country/tj.html"
+    },
+    {
+      "name": "Tanzania",
+      "code": "tz",
+      "url": "https://www.publicdns.xyz/country/tz.html"
+    },
+    {
+      "name": "Thailand",
+      "code": "th",
+      "url": "https://www.publicdns.xyz/country/th.html"
+    },
+    {
+      "name": "Togo",
+      "code": "tg",
+      "url": "https://www.publicdns.xyz/country/tg.html"
+    },
+    {
+      "name": "Tonga",
+      "code": "to",
+      "url": "https://www.publicdns.xyz/country/to.html"
+    },
+    {
+      "name": "Trinidad and Tobago",
+      "code": "tt",
+      "url": "https://www.publicdns.xyz/country/tt.html"
+    },
+    {
+      "name": "Tunisia",
+      "code": "tn",
+      "url": "https://www.publicdns.xyz/country/tn.html"
+    },
+    {
+      "name": "Turkey",
+      "code": "tr",
+      "url": "https://www.publicdns.xyz/country/tr.html"
+    },
+    {
+      "name": "Turkmenistan",
+      "code": "tm",
+      "url": "https://www.publicdns.xyz/country/tm.html"
+    },
+    {
+      "name": "Turks and Caicos Islands",
+      "code": "tc",
+      "url": "https://www.publicdns.xyz/country/tc.html"
+    },
+    {
+      "name": "U.S. Virgin Islands",
+      "code": "vi",
+      "url": "https://www.publicdns.xyz/country/vi.html"
+    },
+    {
+      "name": "Uganda",
+      "code": "ug",
+      "url": "https://www.publicdns.xyz/country/ug.html"
+    },
+    {
+      "name": "Ukraine",
+      "code": "ua",
+      "url": "https://www.publicdns.xyz/country/ua.html"
+    },
+    {
+      "name": "United Arab Emirates",
+      "code": "ae",
+      "url": "https://www.publicdns.xyz/country/ae.html"
+    },
+    {
+      "name": "United Kingdom",
+      "code": "gb",
+      "url": "https://www.publicdns.xyz/country/gb.html"
+    },
+    {
+      "name": "United States",
+      "code": "us",
+      "url": "https://www.publicdns.xyz/country/us.html"
+    },
+    {
+      "name": "Uruguay",
+      "code": "uy",
+      "url": "https://www.publicdns.xyz/country/uy.html"
+    },
+    {
+      "name": "Uzbekistan",
+      "code": "uz",
+      "url": "https://www.publicdns.xyz/country/uz.html"
+    },
+    {
+      "name": "Vanuatu",
+      "code": "vu",
+      "url": "https://www.publicdns.xyz/country/vu.html"
+    },
+    {
+      "name": "Venezuela",
+      "code": "ve",
+      "url": "https://www.publicdns.xyz/country/ve.html"
+    },
+    {
+      "name": "Vietnam",
+      "code": "vn",
+      "url": "https://www.publicdns.xyz/country/vn.html"
+    },
+    {
+      "name": "Wallis and Futuna",
+      "code": "wf",
+      "url": "https://www.publicdns.xyz/country/wf.html"
+    },
+    {
+      "name": "Yemen",
+      "code": "ye",
+      "url": "https://www.publicdns.xyz/country/ye.html"
+    },
+    {
+      "name": "Zambia",
+      "code": "zm",
+      "url": "https://www.publicdns.xyz/country/zm.html"
+    },
+    {
+      "name": "Zimbabwe",
+      "code": "zw",
+      "url": "https://www.publicdns.xyz/country/zw.html"
+    }
+  ],
   "providerPageCount": 30,
-  "status": "manifest_saved_before_country_scrape",
-  "note": "Country page URLs extracted from directory. Raw page snapshots are checkpointed by batch in this repository."
+  "status": "country_manifest_complete",
+  "checkpointPolicy": "Each fetched country batch is committed separately before the next batch."
 }
