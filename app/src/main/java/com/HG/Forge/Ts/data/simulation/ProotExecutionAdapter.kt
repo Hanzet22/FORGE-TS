@@ -70,10 +70,12 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 ?: return@withContext RuntimeAdapterCapability(false,
                     "Missing native PRoot engine/loader or verified rootfs; no process was launched.")
             val (root, engine, loader, logs, tmp) = paths
-            val guestShell = runCatching { File(root, "bin/sh").canonicalFile }.getOrNull()
-            if (guestShell == null || !guestShell.path.startsWith(root.canonicalPath + File.separator) ||
-                !guestShell.isFile || !guestShell.canRead()) {
-                return@withContext RuntimeAdapterCapability(false, "Rootfs /bin/sh is missing, unreadable, or escapes the selected rootfs.")
+            val guestShellAvailable =
+                RootfsGuestPath.isExecutableGuestFile(root, "/bin/sh") ||
+                    RootfsGuestPath.isExecutableGuestFile(root, "/usr/bin/sh")
+            if (!guestShellAvailable) {
+                return@withContext RuntimeAdapterCapability(false,
+                    "Rootfs has no readable executable guest shell at /bin/sh or /usr/bin/sh, or its symlink chain is invalid.")
             }
             val probeLog = File(logs, "ptrace-probe.log")
             val process = runCatching {
