@@ -405,7 +405,14 @@ class HybridRuntimeManager(
         if (!isSafeDirectory(workspace, root)) return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
         val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
         val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
-        return runCatching { adapter.readInteractive(request) }.getOrElse { RuntimeInteractiveResult(false, message = it.message ?: "Terminal output failed.") }
+        val result = runCatching { adapter.readInteractive(request) }.getOrElse {
+            return RuntimeInteractiveResult(false, message = it.message ?: "Terminal output failed.")
+        }
+        if (!result.accepted && result.message == "PRoot PTY output drained; session resources released.") {
+            setRuntimeState(RuntimeEnvironmentId.XFCE_PROOT, distribution, RuntimeLifecycleState.STOPPED)
+            registry.recordEvent("PRoot " + distribution.name + " terminal session exited and resources were released.")
+        }
+        return result
     }
 
     suspend fun executeProotCommand(distribution: ProotDistribution, arguments: List<String>, timeoutSeconds: Long = 30): RuntimeCommandResult {
