@@ -2,8 +2,9 @@
 
 ## Purpose
 
-FORGE-TS has two host-side benchmark suites, both reported to CodSpeed from
-`.github/workflows/codspeed.yml`. Neither adds any dependency to the APK.
+FORGE-TS keeps two host-side benchmark suites. Only the native C++ suite is
+currently uploaded to CodSpeed in GitHub Actions. Neither suite adds a
+dependency to the Android APK.
 
 ### Native PTY helpers (C++, CPU simulation)
 
@@ -25,35 +26,40 @@ JNI entry points in `forge_pty.cpp`:
   `nativeWait`.
 
 These workloads are pure CPU and memory operations, so they run under the
-CodSpeed CPU simulation instrument, which gives deterministic results on
-standard GitHub runners.
+CodSpeed CPU simulation instrument. Simulation results are useful for
+comparisons of instrumented helper logic, but they do not measure kernel or
+system-call costs and must not be presented as end-to-end PTY performance.
 
-### Network planning (Kotlin, JMH, walltime)
+### Network planning (Kotlin, JMH, exploratory)
 
 Location: `benchmarks/jvm/` (standalone Gradle build, separate from the Android
-build). It compiles `app/src/main/java/com/HG/Forge/Ts/data/network/CidrCalculator.kt`
-directly, so the benchmarks run the production code:
+build). It compiles
+`app/src/main/java/com/HG/Forge/Ts/data/network/CidrCalculator.kt` directly,
+so the benchmarks exercise the production source:
 
 - `CidrCalculatorBenchmark.calculate`: IPv4 `/24` and `/31`, IPv6 `/64`, and
   IPv4-mapped IPv6 inputs.
 - `AddressBinaryBenchmark.toBinary`: IPv4 and IPv6 binary conversion.
 - `VlsmCalculatorBenchmark.allocate`: 4-subnet and 64-subnet VLSM plans.
 
-The JVM integration uses the CodSpeed JMH fork, vendored as the git submodule
-`third_party/codspeed-jvm`. CodSpeed only supports the walltime instrument on
-the JVM.
-
-Note: CodSpeed macro runners are only available to organization repositories,
-so the walltime job runs on a standard `ubuntu-latest` runner. Expect
-noticeably higher run-to-run variance there than for the simulation suite. See
+The JMH suite and CodSpeed JMH fork submodule are retained for deliberate
+manual experiments. It is not part of the CodSpeed GitHub Actions workflow.
+The repository currently uses standard GitHub-hosted runners; walltime
+measurements there are too noisy to establish a dependable performance
+baseline. Re-enable CodSpeed walltime reporting only after a suitable runner
+and repeatable measurement environment are available. See
 [walltime on personal accounts](https://codspeed.io/docs/instruments/walltime#usage-on-personal-github-accounts).
 
 ## Run in GitHub Actions
 
-The workflow runs on pushes to `main`, on pull requests targeting `main` that
-touch the benchmarked code, and on manual dispatch. Default-branch runs set the
-baseline used for pull-request comparisons. Both jobs authenticate with GitHub
-OIDC (`id-token: write`); no CodSpeed token is stored in the repository.
+The CodSpeed workflow runs the native C++ simulation suite on pushes to
+`main`, on pull requests targeting `main` that touch native benchmark code,
+and on manual dispatch. Default-branch runs establish the native baseline used
+for pull-request comparisons. The job authenticates with GitHub OIDC
+(`id-token: write`); no CodSpeed token is stored in the repository.
+
+The Kotlin JMH suite is intentionally not run as a CodSpeed CI job. This avoids
+publishing noisy walltime data as if it were a stable regression signal.
 
 ## Build locally
 
@@ -74,13 +80,11 @@ git submodule update --init third_party/codspeed-jvm
 git -C third_party/codspeed-jvm submodule update --init \
   jmh-fork/jmh-core/native-instrument-hooks/instrument-hooks
 gradle -p benchmarks/jvm jmh
-# or, reporting to CodSpeed:
-codspeed run --mode walltime -- gradle -p benchmarks/jvm jmh
 ```
 
-The CodSpeed C++ dependency is pinned to the `v2.4.0` release commit and the
-JMH fork submodule to `v0.2.1`, so the benchmark toolchain only changes on
-purpose.
+The Kotlin command above runs JMH locally; it does not upload a CodSpeed
+baseline. The CodSpeed C++ dependency is pinned to the `v2.4.0` release commit
+and the JMH fork submodule to `v0.2.1`.
 
 ## Measurement boundaries
 
@@ -88,7 +92,7 @@ These are host-side measurements. They do not represent Android device latency
 and do not cover the Kotlin/JNI/Compose path, process creation, PTY I/O
 (`poll`, `read`, `write`, `ioctl`), Android scheduling or terminal rendering.
 Kernel and I/O-bound PTY lifecycle benchmarks should be added as a separate
-walltime suite once a suitable dedicated runner is available.
+walltime suite only when a suitable dedicated runner is available.
 
 ## References
 
