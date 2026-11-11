@@ -3,6 +3,8 @@ package com.HG.Forge.Ts.data.simulation
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -19,7 +21,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val handle: Long,
         val output: ByteArrayOutputStream,
         val inputLock: Any,
-        val readLock: java.util.concurrent.locks.ReentrantLock,
+        val readLock: Mutex,
         var droppedOutputBytes: Long = 0L,
         val outputAvailable: Channel<Unit>,
         @Volatile var reader: Thread? = null
@@ -101,7 +103,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, ByteArrayOutputStream(), Any(), java.util.concurrent.locks.ReentrantLock(), 0L, Channel(Channel.CONFLATED))
+            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Mutex(), 0L, Channel(Channel.CONFLATED))
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
@@ -280,10 +282,9 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         withContext(Dispatchers.IO) {
             val session = sessions[request.workspacePath]
                 ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-            // Serialize consumers so overlapping UI lifecycle callbacks cannot
-            // split or reorder reads from the shared output buffer.
-            session.readLock.lock()
-            try {
+            // Mutex acquisition is cancellable, so switching distributions or
+            // disposing the terminal UI cannot strand a blocked reader.
+            session.readLock.withLock {
                 val signal = session.outputAvailable.receiveCatching()
                 val (bytes, droppedOutputBytes) = synchronized(session.output) {
                     val value = session.output.toByteArray()
@@ -311,12 +312,10 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     !streamOpen -> "PRoot PTY output drained; session resources released."
                     droppedOutputBytes > 0L ->
                         "Terminal output buffer reached its 256 KiB limit; " +
-                            droppedOutputBytes + " older bytes were omitted."
+                        droppedOutputBytes + " older bytes were omitted."
                     else -> "Native PTY output read."
                 }
                 RuntimeInteractiveResult(streamOpen, String(bytes, Charsets.UTF_8), message, bytes)
-            } finally {
-                session.readLock.unlock()
             }
         }
 
