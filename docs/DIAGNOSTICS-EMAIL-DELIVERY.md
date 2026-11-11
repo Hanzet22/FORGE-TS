@@ -5,7 +5,7 @@
 - Local technical logging starts in every build, including release builds, when the Android Application process starts.
 - The app records bounded lifecycle events locally. Runtime lifecycle events remain in the separate bounded runtime journal.
 - On first launch, the user sees a diagnostics notice and chooses whether remote diagnostics may be uploaded.
-- If allowed, startup events and WARNING/ERROR events are queued automatically and uploaded by WorkManager when a network is available.
+- If allowed, the complete bounded local diagnostic journal is sent as one JSON envelope when the app moves to the background. WorkManager persists the request, waits for connectivity, and retries transient failures. Pending events are recovered on the next app launch if Android terminates the process before the background callback can run.
 - The user can revoke remote upload permission at any time in Settings. Revocation cancels pending unique upload work. Local logging remains enabled.
 
 ## Data boundaries
@@ -29,14 +29,15 @@ No mail-provider key is embedded in the Android app or Git repository. If either
 
 ## Alert volume
 
-- Email is sent only when an accepted batch contains WARNING, ERROR, CRITICAL, or CRASH events.
-- Email alerts are throttled to at most one per installation every 30 minutes.
-- Ordinary app-open INFO events are stored remotely (when consented) but do not generate email. This prevents one email per student per app launch.
+- When Resend is configured, the accepted envelope produces a privacy-filtered session summary containing all accepted event levels and technical device metadata.
+- Email summaries are throttled to at most one per installation every 30 minutes to prevent repeated notifications.
+- The email omits raw stack traces and installation identifiers. Full event records remain in the protected diagnostics table.
 
 ## Deployment state
 
-- Android first-launch consent gate and Settings control are in the app source.
-- Remote diagnostic upload remains opt-in per installation.
-- Supabase migration `20261111220653_expand_diagnostic_device_metadata` is applied.
-- `forge-diagnostic-ingest` deployed as version 8 with `verify_jwt=false` preserved.
-- The Edge Function accepts both the plural and legacy singular sender-secret names. A successful deployment does not prove a real email was delivered; no synthetic event or test email was sent.
+- Android first-launch consent gate and Settings control remain in place; local logging is always on and remote upload requires explicit permission per installation.
+- ProcessLifecycleOwner queues upload when the app enters the background; WorkManager handles connectivity and retries.
+- The Android worker sends the bounded local journal in one request, and the Edge Function accepts up to 200 events within its 64 KiB request limit.
+- Supabase migration `20261111220653_expand_diagnostic_device_metadata` remains applied; no new table or database was added.
+- `forge-diagnostic-ingest` deployed as version 9 with `verify_jwt=false` preserved.
+- The Edge Function accepts both the plural and legacy singular sender-secret names. Deployment does not prove a real email was delivered; no synthetic event or test email was sent.
