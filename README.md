@@ -110,3 +110,7 @@ The WorkStation architecture is documented separately from implemented milestone
 
 ### Phase 42 — Offline DNS Provider Catalog
 Adds an offline, searchable catalog of 30 provider profiles normalized from the saved PublicDNS.xyz snapshots. The Tools tab supports provider/IP search and IPv4/IPv6 filtering. Each entry retains its source profile URL and is clearly marked as directory-listed, not live-tested. Country directory IPs are not treated as verified public recursive resolvers, and the catalog does not change Android or PRoot DNS settings. See [Phase 42](docs/PHASE-42-DNS-PROVIDER-CATALOG.md).
+
+
+### Phase 43 — WorkStation Display Session Host
+Adds a backend-neutral display session controller for the WorkStation architecture. It serializes capability inspection, session start, Android Surface attachment, bounded input forwarding, resize and stop. A session is reported as running only after a registered adapter confirms readiness; the default backend registry remains empty. No X11 engine or XFCE desktop is claimed as integrated. See [Phase 43](docs/PHASE-43-WORKSTATION-DISPLAY-SESSION-HOST.md).
