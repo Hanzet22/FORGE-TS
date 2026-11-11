@@ -173,11 +173,13 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeWrite(
         env->ReleaseByteArrayElements(source, bytes, JNI_ABORT);
         return -EPIPE;
     }
-    const ssize_t written = write(session->master, bytes + offset, static_cast<size_t>(length));
+    ssize_t written;
+    do {
+        written = write(session->master, bytes + offset, static_cast<size_t>(length));
+    } while (written < 0 && errno == EINTR);
     const int savedError = errno;
     env->ReleaseByteArrayElements(source, bytes, JNI_ABORT);
     if (written >= 0) return static_cast<jint>(written);
-    if (savedError == EINTR || savedError == EAGAIN) return 0;
     return -savedError;
 }
 
