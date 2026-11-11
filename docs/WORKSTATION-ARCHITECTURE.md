@@ -34,7 +34,7 @@ Source inspection found these existing components under `app/src/main/java/com/H
 - `RuntimeFoundationSupervisor`: Android API/ABI, memory/storage and `/dev/kvm` node visibility/permission inspection; prepares `images`, `instances` and `logs`. A visible KVM node is not proof that KVM can be initialized or used.
 - `LinuxUserlandFoundationSupervisor`: prepares a private Linux-userland workspace only; it does not download, extract, mount or execute a distro.
 - `RouterOsImageImporter`: accepts a user-selected CHR ARM64 RAW image and stages it after comparing its bytes with a user-supplied SHA-256. It does not authenticate the hash source, boot or execute the image.
-- `RuntimeFoundationPanel`, `LinuxUserlandFoundationPanel`, `RouterOsImageImportPanel` and `SimulationEnvironmentLauncher` are currently shown inside `SimulationScreen`. `ToolsScreen` does not yet contain a WorkStation Center.
+- `RuntimeFoundationPanel`, `LinuxUserlandFoundationPanel` and `SimulationEnvironmentLauncher` are currently shown inside `SimulationScreen`. The RouterOS CHR area is an informational version catalog with every entry marked Coming Soon; image import and runtime actions are not exposed. `ToolsScreen` does not yet contain a WorkStation Center.
 
 These are foundation/preparation features, not completed Native Linux, PRoot, X11, RouterOS or VM runtimes. The next implementation must extend these components instead of creating a second runtime manager.
 
@@ -231,7 +231,7 @@ Future adapter scope:
 - Routing and firewall concepts.
 - Network topology integration.
 
-No RouterOS image is bundled, downloaded or executed in the initial WorkStation release. Licensing and supported deployment method must be reviewed before implementation.
+The current UI presents an informational version catalog: RouterOS 7.25.1 (Stable), 7.24.6 (Long-term), 7.26beta5 (Development), 7.25rc3 (Testing) and 6.49.23 (Legacy). Every entry is marked Coming Soon. No download, import, installation or guest execution control is exposed. No RouterOS image is bundled, downloaded or executed in the initial WorkStation release. Licensing and supported deployment method must be reviewed before implementation.
 
 ## 10. App-managed storage
 
