@@ -52,6 +52,8 @@ data class ProotRuntimeInstanceSnapshot(
 )
 
 private class RuntimeRegistryStore(private val context: Context) {
+    private val diagnostics = RuntimeDiagnosticLog(context)
+
     data class Record(val state: RuntimeLifecycleState, val workspacePrepared: Boolean)
     data class ProotRecord(val state: RuntimeLifecycleState, val workspacePrepared: Boolean)
 
@@ -74,6 +76,7 @@ private class RuntimeRegistryStore(private val context: Context) {
             preferences[stringPreferencesKey("manager.last_event")] =
                 "${System.currentTimeMillis()}|${id.name}|${state.name}"
         }
+        diagnostics.append("runtime", id.name, state.name)
     }
 
     suspend fun readProotInstances(): Map<ProotDistribution, ProotRecord> {
@@ -96,6 +99,7 @@ private class RuntimeRegistryStore(private val context: Context) {
             preferences[stringPreferencesKey("manager.last_event")] =
                 "${System.currentTimeMillis()}|PRoot:${distribution.name}|$state"
         }
+        diagnostics.append("proot", distribution.name, state.name)
     }
 
     suspend fun recordEvent(message: String) {
@@ -103,6 +107,7 @@ private class RuntimeRegistryStore(private val context: Context) {
             preferences[stringPreferencesKey("manager.last_event")] =
                 "${System.currentTimeMillis()}|MANAGER|${message.take(240)}"
         }
+        diagnostics.append("manager", "event", "recorded")
     }
 
     suspend fun lastEvent(): String? =
