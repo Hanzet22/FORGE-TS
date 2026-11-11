@@ -1,0 +1,82 @@
+{
+  "batch": 18,
+  "capturedAt": "2026-11-11T10:18:11.557Z",
+  "source": "publicdns.xyz country inventory",
+  "pages": [
+    {
+      "code": "tj",
+      "name": "Tajikistan",
+      "url": "https://www.publicdns.xyz/country/tj.html",
+      "rawMarkdown": "DNS Server in Tajikistan\n\n# DNS Server in Tajikistan\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 85.9.129.36 dns1.beeline.tj. | Dushanbe | 100% |\n| 85.9.129.38 ns.tacom.tj. | Dushanbe | 100% |\n| 95.142.88.177 | Dushanbe | 94.7368% |\n| 45.94.219.58 | Dushanbe | 98.0769% |\n| 94.199.23.154 | Hisor | 100% |\n| 79.170.189.235 | | 100% |\n| 85.9.130.82 | Dushanbe | 100% |\n| 109.75.48.45 | Dushanbe | 96.9697% |\n| 91.218.169.86 91.218.169.86.pppoe.sa-net.tj. | | 100% |\n| 62.122.139.6 62.122.139.6.eastera.tj. | Dushanbe | 100% |\n| 95.142.86.167 | Dushanbe | 100% |\n| 95.142.87.142 | Dushanbe | 100% |\n| 79.170.184.201 | Panjakent | 100% |\n| 217.8.44.205 205.44.8.217.north.tcell.tj. | | 100% |\n| 95.142.89.203 | Dushanbe | 50% |\n| 91.200.219.163 | | 100% |\n| 91.218.169.69 91.218.169.69.pppoe.sa-net.tj. | | 100% |\n| 85.9.133.77 85-9-133-77.tacom.tj. | Dushanbe | 100% |\n| 109.74.68.122 | | 100% |\n| 94.199.18.151 | Dushanbe | 100% |\n| 94.199.18.222 | Dushanbe | 100% |\n| 95.142.91.218 | Dushanbe | 90% |\n| 95.142.87.24 | Dushanbe | 83.3333% |\n| 95.142.89.109 | Dushanbe | 70.9677% |\n| 85.9.128.229 | Dushanbe | 68.75% |\n| 94.199.17.27 icd22.ismailicentre.org. | Dushanbe | 99.187% |\n| 91.200.219.162 | | 96.1977% |\n| 95.142.84.75 | Dushanbe | 99.4048% |\n| 95.142.91.67 | Dushanbe | 94.3182% |\n| 91.218.169.68 91.218.169.68.pppoe.sa-net.tj. | | 33.3333% |\n\n# DNS Server in Tanzania",
+      "source": "Exa"
+    },
+    {
+      "code": "tz",
+      "name": "Tanzania",
+      "url": "https://www.publicdns.xyz/country/tz.html",
+      "rawMarkdown": "DNS Server in Tanzania\n\n# DNS Server in Tanzania\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 41.194.37.106 | | 55.5556% |\n| 41.59.200.123 123.200-59-41.ttcl.co.tz. | Arusha | 100% |\n| 41.74.121.1 | | 86.9159% |\n| 102.219.204.88 host-102-219-204-89.nexusnet.co.tz. | | 100% |\n| 41.59.224.62 | | 100% |\n| 154.66.226.109 | | 100% |\n| 155.12.75.34 | Dar es Salaam | 100% |\n| 41.74.112.228 host-41-74-112-228.myarusha.com. | | 100% |\n| 41.221.36.114 | | 100% |\n| 217.29.133.64 64.64-72-154.admin.hotnet.co.tz. | Tanga | 100% |\n| 196.41.58.154 | Dar es Salaam | 100% |\n| 41.59.97.56 | Arusha | 100% |\n| 154.72.69.26 | Dar es Salaam | 100% |\n| 41.188.183.82 | | 100% |\n| 196.41.60.250 | Dar es Salaam | 81.25% |\n| 154.72.93.177 | Dar es Salaam | 80% |\n| 197.250.10.114 | Dar es Salaam | 64.5161% |\n| 41.59.197.135 | | 94.4444% |\n| 41.59.201.104 | Dar es Salaam | 98.8593% |\n| 196.32.240.44 | | 99.2395% |\n| 217.29.139.189 | Dar es Salaam | 89.4389% |\n| 196.45.40.70 | | 76.5714% |\n| 41.59.40.35 | Arusha | 86.1111% |\n\n# DNS Server in Thailand",
+      "source": "Exa"
+    },
+    {
+      "code": "th",
+      "name": "Thailand",
+      "url": "https://www.publicdns.xyz/country/th.html",
+      "rawMarkdown": "DNS Server in Thailand\n\n# DNS Server in Thailand\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 202.182.0.1 | | 87.4089% |\n| 202.44.52.1 www.worldinternetworkcorporation.com. | | 84.8214% |\n| 203.146.237.237 ns01.csloxinfo.com. | Bangkok | 99.8933% |\n| 203.146.127.85 mail.successmore4.com. | | 100% |\n| 180.180.170.188 node-xq4.pool-180-180.dynamic.totinternet.net. | Phetchabun | 65.2695% |\n| 49.231.140.122 | | 81.1111% |\n| 119.110.209.94 static-119-110-209-94.violin.co.th. | Bangkok | 100% |\n| 184.82.128.211 | | 100% |\n| 58.97.72.83 58-97-72-83.static.asianet.co.th. | Samut Sakhon | 100% |\n| 203.150.128.192 192.128.150.203.sta.inet.co.th. | | 100% |\n| 117.121.211.170 | Phuket | 84.7403% |\n| 118.173.242.189 node-1by5.pool-118-173.dynamic.totinternet.net. | Bang Bon | 98.5714% |\n| 125.25.82.191 node-gcf.pool-125-25.dynamic.totinternet.net. | Bangkok | 86.2745% |\n| 110.77.232.30 | Ban Ko Wiwatthana | 100% |\n| 110.78.186.32 | | 100% |\n| 110.78.164.234 | Si Racha | 100% |\n| 202.29.223.62 | Nonthaburi | 100% |\n| 171.99.131.78 171-99-131-78.static.asianet.co.th. | Bangkok | 66.6667% |\n| 1.179.151.165 | Sam Phran | 100% |\n| 101.108.9.74 node-1u2.pool-101-108.dynamic.totinternet.net. | Khwaeng Bang O | 100% |\n| 1.2.247.175 node-nn3.pool-1-2.dynamic.totinternet.net. | Phichit | 100% |\n| 191.101.184.249 191-101-184-249.static.idc.minethost.com. | | 100% |\n| 139.5.146.125 rev-dns-cloud-bkk-125-146-5-139-th.nipa.cloud. | | 23.3333% |\n| 124.109.2.140 | | 100% |\n| 171.100.29.202 171-100-29-202.static.asianet.co.th. | Bangkok | 100% |\n| 122.154.33.188 | Panare | 100% |\n| 122.154.158.219 | | 100% |\n| 58.136.3.100 | Bangkok | 100% |\n| 113.53.106.208 | Chumphon | 100% |\n| 203.150.221.224 nc-vpn-hq-224.cat.inet.co.th. | | 100% |\n| 43.229.132.105 | | 100% |\n| 103.7.58.94 103-7-58-94.idc.pop-idc.com. | | 100% |\n| 101.109.86.110 node-h2m.pool-101-109.dynamic.totinternet.net. | Kantang | 100% |\n| 103.27.202.89 103-27-202-89.static.bangmod-idc.com. | | 100% |\n| 202.29.60.171 | | 100% |\n| 202.28.71.12 | Surat Thani | 100% |\n| 103.13.29.65 | Bang Bon | 100% |\n| 103.27.201.95 hostings.ruk-com.in.th. | | 100% |\n| 61.19.202.124 | Nakhon Si Thammarat | 100% |\n| 118.174.140.35 node-z.ll-118-174.static.totisp.net. | Bangkok | 100% |\n| 110.77.149.20 | | 100% |\n| 113.53.29.228 node-5wk.pool-113-53.dynamic.totinternet.net. | Nakhon Sawan | 100% |\n| 210.86.170.186 ppp-210-86-170-186.revip.asianet.co.th. | Bangkok | 58.5106% |\n| 202.129.52.170 | Phaya Thai | 91.1765% |\n| 202.14.164.9 ns2.kmutnb.ac.th. | | 98.0469% |\n| 159.192.97.156 | Loei | 100% |\n| 58.82.154.3 3.154.82.58.static-corp.jastel.co.th. | Bangkok | 100% |\n| 110.164.156.114 mx-ll-110.164.156-114.3bb.co.th. | Ban Hong | 81.8792% |\n| 171.103.33.126 171-103-33-126.static.asianet.co.th. | Chon Buri | 88.6207% |\n| 101.109.247.147 node-1cwj.pool-101-109.dynamic.totinternet.net. | Pattaya | 100% |\n\n# DNS Server in Togo",
+      "source": "Exa"
+    },
+    {
+      "code": "tg",
+      "name": "Togo",
+      "url": "https://www.publicdns.xyz/country/tg.html",
+      "rawMarkdown": "DNS Server in Togo\n\n- Togo\n- Country/Region\n- Home\n\n# DNS Server in Togo\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 41.207.186.166 | Lomé | 100% |\n| 196.171.3.119 | Lomé | 57.4468% |\n| 154.70.89.254 | 50% |\n| 196.171.24.223 | Lomé | 45.4545% |\n| 156.38.75.75 | Lomé | 51.2821% |\n| 156.38.75.114 | Lomé | 93.3333% |\n| 80.248.69.166 | 92.8571% |\n| 196.170.122.29 | 54.6448% |\n| 80.248.72.1 | Badou | 88.5042% |\n\n#### Public DNS Server\n\n- DNSpai\n- OneDNS\n- 114DNS\n- DNSPod Public DNS+\n- Baidu Public DNS\n- AliDNS\n- CFIEC IPv6 Public DNS\n- CNNIC SDNS\n- Neustar\n- puntCAT\n- Hurricane Electric\n- UncensoredDNS\n- Yandex.DNS\n- Alternate DNS\n- FreeDNS\n- Dyn\n- Freenom World\n- SmartViper\n- OpenNIC\n- SafeDNS\n- GreenTeamDNS\n- Norton ConnectSafe\n- DNS.WATCH\n- Comodo Secure DNS\n- Quad9\n- Verisign\n- Level 3\n- Cloudflare\n- OpenDNS\n- Google Public DNS\n\n#### Most Visited Country/Region\n\n- Sweden\n- Iran\n- Iraq\n- Poland\n- Thailand\n- Singapore\n- United Kingdom\n- India\n- France\n- Turkey\n- Canada\n- Brazil\n- Taiwan\n- Germany\n- Japan\n- Indonesia\n- South Korea\n- Russia\n- Philippines\n- United States\n\n# DNS Server in Tunisia",
+      "source": "Exa"
+    },
+    {
+      "code": "to",
+      "name": "Tonga",
+      "url": "https://www.publicdns.xyz/country/to.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "tt",
+      "name": "Trinidad and Tobago",
+      "url": "https://www.publicdns.xyz/country/tt.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "tn",
+      "name": "Tunisia",
+      "url": "https://www.publicdns.xyz/country/tn.html",
+      "rawMarkdown": "DNS Server in Tunisia\n\n# DNS Server in Tunisia\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 197.26.8.36 | Aryanah | 100% |\n| 193.95.93.243 dns2.planettunisie.com. | | 99.6564% |\n| 41.225.141.127 | | 100% |\n| 197.15.15.96 | | 100% |\n| 41.225.110.119 | | 100% |\n| 196.203.108.179 | | 100% |\n| 196.203.178.106 | | 100% |\n| 196.203.179.14 | | 89.5038% |\n| 196.203.217.100 | | 100% |\n| 197.27.93.105 | | 91.8367% |\n| 196.234.255.246 | | 100% |\n| 196.234.222.51 | | 100% |\n| 196.234.162.52 | Hammamet | 94.5946% |\n| 193.95.111.96 | | 100% |\n| 41.231.62.166 mail.nafship.com. | | 100% |\n| 41.230.218.194 | | 100% |\n| 41.224.253.210 | | 78.9474% |\n| 196.203.228.161 | | 70% |\n| 197.14.23.141 | Tunis | 41.9355% |\n| 196.178.97.48 | Medjez el Bab | 100% |\n| 197.14.13.63 | | 100% |\n| 196.178.97.117 | Medjez el Bab | 71.4286% |\n| 197.14.23.143 | | 25.7732% |\n| 196.179.236.4 | | 100% |\n| 41.228.23.167 | Sfax | 75% |\n| 196.178.97.254 | Medjez el Bab | 49.7758% |\n| 196.179.250.251 | | 44.1176% |\n| 197.14.23.157 | Tunis | 47.0339% |\n| 196.203.63.34 | | 100% |\n| 196.178.98.56 | Medjez el Bab | 100% |\n| 41.228.23.169 | | 100% |\n| 196.178.99.16 | Medjez el Bab | 100% |\n| 196.179.250.7 | | 72.093% |\n| 196.178.101.21 | Medjez el Bab | 39.5349% |\n| 197.14.23.131 | Tunis | 50% |\n| 41.228.23.137 | Sfax | 80% |\n| 196.178.97.17 | Medjez el Bab | 100% |\n| 196.179.250.50 | | 37.0079% |\n| 196.179.250.93 | | 33.7522% |\n| 196.178.97.45 | Medjez el Bab | 100% |\n| 196.178.97.42 | Medjez el Bab | 57.9545% |\n| 196.179.250.91 | | 64.0078% |\n| 196.178.100.36 | Medjez el Bab | 100% |\n| 196.178.97.112 | Medjez el Bab | 58.6207% |\n| 196.178.97.113 | Medjez el Bab | 24.5283% |\n| 196.178.97.87 | Medjez el Bab | 44.5498% |\n| 196.178.97.52 | Medjez el Bab | 100% |\n| 196.203.173.207 | | 100% |\n| 196.179.230.45 | | 100% |\n| 196.179.252.135 | | 13.9175% |\n\n# DNS Server in Turkey",
+      "source": "Exa"
+    },
+    {
+      "code": "tr",
+      "name": "Turkey",
+      "url": "https://www.publicdns.xyz/country/tr.html",
+      "rawMarkdown": "DNS Server in Turkey\n\n# DNS Server in Turkey\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 95.9.194.13 95.9.194.13.static.ttnet.com.tr. | Konyaalti | 100% |\n| 92.45.59.195 host-92-45-59-195.reverse.superonline.net. | Istanbul | 100% |\n| 93.184.144.5 destek.sistemhost.com. | Edirne | 100% |\n| 94.54.47.200 | Ankara | 100% |\n| 176.53.92.22 server-176.53.92.22.as42926.net. | | 100% |\n| 185.250.193.165 | | 100% |\n| 213.14.10.165 host-213-14-10-165.reverse.superonline.net. | Istanbul | 100% |\n| 62.248.9.91 | Istanbul | 100% |\n| 176.235.200.91 | | 100% |\n| 212.98.235.50 | Istanbul | 100% |\n| 176.236.223.149 | | 60.6061% |\n| 176.236.223.156 | | 75% |\n| 185.200.36.182 | | 63.8889% |\n| 31.7.36.36 resolve01.tek.net.tr. | Antalya | 100% |\n| 31.7.37.37 resolve02.tek.net.tr. | Antalya | 100% |\n| 2.59.119.25 buycryptoservices.com. | | 100% |\n| 5.25.56.138 | Istanbul | 100% |\n| 5.25.82.30 | Istanbul | 100% |\n| 5.25.98.224 | Istanbul | 100% |\n| 5.25.116.109 | Istanbul | 100% |\n| 5.25.113.223 | Istanbul | 100% |\n| 45.195.77.74 | | 100% |\n| 193.192.113.130 130.113.192.193.static.turk.net. | Istanbul | 99.7118% |\n| 78.135.69.51 | Nazilli | 100% |\n| 45.195.77.57 | | 100% |\n| 176.235.165.91 | Istanbul | 100% |\n| 176.53.85.154 server-176.53.85.154.as42926.net. | | 97.8448% |\n| 88.249.41.163 88.249.41.163.static.ttnet.com.tr. | | 100% |\n| 212.125.13.61 | Istanbul | 100% |\n| 78.135.81.205 78-135-81-205.hostlab.net.tr. | Istanbul | 100% |\n| 31.145.58.190 | Tekirdağ | 88.0597% |\n| 195.142.119.220 host-195-142-119-220.reverse.superonline.net. | Istanbul | 100% |\n| 212.68.34.124 undostar.net. | | 100% |\n| 212.68.40.6 mail.tanerbilisim.com. | | 100% |\n| 149.0.16.217 | Bursa | 100% |\n| 213.248.179.191 | | 100% |\n| 109.228.208.152 109-228-208-152.milleni.com.tr. | Antalya | 100% |\n| 77.73.216.5 | Istanbul | 100% |\n| 82.222.48.42 | Istanbul | 100% |\n| 46.221.5.200 | Istanbul | 100% |\n| 91.93.153.68 host-91-93-153-68.reverse.superonline.net. | | 66.1417% |\n| 213.153.223.21 host-213-153-223-21.reverse.superonline.net. | Istanbul | 99.2754% |\n| 78.135.107.209 | | 35.2941% |\n| 31.206.250.130 | Denizli | 82.5472% |\n| 178.211.56.71 178.211.56.71. | | 100% |\n| 185.67.205.193 185-67-205-193.layersistem.com. | | 100% |\n| 78.189.141.206 78.189.141.206.static.ttnet.com.tr. | Bursa | 97.379% |\n| 94.78.85.253 94-78-85-253.netonline.net. | | 100% |\n| 85.98.211.107 85.98.211.107.static.ttnet.com.tr. | Denizli | 93.3333% |\n| 31.145.56.14 mail.yagmurogluambalaj.com.tr. | Istanbul | 100% |\n\n# DNS Server in Turkmenistan",
+      "source": "Exa"
+    },
+    {
+      "code": "tm",
+      "name": "Turkmenistan",
+      "url": "https://www.publicdns.xyz/country/tm.html",
+      "rawMarkdown": "DNS Server in Turkmenistan\n\n# DNS Server in Turkmenistan\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n\n#### Public DNS Server\n\n- Google Public DNS\n- OpenDNS\n- Cloudflare\n- Level 3\n- Verisign\n- Quad9\n- Comodo Secure DNS\n- DNS.WATCH\n- Norton ConnectSafe\n- GreenTeamDNS\n- SafeDNS\n- OpenNIC\n- SmartViper\n- Freenom World\n- Dyn\n- FreeDNS\n- Alternate DNS\n- Yandex.DNS\n- UncensoredDNS\n- Hurricane Electric\n- puntCAT\n- Neustar\n- CNNIC SDNS\n- CFIEC IPv6 Public DNS\n- AliDNS\n- Baidu Public DNS\n- DNSPod Public DNS+\n- 114DNS\n- OneDNS\n- DNSpai\n\nError fetching https://www.publicdns.xyz/country/to.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/tt.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/tc.html: CRAWL_HTTP_403",
+      "source": "Exa"
+    },
+    {
+      "code": "tc",
+      "name": "Turks and Caicos Islands",
+      "url": "https://www.publicdns.xyz/country/tc.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/to.html",
+    "https://www.publicdns.xyz/country/tt.html",
+    "https://www.publicdns.xyz/country/tc.html"
+  ]
+}
