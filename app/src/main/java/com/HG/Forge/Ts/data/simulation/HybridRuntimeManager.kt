@@ -411,7 +411,7 @@ class HybridRuntimeManager(
         val result = runCatching { adapter.readInteractive(request) }.getOrElse {
             return RuntimeInteractiveResult(false, message = it.message ?: "Terminal output failed.")
         }
-        if (!result.accepted && result.message == "PRoot PTY output drained; session resources released.") {
+        if (!result.accepted && result.message.startsWith("PRoot PTY output drained; session resources released.")) {
             setRuntimeState(RuntimeEnvironmentId.XFCE_PROOT, distribution, RuntimeLifecycleState.STOPPED)
             registry.recordEvent("PRoot " + distribution.name + " terminal session exited and resources were released.")
         }
