@@ -35,6 +35,8 @@ interface RuntimeExecutionAdapter {
         RuntimeInteractiveResult(false, message = "Interactive input is not supported by this adapter.")
     suspend fun readInteractive(request: RuntimeAdapterStartRequest): RuntimeInteractiveResult =
         RuntimeInteractiveResult(false, message = "Interactive output is not supported by this adapter.")
+    suspend fun resizeInteractive(request: RuntimeAdapterStartRequest, rows: Int, columns: Int): RuntimeInteractiveResult =
+        RuntimeInteractiveResult(false, message = "Terminal resize is not supported by this adapter.")
     suspend fun stop(request: RuntimeAdapterStartRequest): RuntimeAdapterStopResult =
         RuntimeAdapterStopResult(false, "This adapter does not expose process shutdown.")
 }
