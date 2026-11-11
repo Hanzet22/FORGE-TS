@@ -79,7 +79,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text("Crash recovery & diagnostics", style = MaterialTheme.typography.titleMedium)
         Text(
-            "Local technical logging starts automatically whenever FORGE-TS opens. Remote upload is optional and only runs after permission is granted. Uploaded diagnostics can include app/Android versions, a pseudonymous installation ID, event labels and technical exception traces. They exclude passwords, terminal input/output, message contents and network payloads. You can turn remote uploads off at any time.",
+            "Local technical logging is always on. After you allow remote diagnostics, FORGE-TS automatically sends one bounded report when the app moves to the background and retries when connectivity returns. Reports can include Info, Warning, Error, Crash and Critical Error events; app and Android versions; device brand/model, RAM and display resolution; CPU chipset and architecture; event labels; and a pseudonymous installation ID. Technical exception traces are bounded. No IMEI/serial number, location, passwords, terminal input/output, message contents, files or network payloads are collected. Remote upload can be disabled here at any time.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -105,7 +105,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             )
         }
         Text(
-            "Admin email destination is not configured in the backend yet. Remote events are currently stored in the FORGE-TS Supabase diagnostics service.",
+            "Remote reports are stored in the FORGE-TS Supabase diagnostics service. The backend can send a privacy-filtered session summary to the configured administrator email; raw stack traces and installation IDs are not included in email.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
