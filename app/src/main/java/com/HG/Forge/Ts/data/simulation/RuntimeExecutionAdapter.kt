@@ -24,7 +24,12 @@ data class RuntimeCommandResult(
     val output: String,
     val message: String
 )
-data class RuntimeInteractiveResult(val accepted: Boolean, val output: String = "", val message: String)
+data class RuntimeInteractiveResult(
+    val accepted: Boolean,
+    val output: String = "",
+    val message: String,
+    val rawOutput: ByteArray = byteArrayOf()
+)
 interface RuntimeExecutionAdapter {
     val environmentId: RuntimeEnvironmentId
     suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability
@@ -33,6 +38,8 @@ interface RuntimeExecutionAdapter {
         RuntimeCommandResult(false, null, "", "This adapter does not expose command execution.")
     suspend fun writeInteractive(request: RuntimeAdapterStartRequest, input: String): RuntimeInteractiveResult =
         RuntimeInteractiveResult(false, message = "Interactive input is not supported by this adapter.")
+    suspend fun writeInteractiveBytes(request: RuntimeAdapterStartRequest, input: ByteArray): RuntimeInteractiveResult =
+        writeInteractive(request, String(input, Charsets.UTF_8))
     suspend fun readInteractive(request: RuntimeAdapterStartRequest): RuntimeInteractiveResult =
         RuntimeInteractiveResult(false, message = "Interactive output is not supported by this adapter.")
     suspend fun resizeInteractive(request: RuntimeAdapterStartRequest, rows: Int, columns: Int): RuntimeInteractiveResult =

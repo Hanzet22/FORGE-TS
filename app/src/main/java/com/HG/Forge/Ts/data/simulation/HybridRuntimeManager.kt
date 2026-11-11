@@ -348,15 +348,31 @@ class HybridRuntimeManager(
         }
     }
 
-    suspend fun writeProotTerminalInput(distribution: ProotDistribution, input: String): RuntimeInteractiveResult {
-        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING || distribution !in preparedProotInstances)
+    suspend fun writeProotTerminalInput(distribution: ProotDistribution, input: String): RuntimeInteractiveResult =
+        writeProotTerminalBytes(distribution, input.toByteArray(Charsets.UTF_8))
+
+    suspend fun writeProotTerminalBytes(
+        distribution: ProotDistribution,
+        input: ByteArray
+    ): RuntimeInteractiveResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING ||
+            distribution !in preparedProotInstances) {
             return RuntimeInteractiveResult(false, message = "The selected PRoot instance is not confirmed RUNNING.")
+        }
         val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
         val workspace = File(root, distribution.directoryName)
-        if (!isSafeDirectory(workspace, root)) return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
-        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
-        val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
-        return runCatching { adapter.writeInteractive(request, input) }.getOrElse { RuntimeInteractiveResult(false, message = it.message ?: "Terminal input failed.") }
+        if (!isSafeDirectory(workspace, root))
+            return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
+        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT)
+            ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
+        val request = RuntimeAdapterStartRequest(
+            RuntimeEnvironmentId.XFCE_PROOT,
+            distribution.directoryName,
+            workspace.absolutePath
+        )
+        return runCatching { adapter.writeInteractiveBytes(request, input) }.getOrElse {
+            RuntimeInteractiveResult(false, message = it.message ?: "Terminal input failed.")
+        }
     }
 
     suspend fun resizeProotTerminal(

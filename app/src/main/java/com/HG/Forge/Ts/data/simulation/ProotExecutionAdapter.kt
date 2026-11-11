@@ -3,6 +3,7 @@ package com.HG.Forge.Ts.data.simulation
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit
 class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     private data class PtySession(
         val handle: Long,
-        val output: StringBuilder,
+        val output: ByteArrayOutputStream,
         val inputLock: Any,
         @Volatile var reader: Thread? = null
     )
@@ -85,7 +86,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, StringBuilder(), Any())
+            val session = PtySession(handle, ByteArrayOutputStream(), Any())
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
@@ -97,11 +98,16 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                             if (count > 0) {
                                 log.write(bytes, 0, count)
                                 log.flush()
-                                val chunk = String(bytes, 0, count, Charsets.UTF_8)
                                 synchronized(session.output) {
-                                    session.output.append(chunk)
-                                    if (session.output.length > 262144) {
-                                        session.output.delete(0, session.output.length - 262144)
+                                    session.output.write(bytes, 0, count)
+                                    if (session.output.size() > 262144) {
+                                        val buffered = session.output.toByteArray()
+                                        session.output.reset()
+                                        session.output.write(
+                                            buffered,
+                                            buffered.size - 262144,
+                                            262144
+                                        )
                                     }
                                 }
                             } else if (count < 0 || NativePtyEngine.nativeWait(handle) != 0) {
@@ -166,46 +172,55 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     }
 
     override suspend fun writeInteractive(request: RuntimeAdapterStartRequest, input: String): RuntimeInteractiveResult =
-        withContext(Dispatchers.IO) {
-            if (input.isEmpty() || input.length > 16384 || input.indexOf('\u0000') >= 0) {
-                return@withContext RuntimeInteractiveResult(false, message = "Input is empty or exceeds the 16 KiB session limit.")
-            }
-            val session = sessions[request.workspacePath]
-                ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-            if (NativePtyEngine.nativeWait(session.handle) != 0) {
-                return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
-            }
-            val bytes = input.toByteArray(Charsets.UTF_8)
-            try {
-                synchronized(session.inputLock) {
-                    var offset = 0
-                    while (offset < bytes.size) {
-                        val written = NativePtyEngine.nativeWrite(session.handle, bytes, offset, bytes.size - offset)
-                        if (written <= 0) {
-                            return@withContext RuntimeInteractiveResult(false,
-                                message = "PTY input stopped after $offset of ${bytes.size} bytes.")
-                        }
-                        offset += written
-                    }
-                }
-                RuntimeInteractiveResult(true, message = "Input delivered through the native PTY master.")
-            } catch (error: Exception) {
-                RuntimeInteractiveResult(false, message = "Could not write to the guest PTY: ${error.message ?: "I/O error"}")
-            }
+        writeInteractiveBytes(request, input.toByteArray(Charsets.UTF_8))
+
+    override suspend fun writeInteractiveBytes(
+        request: RuntimeAdapterStartRequest,
+        input: ByteArray
+    ): RuntimeInteractiveResult = withContext(Dispatchers.IO) {
+        if (input.isEmpty() || input.size > 16384 || input.any { it == 0.toByte() }) {
+            return@withContext RuntimeInteractiveResult(false, message = "Input is empty or exceeds the 16 KiB session limit.")
         }
+        val session = sessions[request.workspacePath]
+            ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
+        if (NativePtyEngine.nativeWait(session.handle) != 0) {
+            return@withContext RuntimeInteractiveResult(false, message = "PRoot PTY session has exited.")
+        }
+        val bytes = input.copyOf()
+        try {
+            synchronized(session.inputLock) {
+                var offset = 0
+                while (offset < bytes.size) {
+                    val written = NativePtyEngine.nativeWrite(session.handle, bytes, offset, bytes.size - offset)
+                    if (written <= 0) {
+                        return@withContext RuntimeInteractiveResult(false,
+                            message = "PTY input stopped after $offset of ${bytes.size} bytes.")
+                    }
+                    offset += written
+                }
+            }
+            RuntimeInteractiveResult(true, message = "Input delivered through the native PTY master.")
+        } catch (error: Exception) {
+            RuntimeInteractiveResult(false, message = "Could not write to the guest PTY: ${error.message ?: "I/O error"}")
+        }
+    }
 
     override suspend fun readInteractive(request: RuntimeAdapterStartRequest): RuntimeInteractiveResult =
         withContext(Dispatchers.IO) {
             val session = sessions[request.workspacePath]
                 ?: return@withContext RuntimeInteractiveResult(false, message = "No active native PTY session exists.")
-            val chunk = synchronized(session.output) {
-                val value = session.output.toString()
-                session.output.setLength(0)
+            val bytes = synchronized(session.output) {
+                val value = session.output.toByteArray()
+                session.output.reset()
                 value
             }
             val running = NativePtyEngine.nativeWait(session.handle) == 0
-            RuntimeInteractiveResult(running, chunk,
-                if (running) "Native PTY output read." else "PRoot PTY session exited; buffered output returned.")
+            RuntimeInteractiveResult(
+                running,
+                String(bytes, Charsets.UTF_8),
+                if (running) "Native PTY output read." else "PRoot PTY session exited; buffered output returned.",
+                bytes
+            )
         }
 
     override suspend fun resizeInteractive(

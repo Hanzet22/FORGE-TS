@@ -29,3 +29,13 @@ Third-party libraries, fonts, datasets, documentation sources and their applicab
 - License text: third_party/licenses/WEB-CHECK-MIT.txt
 
 Recheck dependency versions and license notices before distribution.
+
+
+## Terminal emulator
+
+### ConnectBot termlib
+- Project: https://github.com/connectbot/termlib
+- Version: 0.0.12 (`org.connectbot:termlib:0.0.12`)
+- Purpose: Jetpack Compose VT terminal emulator integrated with the native PRoot PTY bridge.
+- License: Apache License 2.0.
+- The bundled libvterm terminal parser is MIT licensed.

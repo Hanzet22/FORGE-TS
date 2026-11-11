@@ -1,13 +1,13 @@
 # FORGE-TS Native PTY Engine Architecture
 
-Status: native PTY is integrated into the PRoot adapter and runtime manager; on-device behavioral acceptance remains pending.
+Status: native PTY and ConnectBot VT terminal emulator are integrated; on-device behavioral acceptance remains pending.
 Target: Android API 29+, ARM64 first, Kotlin + JNI + Android Bionic.
 
 ## 1. Objective
 
 Replace the current pipe-backed PRoot interactive shell with a real pseudo-terminal (PTY). A PTY provides terminal semantics required by shells and interactive programs: isatty(), line discipline, foreground process groups, terminal-generated signals, and terminal window dimensions.
 
-The interactive PRoot adapter now launches its long-lived guest shell through the native PTY bridge. One-shot commands and the disposable ptrace probe still use ProcessBuilder. The terminal emulator/UI integration and on-device behavioral acceptance remain separate milestones.
+The interactive PRoot adapter now launches its long-lived guest shell through the native PTY bridge. One-shot commands and the disposable ptrace probe still use ProcessBuilder. The Compose terminal view forwards PTY output bytes into the emulator, keyboard bytes back to the PTY, and terminal size changes to the runtime manager. On-device behavioral acceptance remains pending.
 
 ## 2. Evidence and platform baseline
 
@@ -19,7 +19,7 @@ The interactive PRoot adapter now launches its long-lived guest shell through th
 ## 3. Layer boundaries
 
 1. Compose terminal UI — renders terminal cells, accepts key events, reports viewport rows/columns.
-2. Terminal emulator — parses VT escape sequences and maintains screen state. ConnectBot termlib is a candidate, subject to API, license, and dependency review.
+2. Terminal emulator — ConnectBot termlib 0.0.12 parses VT escape sequences and maintains the screen, cursor, colors, and scrollback.
 3. Kotlin PTY session facade — owns lifecycle, coroutine dispatch, byte-array boundaries, and session identity.
 4. JNI PTY engine — owns native handles, master FD, child PID, polling, resize, signals, and cleanup.
 5. PRoot launcher — runs the existing packaged PRoot binary with the selected rootfs and guest shell.
@@ -90,7 +90,7 @@ Do not change rootfs provisioning, Supabase, Redis, account flows, or MikroTik/C
 
 ConnectBot termlib is an emulator/display component, not a PTY or process supervisor. Its documented data flow is PTY bytes into TerminalEmulator and keyboard bytes back through a callback, which fits the layer separation above.
 
-The repository declares Apache-2.0 and includes libvterm under MIT. However, the currently surfaced Maven artifact metadata for org.connectbot:termlib:0.0.40 declares Kotlin 2.3.21 and Compose BOM 2026.05.01, while this app currently uses Kotlin 2.2.21 and Compose BOM 2025.10.00. Do not add this dependency blindly; first identify a compatible published version or isolate it behind a separate module after a dependency-resolution review.
+The repository declares Apache-2.0 and includes libvterm under MIT. The pinned org.connectbot:termlib:0.0.12 artifact declares Kotlin 2.2.21 and Compose BOM 2025.12.00. FORGE-TS uses Kotlin 2.2.21 and aligns its Compose BOM to 2025.12.00. The terminal view is connected to the native PTY using byte-preserving input/output callbacks and the PTY resize callback.
 
 - termlib repository and license: https://github.com/connectbot/termlib
 - termlib API documentation: https://termlib.connectbot.org/main
