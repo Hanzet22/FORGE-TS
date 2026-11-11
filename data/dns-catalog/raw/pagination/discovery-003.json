@@ -1,0 +1,137 @@
+{
+  "batch": 2,
+  "capturedAt": "2026-11-11T10:24:33.417Z",
+  "pages": [
+    {
+      "url": "https://www.publicdns.xyz/country/br.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/br/2.html",
+        "https://www.publicdns.xyz/country/br/3.html",
+        "https://www.publicdns.xyz/country/br/4.html",
+        "https://www.publicdns.xyz/country/br/5.html",
+        "https://www.publicdns.xyz/country/br/26.html"
+      ],
+      "lastPage": 26
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bm.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/cm.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bw.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/kh.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bt.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bj.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ca.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/ca/2.html",
+        "https://www.publicdns.xyz/country/ca/3.html",
+        "https://www.publicdns.xyz/country/ca/4.html",
+        "https://www.publicdns.xyz/country/ca/5.html"
+      ],
+      "lastPage": 5
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ba.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/ba/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ky.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/cl.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/cl/2.html",
+        "https://www.publicdns.xyz/country/cl/3.html"
+      ],
+      "lastPage": 3
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bn.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bf.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bo.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/bo/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bg.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/bg/2.html",
+        "https://www.publicdns.xyz/country/bg/3.html",
+        "https://www.publicdns.xyz/country/bg/4.html",
+        "https://www.publicdns.xyz/country/bg/5.html",
+        "https://www.publicdns.xyz/country/bg/9.html"
+      ],
+      "lastPage": 9
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/bz.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/io.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/vg.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bi.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/cv.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    }
+  ]
+}
