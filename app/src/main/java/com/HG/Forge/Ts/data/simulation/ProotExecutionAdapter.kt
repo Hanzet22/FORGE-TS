@@ -304,10 +304,15 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     }
                 }
                 val message = when {
-                    droppedOutputBytes > 0L -> "Terminal output buffer reached its 256 KiB limit; " +
-                        droppedOutputBytes + " older bytes were omitted."
-                    streamOpen -> "Native PTY output read."
-                    else -> "PRoot PTY output drained; session resources released."
+                    !streamOpen && droppedOutputBytes > 0L ->
+                        "PRoot PTY output drained; session resources released. " +
+                            "Terminal output buffer reached its 256 KiB limit; " +
+                            droppedOutputBytes + " older bytes were omitted."
+                    !streamOpen -> "PRoot PTY output drained; session resources released."
+                    droppedOutputBytes > 0L ->
+                        "Terminal output buffer reached its 256 KiB limit; " +
+                            droppedOutputBytes + " older bytes were omitted."
+                    else -> "Native PTY output read."
                 }
                 RuntimeInteractiveResult(streamOpen, String(bytes, Charsets.UTF_8), message, bytes)
             } finally {
