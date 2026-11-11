@@ -1,4 +1,4 @@
-name: CodSpeed PTY Benchmarks
+name: CodSpeed Benchmarks
 
 on:
   push:
@@ -19,8 +19,8 @@ permissions:
   contents: read
 
 jobs:
-  benchmarks:
-    name: Native PTY setup benchmarks
+  native:
+    name: Native PTY helper benchmarks (C++, simulation)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,13 +33,13 @@ jobs:
       - name: Configure CodSpeed C++ benchmarks
         run: >-
           cmake -S benchmarks -B build/benchmarks
-          -DCODSPEED_MODE=instrumentation
+          -DCODSPEED_MODE=simulation
           -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
       - name: Build benchmark executable
-        run: cmake --build build/benchmarks --parallel 2
+        run: cmake --build build/benchmarks --parallel 4
 
-      - name: Run and upload PTY setup benchmarks
+      - name: Run and upload native benchmarks
         uses: CodSpeedHQ/action@v5
         with:
           mode: simulation

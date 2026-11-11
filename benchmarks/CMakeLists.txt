@@ -5,12 +5,17 @@ include(FetchContent)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Benchmark build type" FORCE)
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable upstream benchmark tests" FORCE)
+set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON CACHE BOOL "Fetch benchmark dependencies" FORCE)
+# The CodSpeed instrument-hooks C sources do not build as C23, which is the
+# default C standard of GCC 15 (ubuntu-latest). Pin an older standard.
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 FetchContent_Declare(
     google_benchmark
     GIT_REPOSITORY https://github.com/CodSpeedHQ/codspeed-cpp
     SOURCE_SUBDIR google_benchmark
-    GIT_TAG 1dda6191e7d069501ce9e8dd1ea1e58b0a490c83
+    GIT_TAG f5a917fdd14db7293bd37acb682873fec19f8b6c # v2.4.0
 )
 
 FetchContent_MakeAvailable(google_benchmark)

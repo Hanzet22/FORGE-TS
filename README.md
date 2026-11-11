@@ -1,4 +1,6 @@
 # FORGE-TS
+[![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://app.codspeed.io/Hanzet22/FORGE-TS?utm_source=badge)
+
 **Network & Systems Toolkit** — a native Android app for network utilities, operating-system references and systems administration learning.
 
 ## Platform
