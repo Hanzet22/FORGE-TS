@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "source": "https://www.publicdns.xyz/",
+  "generatedAt": "2026-11-11",
+  "providerCount": 29,
+  "providers": [
+    {
+      "slug": "google",
+      "name": "Google Public DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/google.html",
+      "ipv4": [
+        "8.8.8.8",
+        "8.8.4.4"
+      ],
+      "ipv6": [
+        "2001:4860:4860::8888",
+        "2001:4860:4860::8844",
+        "A",
+        "f"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "opendns",
+      "name": "OpenDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/opendns.html",
+      "ipv4": [
+        "208.67.222.222",
+        "208.67.220.220"
+      ],
+      "ipv6": [
+        "2620:0:ccc::2",
+        "2620:0:ccd::2"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "cloudflare",
+      "name": "Cloudflare",
+      "sourceUrl": "https://www.publicdns.xyz/public/cloudflare.html",
+      "ipv4": [
+        "1.1.1.1",
+        "1.0.0.1"
+      ],
+      "ipv6": [
+        "2606:4700:4700::1111",
+        "2606:4700:4700::1001",
+        "1"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "level3",
+      "name": "Level 3",
+      "sourceUrl": "https://www.publicdns.xyz/public/level3.html",
+      "ipv4": [
+        "209.244.0.3",
+        "209.244.0.4"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "verisign",
+      "name": "Verisign",
+      "sourceUrl": "https://www.publicdns.xyz/public/verisign.html",
+      "ipv4": [
+        "64.6.64.6",
+        "64.6.65.6"
+      ],
+      "ipv6": [
+        "2620:74:1b::1:1",
+        "2620:74:1c::2:2"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "quad9",
+      "name": "Quad9",
+      "sourceUrl": "https://www.publicdns.xyz/public/quad9.html",
+      "ipv4": [
+        "9.9.9.9",
+        "149.112.112.112"
+      ],
+      "ipv6": [
+        "2620:fe::fe",
+        "2620:fe::9"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "comodo-secure",
+      "name": "Comodo Secure DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/comodo-secure.html",
+      "ipv4": [
+        "8.26.56.26",
+        "8.20.247.20"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "dns-watch",
+      "name": "DNS.WATCH",
+      "sourceUrl": "https://www.publicdns.xyz/public/dns-watch.html",
+      "ipv4": [
+        "84.200.69.80",
+        "84.200.70.40"
+      ],
+      "ipv6": [
+        "2001:1608:10:25::1c04:b12f",
+        "2001:1608:10:25::9249:d69b",
+        "D"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "norton-connectsafe",
+      "name": "Norton ConnectSafe",
+      "sourceUrl": "https://www.publicdns.xyz/public/norton-connectsafe.html",
+      "ipv4": [
+        "199.85.126.10",
+        "199.85.127.10"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "greenteamdns",
+      "name": "GreenTeamDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/greenteamdns.html",
+      "ipv4": [
+        "81.218.119.11",
+        "209.88.198.133"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "safedns",
+      "name": "SafeDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/safedns.html",
+      "ipv4": [
+        "195.46.39.39",
+        "195.46.39.40"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "opennic",
+      "name": "OpenNIC",
+      "sourceUrl": "https://www.publicdns.xyz/public/opennic.html",
+      "ipv4": [
+        "185.121.177.177",
+        "169.239.202.202"
+      ],
+      "ipv6": [
+        "2a05:dfc7:5::53",
+        "2a05:dfc7:5353::53"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "smartviper",
+      "name": "SmartViper",
+      "sourceUrl": "https://www.publicdns.xyz/public/smartviper.html",
+      "ipv4": [
+        "208.76.50.50",
+        "208.76.51.51"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "freenom-world",
+      "name": "Freenom World",
+      "sourceUrl": "https://www.publicdns.xyz/public/freenom-world.html",
+      "ipv4": [
+        "80.80.80.80",
+        "80.80.81.81"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "dyn",
+      "name": "Dyn",
+      "sourceUrl": "https://www.publicdns.xyz/public/dyn.html",
+      "ipv4": [
+        "216.146.35.35",
+        "216.146.36.36"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "freedns",
+      "name": "FreeDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/freedns.html",
+      "ipv4": [
+        "37.235.1.174",
+        "37.235.1.177"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "alternate",
+      "name": "Alternate DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/alternate.html",
+      "ipv4": [
+        "198.101.242.72",
+        "23.253.163.53"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "yandex",
+      "name": "Yandex.DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/yandex.html",
+      "ipv4": [
+        "77.88.8.8",
+        "77.88.8.1"
+      ],
+      "ipv6": [
+        "2a02:6b8::feed:0ff",
+        "2a02:6b8:0:1::feed:0ff"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "uncensoreddns",
+      "name": "UncensoredDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/uncensoreddns.html",
+      "ipv4": [
+        "91.239.100.100",
+        "89.233.43.71"
+      ],
+      "ipv6": [
+        "2001:67c:28a4::",
+        "2a01:3a0:53:53::"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "he",
+      "name": "Hurricane Electric",
+      "sourceUrl": "https://www.publicdns.xyz/public/he.html",
+      "ipv4": [],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "puntcat",
+      "name": "puntCAT",
+      "sourceUrl": "https://www.publicdns.xyz/public/puntcat.html",
+      "ipv4": [
+        "109.69.8.51"
+      ],
+      "ipv6": [
+        "2a00:1508:0:4::9"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "cnnic-sdns",
+      "name": "CNNIC SDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/cnnic-sdns.html",
+      "ipv4": [
+        "1.2.4.8",
+        "210.2.4.8"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "cfiec-ipv6",
+      "name": "CFIEC IPv6 Public DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/cfiec-ipv6.html",
+      "ipv4": [],
+      "ipv6": [
+        "240c::6666",
+        "240c::6644"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "alidns",
+      "name": "AliDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/alidns.html",
+      "ipv4": [
+        "223.5.5.5",
+        "223.6.6.6"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "baidu",
+      "name": "Baidu Public DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/baidu.html",
+      "ipv4": [
+        "180.76.76.76"
+      ],
+      "ipv6": [
+        "2400:da00::6666",
+        "Ba"
+      ],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "dnspod",
+      "name": "DNSPod Public DNS+",
+      "sourceUrl": "https://www.publicdns.xyz/public/dnspod.html",
+      "ipv4": [],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "114dns",
+      "name": "114DNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/114dns.html",
+      "ipv4": [
+        "114.114.114.114",
+        "114.114.115.115"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "onedns",
+      "name": "OneDNS",
+      "sourceUrl": "https://www.publicdns.xyz/public/onedns.html",
+      "ipv4": [
+        "117.50.11.11",
+        "117.50.22.22"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    },
+    {
+      "slug": "dnspai",
+      "name": "DNSpai",
+      "sourceUrl": "https://www.publicdns.xyz/public/dnspai.html",
+      "ipv4": [
+        "101.226.4.6",
+        "218.30.118.6"
+      ],
+      "ipv6": [],
+      "source": "PublicDNS.xyz",
+      "verification": "directory-listed; not live-tested"
+    }
+  ]
+}
