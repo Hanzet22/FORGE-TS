@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.work.*
-import com.HG.Forge.Ts.BuildConfig
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -65,7 +64,6 @@ object ForgeDiagnostics {
         if (throwable == null) Log.println(priority, "FORGE/$safeTag", logMessage)
         else Log.println(priority, "FORGE/$safeTag", "$logMessage exception=${throwable.javaClass.name}")
 
-        if (!BuildConfig.DEBUG) return
         runCatching {
             val eventJson = JSONObject()
                 .put("eventId", UUID.randomUUID().toString())
