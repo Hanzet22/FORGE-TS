@@ -22,7 +22,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
     private val appContext = context.applicationContext
     private val sessions = ConcurrentHashMap<String, PtySession>()
-    private val environmentId = RuntimeEnvironmentId.XFCE_PROOT
+    override val environmentId = RuntimeEnvironmentId.XFCE_PROOT
 
     override suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability =
         withContext(Dispatchers.IO) {
