@@ -94,27 +94,41 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             session.reader = Thread({
                 val bytes = ByteArray(8192)
                 try {
+                    var consecutiveEofSignals = 0
                     logFile.outputStream().buffered().use { log ->
                         while (true) {
                             val count = NativePtyEngine.nativeRead(handle, bytes, 250)
-                            if (count > 0) {
-                                log.write(bytes, 0, count)
-                                log.flush()
-                                synchronized(session.output) {
-                                    session.output.write(bytes, 0, count)
-                                    if (session.output.size() > 262144) {
-                                        val buffered = session.output.toByteArray()
-                                        session.output.reset()
-                                        session.output.write(
-                                            buffered,
-                                            buffered.size - 262144,
-                                            262144
-                                        )
+                            when {
+                                count > 0 -> {
+                                    consecutiveEofSignals = 0
+                                    log.write(bytes, 0, count)
+                                    log.flush()
+                                    synchronized(session.output) {
+                                        session.output.write(bytes, 0, count)
+                                        if (session.output.size() > 262144) {
+                                            val buffered = session.output.toByteArray()
+                                            session.output.reset()
+                                            session.output.write(
+                                                buffered,
+                                                buffered.size - 262144,
+                                                262144
+                                            )
+                                        }
                                     }
+                                    session.outputAvailable.trySend(Unit)
                                 }
-                                session.outputAvailable.trySend(Unit)
-                            } else if (count < 0 || NativePtyEngine.nativeWait(handle) != 0) {
-                                break
+                                count == -5 -> {
+                                    // Linux PTYs may briefly report EIO while the
+                                    // slave line discipline is still flushing data.
+                                    if (NativePtyEngine.nativeWait(handle) != 0) {
+                                        consecutiveEofSignals++
+                                        if (consecutiveEofSignals >= 10) break
+                                    } else {
+                                        consecutiveEofSignals = 0
+                                    }
+                                    Thread.sleep(10)
+                                }
+                                count < 0 || NativePtyEngine.nativeWait(handle) != 0 -> break
                             }
                         }
                     }
