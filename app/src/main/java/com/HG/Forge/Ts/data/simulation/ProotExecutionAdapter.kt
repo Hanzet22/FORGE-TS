@@ -34,13 +34,21 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     private val appContext = context.applicationContext
     private val connectivityManager = appContext.getSystemService(ConnectivityManager::class.java)
     private val dnsLock = Any()
+    @Volatile private var defaultDnsNetwork: Network? = null
     private val dnsCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            defaultDnsNetwork = network
+        }
+
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-            updateResolverFiles(linkProperties)
+            if (defaultDnsNetwork == network) updateResolverFiles(linkProperties)
         }
 
         override fun onLost(network: Network) {
-            clearResolverFiles()
+            if (defaultDnsNetwork == network) {
+                defaultDnsNetwork = null
+                clearResolverFiles()
+            }
         }
     }
     private val sessions = ConcurrentHashMap<String, PtySession>()
@@ -450,6 +458,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
     private fun refreshAllResolverFiles() {
         val network = runCatching { connectivityManager.activeNetwork }.getOrNull()
+        defaultDnsNetwork = network
         val linkProperties = network?.let { runCatching { connectivityManager.getLinkProperties(it) }.getOrNull() }
         updateResolverFiles(linkProperties)
     }
