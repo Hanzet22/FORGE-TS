@@ -1,4 +1,4 @@
-name: CodSpeed PTY Benchmarks
+name: CodSpeed Benchmarks
 
 on:
   push:
@@ -6,21 +6,29 @@ on:
     paths:
       - "benchmarks/**"
       - "app/src/main/cpp/**"
+      - "app/src/main/java/com/HG/Forge/Ts/data/network/CidrCalculator.kt"
+      - "third_party/codspeed-jvm"
+      - ".gitmodules"
       - ".github/workflows/codspeed.yml"
   pull_request:
     branches: [main]
     paths:
       - "benchmarks/**"
       - "app/src/main/cpp/**"
+      - "app/src/main/java/com/HG/Forge/Ts/data/network/CidrCalculator.kt"
+      - "third_party/codspeed-jvm"
+      - ".gitmodules"
       - ".github/workflows/codspeed.yml"
+  # `workflow_dispatch` allows CodSpeed to trigger backtest
+  # performance analysis in order to generate initial data.
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  benchmarks:
-    name: Native PTY setup benchmarks
+  native:
+    name: Native PTY helper benchmarks (C++, simulation)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,14 +41,51 @@ jobs:
       - name: Configure CodSpeed C++ benchmarks
         run: >-
           cmake -S benchmarks -B build/benchmarks
-          -DCODSPEED_MODE=instrumentation
+          -DCODSPEED_MODE=simulation
           -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
       - name: Build benchmark executable
-        run: cmake --build build/benchmarks --parallel 2
+        run: cmake --build build/benchmarks --parallel 4
 
-      - name: Run and upload PTY setup benchmarks
+      - name: Run and upload native benchmarks
         uses: CodSpeedHQ/action@v5
         with:
-          mode: simulation,walltime
+          mode: simulation
           run: ./build/benchmarks/forge_pty_bench
+
+  jvm:
+    name: Network planning benchmarks (Kotlin JMH, walltime)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch CodSpeed JMH fork
+        run: |
+          git submodule update --init --depth 1 third_party/codspeed-jvm
+          git -C third_party/codspeed-jvm submodule update --init --depth 1 \
+            jmh-fork/jmh-core/native-instrument-hooks/instrument-hooks
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Build JMH benchmarks
+        run: gradle --no-daemon -p benchmarks/jvm jmhJar
+
+      - name: Run and upload JMH benchmarks
+        uses: CodSpeedHQ/action@v5
+        with:
+          mode: walltime
+          run: gradle --no-daemon -p benchmarks/jvm jmh

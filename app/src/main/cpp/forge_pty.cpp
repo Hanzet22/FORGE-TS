@@ -41,12 +41,6 @@ std::shared_ptr<Session> findSession(jlong handle) {
     return found == sessions.end() ? nullptr : found->second;
 }
 
-bool allowedSignal(jint signalValue) {
-    return signalValue == SIGINT || signalValue == SIGTERM ||
-           signalValue == SIGHUP || signalValue == SIGWINCH ||
-           signalValue == SIGTSTP || signalValue == SIGCONT;
-}
-
 bool readStringArray(JNIEnv* env, jobjectArray input,
                      std::vector<std::string>& values,
                      std::vector<char*>& pointers) {
@@ -66,8 +60,7 @@ bool readStringArray(JNIEnv* env, jobjectArray input,
         values.emplace_back(chars);
         env->ReleaseStringUTFChars(item, chars);
         env->DeleteLocalRef(item);
-        if (values.back().empty() || values.back().size() > 8192 ||
-            values.back().find('\0') != std::string::npos) return false;
+        if (!forge::pty::validStringArgument(values.back())) return false;
     }
     forge::pty::buildCStringPointers(values, pointers);
     return true;
@@ -92,7 +85,7 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeStart(
     if (cwdChars == nullptr) return -ENOMEM;
     const std::string cwd(cwdChars);
     env->ReleaseStringUTFChars(cwdString, cwdChars);
-    if (cwd.empty() || cwd.front() != '/' || cwd.size() > 4096) return -EINVAL;
+    if (!forge::pty::validWorkingDirectory(cwd)) return -EINVAL;
 
     struct winsize size {};
     size.ws_row = static_cast<unsigned short>(rows);
@@ -202,8 +195,7 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeWait(
     if (!session) return -EBADF;
     std::lock_guard<std::mutex> lock(session->ioMutex);
     if (session->exited) {
-        return WIFEXITED(session->waitStatus) ? WEXITSTATUS(session->waitStatus) + 1
-             : WIFSIGNALED(session->waitStatus) ? 256 + WTERMSIG(session->waitStatus) : 1;
+        return forge::pty::encodeWaitStatus(session->waitStatus);
     }
     int status = 0;
     const pid_t result = waitpid(session->child, &status, WNOHANG);
@@ -214,14 +206,13 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeWait(
     }
     session->exited = true;
     session->waitStatus = status;
-    return WIFEXITED(status) ? WEXITSTATUS(status) + 1
-         : WIFSIGNALED(status) ? 256 + WTERMSIG(status) : 1;
+    return forge::pty::encodeWaitStatus(status);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeSignal(
     JNIEnv*, jobject, jlong handle, jint signalValue) {
-    if (!allowedSignal(signalValue)) return JNI_FALSE;
+    if (!forge::pty::allowedSignal(signalValue)) return JNI_FALSE;
     auto session = findSession(handle);
     if (!session) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(session->ioMutex);
