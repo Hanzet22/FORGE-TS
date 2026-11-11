@@ -1,0 +1,9 @@
+{
+  "source": "https://www.publicdns.xyz/country/",
+  "capturedAt": "2026-11-11T10:07:00.482Z",
+  "countryPageCount": 0,
+  "countryCodes": [],
+  "providerPageCount": 30,
+  "status": "manifest_saved_before_country_scrape",
+  "note": "Country page URLs extracted from directory. Raw page snapshots are checkpointed by batch in this repository."
+}
