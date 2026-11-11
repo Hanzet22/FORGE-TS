@@ -139,7 +139,10 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeRead(
     if (capacity <= 0 || capacity > 65536) return -EINVAL;
 
     std::lock_guard<std::mutex> lock(session->ioMutex);
-    if (session->master < 0 || session->exited) return 0;
+    // Keep reading after waitpid reports the leader exit: buffered PTY output
+    // may still be pending, and Linux can briefly report EIO before its final
+    // line-discipline data becomes readable.
+    if (session->master < 0) return -EBADF;
     struct pollfd descriptor { session->master, POLLIN | POLLHUP | POLLERR, 0 };
     int ready;
     do { ready = poll(&descriptor, 1, timeoutMillis); } while (ready < 0 && errno == EINTR);
@@ -152,7 +155,8 @@ Java_com_HG_Forge_Ts_data_simulation_NativePtyEngine_nativeRead(
         env->SetByteArrayRegion(destination, 0, static_cast<jsize>(count), buffer.data());
         return static_cast<jint>(count);
     }
-    if (count == 0 || errno == EIO || errno == EAGAIN || errno == EINTR) return 0;
+    if (count == 0 || (count < 0 && errno == EIO)) return -EIO;
+    if (count < 0 && (errno == EAGAIN || errno == EINTR)) return 0;
     return -errno;
 }
 
