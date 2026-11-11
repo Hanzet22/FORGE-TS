@@ -43,7 +43,7 @@ object ForgeDiagnosticsConsent {
 object ForgeDiagnostics {
     private const val FILE_NAME = "forge-diagnostic-events.json"
     private const val MAX_EVENTS = 200
-    private const val MAX_FILE_BYTES = 128 * 1024
+    private const val MAX_FILE_BYTES = 48 * 1024
 
     fun log(
         context: Context,
@@ -122,11 +122,11 @@ object ForgeDiagnostics {
         val seen = HashSet<Throwable>()
         var current: Throwable? = error
         var depth = 0
-        while (current != null && seen.add(current) && depth < 4 && out.length < 12000) {
+        while (current != null && seen.add(current) && depth < 3 && out.length < 3000) {
             if (depth > 0) out.append("\nCaused by: ")
             out.append(current.javaClass.name).append('\n')
-            current.stackTrace.take(50).forEach { frame ->
-                if (out.length < 12000) {
+            current.stackTrace.take(20).forEach { frame ->
+                if (out.length < 3000) {
                     out.append(" at ").append(frame.className).append('.')
                         .append(frame.methodName).append('(')
                         .append(frame.fileName ?: "Unknown")
@@ -137,7 +137,7 @@ object ForgeDiagnostics {
             current = current.cause
             depth++
         }
-        return out.toString().take(12000)
+        return out.toString().take(3000)
     }
 
     @Synchronized
