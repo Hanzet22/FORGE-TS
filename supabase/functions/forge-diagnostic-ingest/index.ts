@@ -73,7 +73,7 @@ Deno.serve(async (req: Request) => {
 
     stage = "event_validation";
     const events = input.events;
-    if (!Array.isArray(events) || events.length < 1 || events.length > 40) {
+    if (!Array.isArray(events) || events.length < 1 || events.length > 200) {
       return json({ ok: false, error: "invalid_event_batch" }, 400);
     }
 
@@ -226,15 +226,14 @@ Deno.serve(async (req: Request) => {
       return json({ ok: false, error: "diagnostic_storage_unavailable" }, 502);
     }
 
-    // Optional admin email alert: only WARNING/ERROR summaries, never raw stack traces,
-    // installation IDs, credentials, terminal data, or message contents.
+    // Send one privacy-filtered summary for the accepted background-session envelope.
+    // Raw stack traces, installation IDs, credentials, terminal data, and message contents
+    // are never included in administrator email.
     let emailAlert = "not_configured";
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const emailFrom = Deno.env.get("DIAGNOSTICS_EMAIL_FROM") ||
       Deno.env.get("DIAGNOSTIC_EMAIL_FROM");
-    const importantEvents = normalized.filter((event) =>
-      ["WARNING", "ERROR", "CRITICAL", "CRASH"].includes(String(event.level))
-    );
+    const importantEvents = normalized;
     if (resendKey && emailFrom && importantEvents.length > 0) {
       stage = "admin_email_rate_limit";
       const emailRateKey = "forge-ts:diagnostic-email:" + installHash;
@@ -276,8 +275,8 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify({
               from: emailFrom,
               to: ["papakjamsutnoruu@gmail.com"],
-              subject: "[FORGE-TS] Diagnostic alert summary",
-              text: "FORGE-TS received important diagnostic events.\n\n" +
+              subject: "[FORGE-TS] Session diagnostics summary",
+              text: "FORGE-TS received a background-session diagnostics report.\n\n" +
                 JSON.stringify(summary, null, 2) +
                 "\n\nFull event records remain in the protected FORGE-TS diagnostics backend.",
             }),
