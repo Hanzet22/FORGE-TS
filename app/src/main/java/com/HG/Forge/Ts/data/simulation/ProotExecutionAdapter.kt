@@ -82,8 +82,8 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                 val count = stream.read(buffer)
                                 if (count < 0) break
                                 val chunk = String(buffer, 0, count, Charsets.UTF_8)
-                                synchronized(interactiveOutput[key] ?: continue) {
-                                    val output = interactiveOutput[key] ?: continue
+                                val output = interactiveOutput[key]
+                                if (output != null) synchronized(output) {
                                     output.append(chunk)
                                     if (output.length > 262144) output.delete(0, output.length - 262144)
                                 }
@@ -100,7 +100,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 return@withContext RuntimeAdapterStartResult(false, false, "PRoot shell exited during startup; inspect session.log.")
             }
             RuntimeAdapterStartResult(true, true,
-                "PRoot shell process is active. Interactive terminal/display integration remains a separate milestone.")
+                "Pipe-backed interactive shell is active. A true PTY, terminal job control, and X11 display remain separate milestones.")
         }
 
     override suspend fun execute(
