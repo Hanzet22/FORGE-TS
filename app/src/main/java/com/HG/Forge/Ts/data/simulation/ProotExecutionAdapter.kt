@@ -51,7 +51,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             val process = runCatching {
                 ProcessBuilder(command(engine, root, listOf("/bin/sh", "-c", "exit 0")))
                     .directory(root).redirectErrorStream(true).redirectOutput(probeLog)
-                    .apply { environment().putAll(environment(loader, tmp)) }.start()
+                    .apply { environment().clear(); environment().putAll(environment(loader, tmp)) }.start()
             }.getOrElse {
                 return@withContext RuntimeAdapterCapability(false,
                     "PRoot disposable-child probe could not launch: " + (it.message ?: "unknown error"))
@@ -215,7 +215,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 .directory(root)
                 .redirectErrorStream(true)
                 .redirectOutput(outputFile)
-                .apply { environment().putAll(environment(loader, tmp)) }
+                .apply { environment().clear(); environment().putAll(environment(loader, tmp)) }
                 .start()
         }.getOrElse {
             return@withContext RuntimeCommandResult(false, null, "", "Guest command launch failed: ${it.message ?: "unknown error"}")
@@ -417,6 +417,8 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         "TMPDIR" to tmp.absolutePath,
         "LD_LIBRARY_PATH" to appContext.applicationInfo.nativeLibraryDir,
         "HOME" to "/root",
+        "USER" to "root",
+        "LOGNAME" to "root",
         "PATH" to "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         "TERM" to "xterm-256color",
         "LANG" to "C.UTF-8"
