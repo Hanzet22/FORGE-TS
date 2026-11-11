@@ -4,8 +4,14 @@ import android.app.Application
 import android.content.Context
 import com.HG.Forge.Ts.data.sync.CrashReportStore
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
+import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsConsent
+import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsUploadScheduler
+import com.HG.Forge.Ts.data.sync.CrashReportUploadScheduler
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 
-class ForgeApplication : Application() {
+class ForgeApplication : Application(), DefaultLifecycleObserver {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         installEarlyCrashHandler()
@@ -14,9 +20,26 @@ class ForgeApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Keep Application startup minimal. Diagnostic data is stored locally;
-        // recovery and sharing must not depend on WorkManager or network services.
+        // Observe the whole process, not individual Activity recreation.
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         ForgeDiagnostics.log(this, "INFO", "Application", "application.on_create")
+        if (ForgeDiagnosticsConsent.isEnabled(this)) {
+            ForgeDiagnosticsUploadScheduler.enqueue(this)
+            CrashReportUploadScheduler.enqueue(this)
+        }
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        ForgeDiagnostics.log(this, "INFO", "Application", "session.foreground")
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        // WorkManager persists this request and waits for connectivity after backgrounding.
+        ForgeDiagnostics.log(this, "INFO", "Application", "session.background")
+        if (ForgeDiagnosticsConsent.isEnabled(this)) {
+            ForgeDiagnosticsUploadScheduler.enqueue(this)
+            CrashReportUploadScheduler.enqueue(this)
+        }
     }
 
     private fun installEarlyCrashHandler() {
