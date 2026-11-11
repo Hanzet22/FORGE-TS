@@ -1,6 +1,10 @@
 package com.HG.Forge.Ts.data.simulation
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
@@ -28,9 +32,25 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     )
 
     private val appContext = context.applicationContext
+    private val connectivityManager = appContext.getSystemService(ConnectivityManager::class.java)
+    private val dnsLock = Any()
+    private val dnsCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            updateResolverFiles(linkProperties)
+        }
+
+        override fun onLost(network: Network) {
+            clearResolverFiles()
+        }
+    }
     private val sessions = ConcurrentHashMap<String, PtySession>()
     private val sessionLocks = ConcurrentHashMap<String, Any>()
     override val environmentId = RuntimeEnvironmentId.XFCE_PROOT
+
+    init {
+        runCatching { connectivityManager.registerDefaultNetworkCallback(dnsCallback) }
+        refreshAllResolverFiles()
+    }
 
     override suspend fun inspect(request: RuntimeAdapterStartRequest): RuntimeAdapterCapability =
         withContext(Dispatchers.IO) {
@@ -408,8 +428,78 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 args += "--bind=$hostPath"
             }
         }
+        val workspace = root.parentFile
+        if (workspace != null) {
+            val resolverFile = refreshResolverFile(workspace)
+            if (resolverFile != null) args += "--bind=${resolverFile.absolutePath}:/etc/resolv.conf"
+        }
         args += guest
         return args
+    }
+
+    /**
+     * Linux guests need /etc/resolv.conf, but Android Private DNS must not be
+     * bypassed by sending plaintext DNS directly to LinkProperties DNS servers.
+     * In that mode (or while offline), expose an empty resolver file instead.
+     */
+    private fun refreshResolverFile(workspace: File): File? {
+        val network = runCatching { connectivityManager.activeNetwork }.getOrNull()
+        val linkProperties = network?.let { runCatching { connectivityManager.getLinkProperties(it) }.getOrNull() }
+        return writeResolverFile(workspace, linkProperties)
+    }
+
+    private fun refreshAllResolverFiles() {
+        val network = runCatching { connectivityManager.activeNetwork }.getOrNull()
+        val linkProperties = network?.let { runCatching { connectivityManager.getLinkProperties(it) }.getOrNull() }
+        updateResolverFiles(linkProperties)
+    }
+
+    private fun updateResolverFiles(linkProperties: LinkProperties?) {
+        val runtimeRoot = File(appContext.filesDir, "forge-runtime/proot")
+        listOf("alpine", "debian", "ubuntu").forEach { distro ->
+            val workspace = File(runtimeRoot, distro)
+            if (workspace.isDirectory) writeResolverFile(workspace, linkProperties)
+        }
+    }
+
+    private fun clearResolverFiles() {
+        updateResolverFiles(null)
+    }
+
+    private fun writeResolverFile(workspace: File, linkProperties: LinkProperties?): File? {
+        val appFiles = runCatching { appContext.filesDir.canonicalFile }.getOrNull() ?: return null
+        val safeWorkspace = runCatching { workspace.canonicalFile }.getOrNull() ?: return null
+        if (!safeWorkspace.path.startsWith(appFiles.path + File.separator) || !safeWorkspace.isDirectory) return null
+
+        val dnsDirectory = File(safeWorkspace, "dns")
+        if (!(dnsDirectory.isDirectory || dnsDirectory.mkdirs())) return null
+        val safeDnsDirectory = runCatching { dnsDirectory.canonicalFile }.getOrNull() ?: return null
+        if (!safeDnsDirectory.path.startsWith(safeWorkspace.path + File.separator)) return null
+
+        val resolverFile = File(safeDnsDirectory, "resolv.conf")
+        val safeResolverFile = runCatching { resolverFile.canonicalFile }.getOrNull() ?: return null
+        if (!safeResolverFile.path.startsWith(safeDnsDirectory.path + File.separator)) return null
+
+        val dnsServers = if (linkProperties != null && !linkProperties.isPrivateDnsActive) {
+            linkProperties.dnsServers
+        } else {
+            emptyList()
+        }
+        val contents = dnsServers.mapNotNull { address ->
+            val host = address.hostAddress?.substringBefore('%') ?: return@mapNotNull null
+            if (host.isBlank() || host.any { it.isWhitespace() || it == '#' }) null
+            else "nameserver $host"
+        }.distinct().joinToString(separator = "\n", postfix = if (dnsServers.isEmpty()) "" else "\n")
+
+        return runCatching {
+            synchronized(dnsLock) {
+                FileOutputStream(safeResolverFile, false).use { output ->
+                    output.write(contents.toByteArray(Charsets.US_ASCII))
+                    output.fd.sync()
+                }
+            }
+            safeResolverFile
+        }.getOrNull()
     }
 
     private fun environment(loader: File, tmp: File): Map<String, String> = mapOf(
