@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.data.sync
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -55,7 +56,7 @@ object ForgeDiagnostics {
         val safeTag = tag.replace(Regex("[^A-Za-z0-9_.-]"), "_").take(48)
         val safeEvent = event.replace(Regex("[^A-Za-z0-9_.:-]"), "_").take(120)
         val priority = when (normalizedLevel) {
-            "ERROR" -> Log.ERROR
+            "ERROR", "CRITICAL", "CRASH" -> Log.ERROR
             "WARNING", "WARN" -> Log.WARN
             "DEBUG" -> Log.DEBUG
             else -> Log.INFO
@@ -72,6 +73,12 @@ object ForgeDiagnostics {
                 .put("appVersion", appVersion(context))
                 .put("androidSdk", Build.VERSION.SDK_INT)
                 .put("androidRelease", Build.VERSION.RELEASE.orEmpty().take(32))
+                .put("deviceBrand", Build.MANUFACTURER.orEmpty().take(48))
+                .put("deviceModel", Build.MODEL.orEmpty().take(80))
+                .put("deviceRamMb", totalRamMb(context))
+                .put("displayResolution", "${context.resources.displayMetrics.widthPixels}x${context.resources.displayMetrics.heightPixels}")
+                .put("cpuChipset", chipsetModel())
+                .put("cpuArchitecture", Build.SUPPORTED_ABIS.firstOrNull().orEmpty().take(40))
                 .put("level", if (normalizedLevel == "WARN") "WARNING" else normalizedLevel)
                 .put("tag", safeTag)
                 .put("eventName", safeEvent)
@@ -94,6 +101,17 @@ object ForgeDiagnostics {
         prefs.edit().putString("installation_id", created).commit()
         return created
     }
+
+    private fun totalRamMb(context: Context): Long = runCatching {
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val memory = ActivityManager.MemoryInfo()
+        manager.getMemoryInfo(memory)
+        memory.totalMem / (1024L * 1024L)
+    }.getOrDefault(0L)
+
+    private fun chipsetModel(): String = runCatching {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Build.SOC_MODEL else Build.HARDWARE
+    }.getOrDefault(Build.HARDWARE.orEmpty()).ifBlank { "unknown" }.take(80)
 
     private fun appVersion(context: Context): String = runCatching {
         context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "unknown"
