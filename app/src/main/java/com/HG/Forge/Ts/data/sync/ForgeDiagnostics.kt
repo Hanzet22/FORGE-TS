@@ -86,7 +86,7 @@ object ForgeDiagnostics {
                 .put("stackTrace", throwable?.let(::safeStackTrace) ?: "")
             append(context, eventJson)
             if (ForgeDiagnosticsConsent.isEnabled(context) &&
-                (normalizedLevel == "ERROR" || normalizedLevel == "WARNING" || normalizedLevel == "WARN" ||
+                (normalizedLevel == "ERROR" || normalizedLevel == "WARNING" || normalizedLevel == "WARN" || normalizedLevel == "CRITICAL" || normalizedLevel == "CRASH" ||
                     safeEvent == "application.on_create" || safeEvent == "activity.on_create.enter")) {
                 ForgeDiagnosticsUploadScheduler.enqueue(context)
             }
