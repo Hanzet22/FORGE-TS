@@ -54,7 +54,7 @@ internal object RootfsGuestPath {
     }
 
     private fun isLexicallyContained(file: File, root: File): Boolean {
-        val path = file.absoluteFile.normalize().path
+        val path = file.toPath().toAbsolutePath().normalize().toString()
         return path == root.path || path.startsWith(root.path + File.separator)
     }
 
