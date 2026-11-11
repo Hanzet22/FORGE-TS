@@ -9,7 +9,7 @@ import java.time.Instant
 import java.util.UUID
 
 object CrashReportConsent {
-    fun isEnabled(context: Context): Boolean = true
+    fun isEnabled(context: Context): Boolean = ForgeDiagnosticsConsent.isEnabled(context)
 }
 
 internal object CrashReportStore {
