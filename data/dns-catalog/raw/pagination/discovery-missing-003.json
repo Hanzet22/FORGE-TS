@@ -1,0 +1,91 @@
+{
+  "batch": 3,
+  "capturedAt": "2026-11-11T10:42:40.561Z",
+  "pages": [],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/kp.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/kn.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/lc.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/pm.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/vc.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ws.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/sc.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/sz.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tg.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/to.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/tc.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/vu.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/wf.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/zm.html",
+      "error_type": "network_error",
+      "http_status_code": null,
+      "content": null
+    }
+  ]
+}
