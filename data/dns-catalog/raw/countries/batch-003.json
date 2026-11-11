@@ -1,0 +1,85 @@
+{
+  "batch": 3,
+  "capturedAt": "2026-11-11T10:14:33.606Z",
+  "source": "publicdns.xyz country inventory",
+  "pages": [
+    {
+      "code": "bz",
+      "name": "Belize",
+      "url": "https://www.publicdns.xyz/country/bz.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "bj",
+      "name": "Benin",
+      "url": "https://www.publicdns.xyz/country/bj.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "bm",
+      "name": "Bermuda",
+      "url": "https://www.publicdns.xyz/country/bm.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "bt",
+      "name": "Bhutan",
+      "url": "https://www.publicdns.xyz/country/bt.html",
+      "rawMarkdown": "DNS Server in Bhutan\n\n# DNS Server in Bhutan\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 43.241.138.152 cust-sangay-dorji-gw3-plg.tashicell.com. | Tsimasham | 100% |\n| 202.144.140.220 | Thimphu | 100% |\n| 202.144.139.180 ppp139-180.dialup.thimphu.druknet.bt. | Thimphu | 65.7895% |\n| 202.144.130.61 | Thimphu | 70.9677% |\n| 119.2.107.238 ll-cust-119.2-107-238.gw2.lungtenzampa.druknet.bt. | Thimphu | 67.3913% |\n| 119.2.120.222 dsl-119-2-120-222.p-ling.druknet.bt. | Thimphu | 89.4942% |\n\n# DNS Server in Bolivia",
+      "source": "Exa"
+    },
+    {
+      "code": "bo",
+      "name": "Bolivia",
+      "url": "https://www.publicdns.xyz/country/bo.html",
+      "rawMarkdown": "DNS Server in Bolivia\n\n# DNS Server in Bolivia\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 190.109.224.227 static-190-109-224-227.redcotel.bo. | La Paz | 64.6943% |\n| 190.181.21.50 static-190-181-21-50.acelerate.net. | | 100% |\n| 190.186.18.161 static-ip-adsl-190.186.18.161.cotas.com.bo. | Santa Cruz | 100% |\n| 190.171.205.231 ip-adsl-190.171.205.231.cotas.com.bo. | Santa Cruz | 100% |\n| 181.115.168.29 | Tarija | 100% |\n| 190.104.17.4 scz-190-104-17-00004.tigo.bo. | Santa Cruz | 100% |\n| 181.115.184.186 | Cochabamba | 65.0685% |\n| 168.205.99.11 static-168-205-99-11.entelnet.bo. | | 100% |\n| 200.87.100.10 dns.entelnet.bo. | | 99.7773% |\n| 186.121.238.78 static-186-121-238-78.acelerate.net. | La Paz | 100% |\n| 177.222.122.20 | Santa Cruz | 96.5854% |\n| 200.107.241.99 host-200-107-241-99.cotes.net.bo. | | 100% |\n| 200.119.222.242 static-ip-adsl-lpz-200.119.222.242.cotas.com.bo. | Santa Cruz | 80.5556% |\n| 200.58.81.29 static-200-58-81-29.supernet.com.bo. | Cochabamba | 100% |\n| 200.58.74.9 static-200-58-74-9.supernet.com.bo. | | 80.292% |\n| 181.115.181.197 | La Paz | 91.6667% |\n| 177.222.42.118 scz-177-222-42-00118.tigo.bo. | Santa Cruz | 84.7826% |\n| 181.114.110.106 scz-181-114-110-00106.tigo.bo. | Villamontes | 98.9474% |\n| 181.188.169.98 lpz-181-188-169-00098.tigo.bo. | La Paz | 22.3881% |\n| 200.90.148.129 | | 55.5556% |\n| 200.58.182.206 static-ip-adsl-200.58.182.206.cotas.com.bo. | Santa Cruz | 91.6667% |\n| 181.115.184.75 | La Paz | 90.3904% |\n| 190.0.249.41 | | 66.6667% |\n| 190.186.41.66 static-ip-adsl-190.186.41.66.cotas.com.bo. | Santa Cruz | 92.5% |\n| 181.115.203.138 | Santa Cruz | 100% |\n| 190.186.245.140 ip-adsl-190.186.245.140.cotas.com.bo. | La Paz | 100% |\n| 200.58.83.176 static-200-58-83-176.supernet.com.bo. | Cochabamba | 91.8699% |\n| 190.181.50.226 static-190-181-50-226.acelerate.net. | | 94.8148% |\n| 181.114.168.172 | Potosí | 33.3333% |\n| 186.121.226.122 static-186-121-226-122.acelerate.net. | La Paz | 89.2216% |\n| 200.119.222.238 static-ip-adsl-lpz-200.119.222.238.cotas.com.bo. | Santa Cruz | 68% |\n| 190.186.81.162 dynamic-ip-adsl-190.186.81.162.cotas.com.bo. | Santa Cruz | 99.3197% |\n| 190.181.33.58 static-190-181-33-58.acelerate.net. | La Paz | 92.3858% |\n| 190.186.131.245 static-ip-adsl-190.186.131.245.cotas.com.bo. | Santa Cruz | 89.0909% |\n| 181.115.157.89 | Santa Cruz | 100% |\n| 190.180.33.136 ip-adsl-190.180.33.136.cotas.com.bo. | Santa Cruz | 100% |\n| 190.171.236.85 static-ip-adsl-190.171.236.85.cotas.com.bo. | Santa Cruz | 100% |\n| 190.186.110.122 webmail.eurocom.com.bo. | | 100% |\n| 200.58.83.145 static-200-58-83-145.supernet.com.bo. | Cochabamba | 100% |\n| 190.171.226.51 ip-adsl-190.171.226.51.cotas.com.bo. | Santa Cruz | 100% |\n| 190.180.32.33 ip-adsl-190.180.32.33.cotas.com.bo. | Santa Cruz | 100% |\n| 190.103.74.37 190-103-74-37.redcotel.bo. | La Paz | 100% |\n| 181.188.156.204 scz-181-188-156-00204.tigo.bo. | Santa Cruz | 100% |\n| 190.103.74.40 190-103-74-40.redcotel.bo. | La Paz | 100% |\n| 190.171.219.92 ip-adsl-190.171.219.92.cotas.com.bo. | Santa Cruz | 100% |\n| 200.10.156.62 | | 100% |\n| 201.222.70.184 static-ip-adsl-cbba-201.222.70.184.cotas.com.bo. | Santa Cruz | 100% |\n| 190.103.74.163 190-103-74-163.redcotel.bo. | La Paz | 100% |\n| 201.222.125.82 static-ip-adsl-201.222.125.82.cotas.com.bo. | Santa Cruz | 100% |\n| 201.131.41.35 tesis.ucb.edu.bo. | La Paz | 100% |\n\n# DNS Server in Bosnia and Herzegovina",
+      "source": "Exa"
+    },
+    {
+      "code": "ba",
+      "name": "Bosnia and Herzegovina",
+      "url": "https://www.publicdns.xyz/country/ba.html",
+      "rawMarkdown": "DNS Server in Bosnia and Herzegovina\n\n# DNS Server in Bosnia and Herzegovina\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 91.191.42.18 | Ljubuski | 71.9033% |\n| 77.238.210.30 | Sarajevo | 69.0355% |\n| 5.133.134.93 adsl70po93.tel.net.ba. | | 100% |\n| 5.149.90.172 | | 100% |\n| 5.149.90.231 | | 100% |\n| 5.149.90.246 | | 100% |\n| 5.149.91.177 | | 42.8571% |\n| 5.149.90.125 | Gracanica | 33.3333% |\n| 5.149.90.78 | | 100% |\n| 5.149.90.181 | | 45.8763% |\n| 5.149.90.186 | | 100% |\n| 5.149.91.38 | | 49.0881% |\n| 5.149.91.51 | | 100% |\n| 5.149.91.59 | | 100% |\n| 5.149.91.74 | | 100% |\n| 5.149.91.145 | | 100% |\n| 5.149.91.191 | | 100% |\n| 5.149.91.199 | | 71.4286% |\n| 5.149.90.26 | | 100% |\n| 5.149.91.22 | | 100% |\n| 5.149.90.213 | | 100% |\n| 5.149.91.139 | | 100% |\n| 5.149.91.18 | | 100% |\n| 5.133.156.252 adsl80po252.tel.net.ba. | Siroki Brijeg | 100% |\n| 5.149.69.139 | Banovici | 71.4286% |\n| 5.149.90.113 | | 100% |\n| 5.149.90.150 | | 100% |\n| 5.149.90.43 | | 100% |\n| 5.149.90.198 | | 100% |\n| 5.149.90.250 | | 12.2807% |\n| 5.149.91.17 | | 100% |\n| 5.149.90.157 | | 41.1765% |\n| 5.149.90.241 | | 100% |\n| 5.149.91.175 | | 100% |\n| 5.149.91.190 | | 100% |\n| 5.149.91.201 | | 100% |\n| 5.149.90.17 | | 100% |\n| 5.149.91.171 | | 100% |\n| 5.149.91.60 | Gracanica | 100% |\n| 5.149.90.158 | | 100% |\n| 5.149.91.122 | | 100% |\n| 5.149.90.236 | | 100% |\n| 5.149.90.114 | | 80.7692% |\n| 5.149.91.100 | | 100% |\n| 5.152.235.5 | | 100% |\n| 5.152.235.100 | | 100% |\n| 109.105.205.94 tc-cutuk-net-14-94.team.ba. | | 100% |\n| 185.65.122.90 | | 100% |\n| 77.238.209.242 b2b-77-238-209-242.static.telemach.ba. | Sarajevo | 97.561% |\n| 87.250.111.14 | | 91.8699% |\n\n# DNS Server in Brazil",
+      "source": "Exa"
+    },
+    {
+      "code": "bw",
+      "name": "Botswana",
+      "url": "https://www.publicdns.xyz/country/bw.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "br",
+      "name": "Brazil",
+      "url": "https://www.publicdns.xyz/country/br.html",
+      "rawMarkdown": "DNS Server in Brazil\n\n# DNS Server in Brazil\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 200.174.105.3 | São Paulo | 41.6667% |\n| 138.36.1.131 138-36-1-131.texnet.net.br. | Fortaleza | 97.6378% |\n| 177.43.56.139 trufer139.static.host.gvt.net.br. | Curitiba | 98.4375% |\n| 201.44.177.131 | | 78.6487% |\n| 131.196.220.10 dyn10.220.melnetrs.com.br. | Porto Alegre | 94.4072% |\n| 177.135.239.132 | Brasília | 99.3758% |\n| 177.184.176.5 177-184-176-5.netcartelecom.com.br. | Carbonita | 100% |\n| 179.109.15.42 | Alegre | 99.7506% |\n| 186.251.103.10 | Coronel Fabriciano | 83.5121% |\n| 187.16.105.10 mvx-187-16-105-10.mundivox.com. | Rio de Janeiro | 100% |\n| 189.23.31.242 | São Luís | 72.7749% |\n| 200.169.96.10 | | 83.8471% |\n| 200.195.185.234 mail.hidraulicahidra.com.br. | Araucária | 100% |\n| 54.94.175.250 ec2-54-94-175-250.sa-east-1.compute.amazonaws.com. | São Paulo | 100% |\n| 138.0.207.117 138.0.207.117.linkbrasil.net.br. | Bento de Abreu | 100% |\n| 177.36.11.189 | Recife | 48.0565% |\n| 200.223.95.98 mailjmc.yamana.com. | Itapebi | 72.1763% |\n| 167.250.65.246 | Ananindeua | 100% |\n| 201.91.82.155 201-91-82-155.customer.tdatabrasil.net.br. | São Paulo | 64.7929% |\n| 177.86.201.22 | Bom Despacho | 100% |\n| 206.62.64.34 34.64.62.206.static.deltainternet.net.br. | Maringá | 94.2857% |\n| 143.255.108.173 143-255-108-173.mcdtelecom.com.br. | Brasília | 100% |\n| 200.159.205.11 | | 100% |\n| 177.73.94.186 | Afogados da Ingazeira | 100% |\n| 187.62.191.3 3.191.62.187.cnnet.com.br. | Bauru | 100% |\n| 177.104.125.173 | Itaitinga | 100% |\n| 177.94.208.128 177-94-208-128.dsl.telesp.net.br. | São Paulo | 100% |\n| 187.111.176.193 | Votorantim | 100% |\n| 191.191.32.213 bfbf20d5.virtua.com.br. | Florianópolis | 100% |\n| 45.234.19.98 | Paragominas | 100% |\n| 177.52.182.159 | | 100% |\n| 45.176.203.81 | | 100% |\n| 179.217.179.207 b3d9b3cf.virtua.com.br. | Ribeirão Preto | 100% |\n| 200.164.238.180 | | 100% |\n| 45.5.156.37 static-45-5-156-37.netfacilfibra.com.br. | Brasília | 100% |\n| 45.165.236.69 | Santa Cruz da Vitoria | 100% |\n| 45.181.185.1 45-181-185-1.internetconnect.com.br. | Pedro Leopoldo | 100% |\n| 132.226.245.63 | São Paulo | 100% |\n| 201.40.92.186 201-40-92-186.user3p.brasiltelecom.net.br. | Curitiba | 100% |\n| 200.164.238.178 | | 100% |\n| 201.77.8.5 5-8-77-201.rgprovider.com.br. | Boa Esperanca | 100% |\n| 177.85.16.19 19-16-85-177.netvale.psi.br. | Santana do Paraiso | 100% |\n| 191.7.57.5 191-7-57-5.user.v2net.com.br. | Jardim do Serido | 100% |\n| 189.122.57.179 bd7a39b3.virtua.com.br. | Rio de Janeiro | 100% |\n| 193.123.117.75 | Vinhedo | 100% |\n| 35.198.23.47 47.23.198.35.bc.googleusercontent.com. | São Paulo | 100% |\n| 35.247.214.247 247.214.247.35.bc.googleusercontent.com. | São Paulo | 100% |\n| 201.20.87.90 | Baturite | 100% |\n| 18.228.199.122 ec2-18-228-199-122.sa-east-1.compute.amazonaws.com. | São Paulo | 100% |\n| 191.235.241.155 | Campinas | 100% |\n\nError fetching https://www.publicdns.xyz/country/bz.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/bj.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/bm.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/bw.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/io.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/vg.html: CRAWL_HTTP_403",
+      "source": "Exa"
+    },
+    {
+      "code": "io",
+      "name": "British Indian Ocean Territory",
+      "url": "https://www.publicdns.xyz/country/io.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    },
+    {
+      "code": "vg",
+      "name": "British Virgin Islands",
+      "url": "https://www.publicdns.xyz/country/vg.html",
+      "rawMarkdown": "",
+      "source": "Exa-not-returned"
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/bz.html",
+    "https://www.publicdns.xyz/country/bj.html",
+    "https://www.publicdns.xyz/country/bm.html",
+    "https://www.publicdns.xyz/country/bw.html",
+    "https://www.publicdns.xyz/country/io.html",
+    "https://www.publicdns.xyz/country/vg.html"
+  ]
+}
