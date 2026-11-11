@@ -184,7 +184,8 @@ SOURCE_PATCHES=ashmem_memfd-add-string.h,loader-16kb-page-alignment
 MANIFEST
 (
   cd "$STAGE"
-  find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+  sha256sum "$ABI/libproot.so" "$ABI/libproot_loader.so" > PAYLOAD-SHA256SUMS
+  find . -type f ! -name SHA256SUMS ! -name PAYLOAD-SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
 )
 
 echo "Built ARM64 PRoot payloads:"

@@ -99,12 +99,12 @@ The inspected community static script currently builds AArch64 only. It is not e
   - `arm64-v8a/libproot.so`
   - `arm64-v8a/libproot_loader.so`
 - The build checks ELF architecture, 16 KB maximum page alignment for both payloads, and absence of a dynamic `libtalloc.so` dependency. It emits ELF reports, source/license materials, a build manifest and SHA-256 sums.
-- GitHub Actions uploads `forge-ts-proot-native-arm64` as a 14-day artifact. The artifact must be reviewed and copied into `app/src/main/jniLibs/arm64-v8a/` before it can be included in an APK.
+- GitHub Actions uploads `forge-ts-proot-native-arm64` as a 14-day artifact. The workflow copies the two ARM64 ELF payloads into `app/src/main/jniLibs/arm64-v8a/` and commits them to `main` together with the build manifest, payload SHA-256 list and complete upstream license directory. The generated payload commit does not modify the workflow's own path filters, so it does not start another native build.
 
 ### Validation boundary
 
-- The pipeline source and workflow are committed, but the first CI execution has not yet been confirmed successful.
-- No binary is currently bundled in `jniLibs`; the adapter must continue to report unavailable.
+- The pipeline source and workflow are committed, A successful CI execution and artifact review are not yet confirmed.
+- The adapter must continue to report unavailable until the native build job successfully commits both payloads and the Android packaging workflow completes.
 - A successful CI build is not a device runtime test. The disposable guest-child probe, ptrace behavior, rootfs verification, and Android device execution remain mandatory before enabling PRoot.
 - The first artifact is ARM64 only; no 32-bit guest loader is generated or advertised by this phase.
 
@@ -114,3 +114,11 @@ The first CI compile reached PRoot but failed because ashmem_memfd.c used strcmp
 
 ### P0.5.8 — Include talloc portability implementation in static archive
 The first link attempt with talloc 2.5.0 exposed an undefined `rep_memset_explicit` symbol. The upstream 2.5.0 release uses the libreplace portability layer for this function when the target libc does not provide `memset_explicit` (Android API 29 does not provide that API). The builder now includes the generated `lib/replace/*.o` objects alongside `talloc*.o` when assembling the static archive, so the replacement implementation is linked instead of leaving an unresolved reference. This is a dependency-closure correction; it does not change PRoot runtime behavior.
+
+
+### P0.5.9 — Native payload to APK CI handoff
+
+- Removed the generated PRoot payload commit's `[skip ci]` marker. The native workflow's generated commit now triggers the Android Debug APK workflow, so the packaged ELF payloads are included in an actual APK build rather than silently skipped by CI.
+- Preserve all upstream license files from the build artifact under `app/src/main/assets/licenses/proot-runtime/`; do not ship only the PRoot notice while omitting the talloc notice.
+- Added a dedicated `PAYLOAD-SHA256SUMS` containing only the two executable ARM64 payload hashes. The broader `SHA256SUMS` remains an artifact-level manifest.
+- A successful APK build does not prove ptrace or PRoot execution on a physical device.
