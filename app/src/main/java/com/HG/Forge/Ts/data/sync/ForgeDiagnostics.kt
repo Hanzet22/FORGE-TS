@@ -17,6 +17,9 @@ object ForgeDiagnosticsConsent {
     private const val PREFS = "forge_diagnostics_consent"
     private const val KEY_UPLOADS_ENABLED = "uploads_enabled"
 
+    fun hasDecision(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).contains(KEY_UPLOADS_ENABLED)
+
     /** Remote telemetry is opt-in per installation; local diagnostics remain enabled. */
     fun isEnabled(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
