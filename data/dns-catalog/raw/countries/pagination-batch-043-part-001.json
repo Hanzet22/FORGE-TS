@@ -1,0 +1,53 @@
+{
+  "batch": 43,
+  "part": 1,
+  "capturedAt": "2026-11-11T10:45:19.299Z",
+  "pages": [
+    {
+      "code": "th",
+      "page": 16,
+      "url": "https://www.publicdns.xyz/country/th/16.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 17,
+      "url": "https://www.publicdns.xyz/country/th/17.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 18,
+      "url": "https://www.publicdns.xyz/country/th/18.html",
+      "rawMarkdown": "DNS Server in Thailand\n\n# DNS Server in Thailand\n\n| DNS Server | Location | Reliability |\n| --- | --- | --- |\n| 1.2.252.148 node-olw.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.252.250 node-ooq.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.252.245 node-ool.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.254.23 node-own.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.254.137 node-ozt.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.2.254.143 node-ozz.pool-1-2.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.4.135.69 node-1fp.pool-1-4.dynamic.totinternet.net. | Bangkok | 0.862069% |\n| 1.4.140.79 node-2fj.pool-1-4.dynamic.totinternet.net. | Bueng Kan | 89.8678% |\n| 1.4.141.81 node-2mp.pool-1-4.dynamic.totinternet.net. | Ban Chan | 96.9697% |\n| 1.4.143.156 node-330.pool-1-4.dynamic.totinternet.net. | Ban Chan | 100% |\n| 1.4.143.157 node-331.pool-1-4.dynamic.totinternet.net. | Ban Chan | 100% |\n| 1.4.143.158 node-332.pool-1-4.dynamic.totinternet.net. | Ban Chan | 97.4874% |\n| 1.4.144.45 node-371.pool-1-4.dynamic.totinternet.net. | Pak Kret | 100% |\n| 1.4.144.52 node-378.pool-1-4.dynamic.totinternet.net. | Pak Kret | 100% |\n| 1.4.144.83 node-383.pool-1-4.dynamic.totinternet.net. | Pak Kret | 100% |\n| 1.4.144.145 node-39t.pool-1-4.dynamic.totinternet.net. | Pak Kret | 100% |\n| 1.4.144.242 node-3ci.pool-1-4.dynamic.totinternet.net. | Pak Kret | 100% |\n| 1.4.145.122 node-3ga.pool-1-4.dynamic.totinternet.net. | Pak Kret | 100% |\n| 1.4.146.85 node-3md.pool-1-4.dynamic.totinternet.net. | Nonthaburi | 100% |\n| 1.4.146.209 node-3pt.pool-1-4.dynamic.totinternet.net. | Nonthaburi | 100% |\n| 1.4.147.25 node-3rt.pool-1-4.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.4.147.64 node-3sw.pool-1-4.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.4.147.75 node-3t7.pool-1-4.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.4.147.107 node-3u3.pool-1-4.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.4.147.132 node-3us.pool-1-4.dynamic.totinternet.net. | Bangkok | 100% |\n| 1.4.148.35 node-3z7.pool-1-4.dynamic.totinternet.net. | Nonthaburi | 100% |\n| 1.4.148.214 node-446.pool-1-4.dynamic.totinternet.net. | Nonthaburi | 100% |\n| 1.4.148.253 node-459.pool-1-4.dynamic.totinternet.net. | Nonthaburi | 100% |\n| 1.4.150.80 node-4eo.pool-1-4.dynamic.totinternet.net. | Lat Bua Luang | 100% |\n| 1.4.150.133 node-4g5.pool-1-4.dynamic.totinternet.net. | Lat Bua Luang | 100% |\n| 1.4.154.87 node-57b.pool-1-4.dynamic.totinternet.net. | Ban Kho | 100% |\n| 1.4.157.31 node-5r3.pool-1-4.dynamic.totinternet.net. | Pattani | 100% |\n| 1.4.157.43 node-5rf.pool-1-4.dynamic.totinternet.net. | Pattani | 100% |\n| 1.4.157.95 node-5sv.pool-1-4.dynamic.totinternet.net. | Pattani | 100% |\n| 1.4.158.22 node-5xy.pool-1-4.dynamic.totinternet.net. | Ban Du | 100% |\n| 1.4.158.21 node-5xx.pool-1-4.dynamic.totinternet.net. | Ban Du | 100% |\n| 1.4.158.51 node-5yr.pool-1-4.dynamic.totinternet.net. | Ban Du | 100% |\n| 1.4.158.8 node-5xk.pool-1-4.dynamic.totinternet.net. | Ban Du | 100% |\n| 1.4.158.54 node-5yu.pool-1-4.dynamic.totinternet.net. | Ban Du | 100% |\n| 1.4.159.2 node-64i.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.8 node-64o.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.9 node-64p.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.22 node-652.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.92 node-670.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.138 node-68a.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.182 node-69i.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.216 node-6ag.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.198 node-69y.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.177 node-69d.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n| 1.4.159.226 node-6aq.pool-1-4.dynamic.totinternet.net. | Songkhla | 100% |\n\nError fetching https://www.publicdns.xyz/country/th/16.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/17.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/19.html: CRAWL_HTTP_403\nError fetching https://www.publicdns.xyz/country/th/20.html: CRAWL_HTTP_403",
+      "source": "Exa",
+      "rawChars": 4245
+    },
+    {
+      "code": "th",
+      "page": 19,
+      "url": "https://www.publicdns.xyz/country/th/19.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    },
+    {
+      "code": "th",
+      "page": 20,
+      "url": "https://www.publicdns.xyz/country/th/20.html",
+      "rawMarkdown": "",
+      "source": "Exa-binary-or-corrupt",
+      "rawChars": 0
+    }
+  ],
+  "missing": [
+    "https://www.publicdns.xyz/country/th/16.html",
+    "https://www.publicdns.xyz/country/th/17.html",
+    "https://www.publicdns.xyz/country/th/19.html",
+    "https://www.publicdns.xyz/country/th/20.html"
+  ]
+}
