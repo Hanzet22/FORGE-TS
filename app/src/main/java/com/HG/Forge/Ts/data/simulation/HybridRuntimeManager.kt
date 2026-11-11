@@ -359,6 +359,29 @@ class HybridRuntimeManager(
         return runCatching { adapter.writeInteractive(request, input) }.getOrElse { RuntimeInteractiveResult(false, message = it.message ?: "Terminal input failed.") }
     }
 
+    suspend fun resizeProotTerminal(
+        distribution: ProotDistribution,
+        rows: Int,
+        columns: Int
+    ): RuntimeInteractiveResult {
+        if (rows !in 1..1000 || columns !in 1..1000)
+            return RuntimeInteractiveResult(false, message = "Terminal dimensions must be between 1 and 1000.")
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING ||
+            distribution !in preparedProotInstances) {
+            return RuntimeInteractiveResult(false, message = "The selected PRoot instance is not confirmed RUNNING.")
+        }
+        val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
+        val workspace = File(root, distribution.directoryName)
+        if (!isSafeDirectory(workspace, root))
+            return RuntimeInteractiveResult(false, message = "PRoot workspace containment check failed.")
+        val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT)
+            ?: return RuntimeInteractiveResult(false, message = "No PRoot adapter is registered.")
+        val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
+        return runCatching { adapter.resizeInteractive(request, rows, columns) }.getOrElse {
+            RuntimeInteractiveResult(false, message = it.message ?: "Terminal resize failed.")
+        }
+    }
+
     suspend fun readProotTerminalOutput(distribution: ProotDistribution): RuntimeInteractiveResult {
         if (distribution !in preparedProotInstances) return RuntimeInteractiveResult(false, message = "PRoot workspace is not prepared.")
         val root = roots.getValue(RuntimeEnvironmentId.XFCE_PROOT)
