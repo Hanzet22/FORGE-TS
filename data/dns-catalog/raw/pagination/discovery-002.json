@@ -1,0 +1,145 @@
+{
+  "batch": 1,
+  "capturedAt": "2026-11-11T10:24:06.798Z",
+  "pages": [
+    {
+      "url": "https://www.publicdns.xyz/country/az.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/az/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/au.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/au/2.html",
+        "https://www.publicdns.xyz/country/au/3.html",
+        "https://www.publicdns.xyz/country/au/4.html",
+        "https://www.publicdns.xyz/country/au/5.html",
+        "https://www.publicdns.xyz/country/au/7.html"
+      ],
+      "lastPage": 7
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/al.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/al/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/af.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/be.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/be/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ar.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/ar/2.html",
+        "https://www.publicdns.xyz/country/ar/3.html",
+        "https://www.publicdns.xyz/country/ar/4.html",
+        "https://www.publicdns.xyz/country/ar/5.html",
+        "https://www.publicdns.xyz/country/ar/9.html"
+      ],
+      "lastPage": 9
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ao.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/dz.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/by.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/by/2.html"
+      ],
+      "lastPage": 2
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ad.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bh.html",
+      "pagination": [],
+      "lastPage": 1
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/at.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/at/2.html",
+        "https://www.publicdns.xyz/country/at/3.html"
+      ],
+      "lastPage": 3
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bd.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/bd/2.html",
+        "https://www.publicdns.xyz/country/bd/3.html",
+        "https://www.publicdns.xyz/country/bd/4.html",
+        "https://www.publicdns.xyz/country/bd/5.html",
+        "https://www.publicdns.xyz/country/bd/22.html"
+      ],
+      "lastPage": 22
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/am.html",
+      "pagination": [
+        "https://www.publicdns.xyz/country/am/2.html"
+      ],
+      "lastPage": 2
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://www.publicdns.xyz/country/as.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ai.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/aq.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/ag.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bs.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    },
+    {
+      "url": "https://www.publicdns.xyz/country/bb.html",
+      "error_type": "network_error",
+      "http_status_code": 200,
+      "content": null
+    }
+  ]
+}
