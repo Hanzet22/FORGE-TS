@@ -195,13 +195,27 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         try {
             synchronized(session.inputLock) {
                 var offset = 0
+                var backpressureRetries = 0
                 while (offset < bytes.size) {
                     val written = NativePtyEngine.nativeWrite(session.handle, bytes, offset, bytes.size - offset)
-                    if (written <= 0) {
-                        return@withContext RuntimeInteractiveResult(false,
-                            message = "PTY input stopped after $offset of ${bytes.size} bytes.")
+                    when {
+                        written > 0 -> {
+                            offset += written
+                            backpressureRetries = 0
+                        }
+                        written == -11 -> {
+                            if (backpressureRetries >= 50) {
+                                return@withContext RuntimeInteractiveResult(false,
+                                    message = "PTY remained backpressured after $offset of ${bytes.size} bytes.")
+                            }
+                            backpressureRetries += 1
+                            Thread.sleep(2)
+                        }
+                        else -> {
+                            return@withContext RuntimeInteractiveResult(false,
+                                message = "PTY input failed after $offset of ${bytes.size} bytes (errno=${-written}).")
+                        }
                     }
-                    offset += written
                 }
             }
             RuntimeInteractiveResult(true, message = "Input delivered through the native PTY master.")
