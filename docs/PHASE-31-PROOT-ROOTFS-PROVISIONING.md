@@ -24,7 +24,7 @@ Sources:
 
 - Downloads remain outside the APK and use the existing app-private `filesDir/forge-runtime/proot/<distro>/` workspace.
 - HTTPS-only downloads, same-origin HTTPS redirects, connection timeouts, and archive-size ceilings.
-- SHA-256 is checked before any extraction. Alpine uses the exact pinned digest above; Ubuntu obtains the ARM64 digest from Canonical's official SHA256SUMS endpoint and compares the selected archive.
+- SHA-256 is checked before any extraction. Alpine and Ubuntu use exact digests pinned in application source; the Ubuntu digest was cross-checked against Canonical's official `SHA256SUMS` list. Debian uses the ARM64 layer digest from its pinned OCI manifest.
 - Tar extraction is staged; rejects absolute/traversal paths, duplicate paths, special device/socket entries, oversized entries, and writes through symlink parents.
 - Hardlinks and symlinks are deferred until ordinary files have been extracted; link targets are constrained to the guest root.
 - Validated staging rootfs is promoted while preserving an existing installation on failure.
