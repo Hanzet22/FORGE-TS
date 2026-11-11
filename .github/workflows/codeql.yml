@@ -84,6 +84,12 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+    - name: Install Android NDK and CMake
+      if: matrix.language == 'java-kotlin'
+      uses: android-actions/setup-android@v3
+      with:
+        packages: ndk;27.2.12479018 cmake;3.22.1
+
     - name: Set up JDK 17
       if: matrix.language == 'java-kotlin'
       uses: actions/setup-java@v4
