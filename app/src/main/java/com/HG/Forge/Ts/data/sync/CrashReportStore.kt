@@ -43,9 +43,13 @@ internal object CrashReportStore {
     }.getOrNull()
 
     fun markAnonymousUploaded(context: Context) {
-        val report = read(context) ?: return
+        val file = File(context.filesDir, REPORT_FILE)
+        check(file.isFile && file.length() <= 48 * 1024) {
+            "Crash report is unavailable for upload acknowledgement"
+        }
+        val report = JSONObject(file.readText(Charsets.UTF_8))
         report.put("uploadedAnonymously", true)
-        writeAtomically(File(context.filesDir, REPORT_FILE), report.toString())
+        writeAtomically(file, report.toString())
     }
 
     fun markRecoveryAcknowledged(context: Context) {
