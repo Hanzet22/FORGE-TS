@@ -90,6 +90,7 @@ Deno.serve(async (req: Request) => {
       const appVersion = cleanText(event.appVersion, 32);
       const androidRelease = cleanText(event.androidRelease, 32);
       const level = cleanText(event.level, 8);
+      const category = cleanText(event.category, 32) || "GENERAL";
       const tag = cleanText(event.tag, 48);
       const eventName = cleanText(event.eventName, 120);
       const exceptionType = cleanText(event.exceptionType, 200);
@@ -107,6 +108,7 @@ Deno.serve(async (req: Request) => {
           !Number.isFinite(Date.parse(occurredAt)) ||
           !appVersion || !androidRelease ||
           !["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", "CRASH"].includes(level) ||
+          !["GENERAL", "APP_LIFECYCLE", "ACTIVITY", "NAVIGATION", "FEATURE", "NETWORK", "DNS", "STORAGE", "DATABASE", "BACKGROUND", "PERMISSION", "RUNTIME", "MEDIA", "PERFORMANCE", "SECURITY", "CRASH", "TELEMETRY"].includes(category) ||
           !deviceBrand || !deviceModel ||
           !Number.isInteger(deviceRamMb) || deviceRamMb < 128 || deviceRamMb > 1048576 ||
           !/^\d{2,5}x\d{2,5}$/.test(displayResolution) ||
@@ -131,6 +133,7 @@ Deno.serve(async (req: Request) => {
         cpu_chipset: cpuChipset,
         cpu_architecture: cpuArchitecture,
         level,
+        category,
         tag,
         event_name: eventName,
         exception_type: exceptionType,
@@ -262,6 +265,7 @@ Deno.serve(async (req: Request) => {
             cpuChipset: event.cpu_chipset,
             cpuArchitecture: event.cpu_architecture,
             level: event.level,
+            category: event.category,
             component: event.tag,
             event: event.event_name,
             exceptionType: event.exception_type,
