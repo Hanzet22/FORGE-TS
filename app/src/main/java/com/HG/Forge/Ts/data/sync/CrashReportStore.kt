@@ -2,6 +2,7 @@ package com.HG.Forge.Ts.data.sync
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -19,6 +20,8 @@ internal object CrashReportStore {
     private const val PREFS = "forge_crash_telemetry"
     private const val INSTALLATION_ID = "installation_id"
     private const val REPORT_FILE = "forge-crash-report.json"
+    private const val REPORT_PREFIX = "forge-crash-report-"
+    private const val MAX_PENDING_REPORTS = 5
 
     fun capture(context: Context, throwable: Throwable) {
         runCatching {
@@ -32,36 +35,71 @@ internal object CrashReportStore {
                 .put("exceptionType", throwable.javaClass.name.take(200))
                 .put("stackTrace", safeStackTrace(throwable))
                 .put("uploadedAnonymously", false)
-            writeAtomically(File(context.filesDir, REPORT_FILE), report.toString())
+            val pending = pendingFiles(context)
+            if (pending.size >= MAX_PENDING_REPORTS) {
+                Log.w("FORGE/CrashStore", "Pending crash queue is full; newest report was not persisted")
+                return@runCatching
+            }
+            val filename = "$REPORT_PREFIX${System.currentTimeMillis()}-${UUID.randomUUID()}.json"
+            writeAtomically(File(context.filesDir, filename), report.toString())
         }
     }
 
+    @Synchronized
     fun read(context: Context): JSONObject? = runCatching {
-        val file = File(context.filesDir, REPORT_FILE)
-        if (!file.isFile || file.length() > 48 * 1024) null
+        val file = pendingFiles(context).firstOrNull() ?: return@runCatching null
+        if (file.length() > 48 * 1024) null
         else JSONObject(file.readText(Charsets.UTF_8))
     }.getOrNull()
 
-    fun markAnonymousUploaded(context: Context) {
-        val file = File(context.filesDir, REPORT_FILE)
-        check(file.isFile && file.length() <= 48 * 1024) {
-            "Crash report is unavailable for upload acknowledgement"
-        }
+    @Synchronized
+    fun markAnonymousUploaded(context: Context, crashId: String) {
+        updateReport(context, crashId) { it.put("uploadedAnonymously", true) }
+    }
+
+    @Synchronized
+    fun markRecoveryAcknowledged(context: Context) {
+        val file = pendingFiles(context).firstOrNull() ?: return
         val report = JSONObject(file.readText(Charsets.UTF_8))
-        report.put("uploadedAnonymously", true)
+        report.put("recoveryAcknowledged", true)
         writeAtomically(file, report.toString())
     }
 
-    fun markRecoveryAcknowledged(context: Context) {
-        runCatching {
-            val report = read(context) ?: return
-            report.put("recoveryAcknowledged", true)
-            writeAtomically(File(context.filesDir, REPORT_FILE), report.toString())
+    @Synchronized
+    fun clear(context: Context, crashId: String) {
+        val file = findReport(context, crashId)
+            ?: throw IOException("Crash report is unavailable for removal")
+        if (!file.delete() && file.exists()) {
+            throw IOException("Unable to remove uploaded crash report")
         }
     }
 
-    fun clear(context: Context) {
-        runCatching { File(context.filesDir, REPORT_FILE).delete() }
+    private fun updateReport(context: Context, crashId: String, update: (JSONObject) -> Unit) {
+        val file = findReport(context, crashId)
+            ?: throw IOException("Crash report is unavailable for acknowledgement")
+        check(file.length() <= 48 * 1024) { "Crash report exceeds the local size limit" }
+        val report = JSONObject(file.readText(Charsets.UTF_8))
+        check(report.optString("crashId") == crashId) { "Crash report identity changed" }
+        update(report)
+        writeAtomically(file, report.toString())
+    }
+
+    private fun findReport(context: Context, crashId: String): File? =
+        pendingFiles(context).firstOrNull { file ->
+            runCatching {
+                file.length() <= 48 * 1024 &&
+                    JSONObject(file.readText(Charsets.UTF_8)).optString("crashId") == crashId
+            }.getOrDefault(false)
+        }
+
+    private fun pendingFiles(context: Context): List<File> {
+        val legacy = File(context.filesDir, REPORT_FILE)
+        val queued = context.filesDir.listFiles { file ->
+            file.isFile && file.name.startsWith(REPORT_PREFIX) && file.name.endsWith(".json")
+        }?.toList().orEmpty()
+        return (listOfNotNull(legacy.takeIf { it.isFile }) + queued)
+            .distinctBy { it.absolutePath }
+            .sortedBy { it.lastModified() }
     }
 
     private fun installationId(context: Context): String {

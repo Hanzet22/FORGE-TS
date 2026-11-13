@@ -37,7 +37,7 @@ class CrashReportUploadWorker(context: Context, params: WorkerParameters) :
             val responseCode = postCrashReport(report, accessToken = null, linkOnly = false)
             currentCoroutineContext().ensureActive()
             if (responseCode in 200..299) {
-                CrashReportStore.markAnonymousUploaded(applicationContext)
+                CrashReportStore.markAnonymousUploaded(applicationContext, report.optString("crashId"))
                 Result.success()
             } else if (responseCode == 429 || responseCode >= 500) {
                 Result.retry()
@@ -79,7 +79,7 @@ object CrashReportUploader {
                 val linkOnly = report.optBoolean("uploadedAnonymously")
                 val code = postCrashReport(report, accessToken, linkOnly)
                 if (code in 200..299) {
-                    CrashReportStore.clear(context)
+                    CrashReportStore.clear(context, report.optString("crashId"))
                     if (linkOnly) "previous anonymous report linked to your signed-in account"
                     else "report sent with authenticated account context"
                 } else null

@@ -35,8 +35,31 @@ const EVENT_RATE_LIMIT_SCRIPT = [
   "end",
   "return {global+increment,install+increment,increment}",
 ].join(" ");
-const EMAIL_RATE_LIMIT_SCRIPT =
-  "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],1800) end; return n";
+const EMAIL_RESERVATION_SCRIPT =
+  "return redis.call('SET',KEYS[1],ARGV[1],'NX','EX',1800) and 1 or 0";
+const EMAIL_RESERVATION_RELEASE_SCRIPT =
+  "if redis.call('GET',KEYS[1]) == ARGV[1] then return redis.call('DEL',KEYS[1]) else return 0 end";
+
+async function releaseEmailReservation(
+  redisEndpoint: URL,
+  redisToken: string,
+  reservationId: string,
+): Promise<void> {
+  try {
+    const response = await fetch(redisEndpoint, {
+      method: "POST",
+      headers: { Authorization: "Bearer " + redisToken, "Content-Type": "application/json" },
+      body: JSON.stringify([
+        "EVAL", EMAIL_RESERVATION_RELEASE_SCRIPT, "1",
+        "forge-ts:diagnostic-email:global", reservationId,
+      ]),
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!response.ok) console.error("diagnostic_admin_email_reservation_release_failed", { status: response.status });
+  } catch (error) {
+    console.error("diagnostic_admin_email_reservation_release_failed", { error_name: errorName(error) });
+  }
+}
 
 function cleanText(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
@@ -285,11 +308,15 @@ Deno.serve(async (req: Request) => {
     if (resendKey && emailFrom && emailTo.length > 0 && importantEvents.length > 0) {
       stage = "admin_email_rate_limit";
       const emailRateKey = "forge-ts:diagnostic-email:global";
+      const reservationId = crypto.randomUUID();
+      let reservationHeld = false;
       try {
         const emailLimitResponse = await fetch(redisEndpoint, {
           method: "POST",
           headers: { Authorization: "Bearer " + redisToken, "Content-Type": "application/json" },
-          body: JSON.stringify(["EVAL", EMAIL_RATE_LIMIT_SCRIPT, "1", emailRateKey]),
+          body: JSON.stringify([
+            "EVAL", EMAIL_RESERVATION_SCRIPT, "1", emailRateKey, reservationId,
+          ]),
           signal: AbortSignal.timeout(4000),
         });
         const emailLimitPayload = emailLimitResponse.ok
@@ -297,6 +324,7 @@ Deno.serve(async (req: Request) => {
           : null;
         const emailCount = Number(emailLimitPayload?.result);
         if (Number.isFinite(emailCount) && emailCount === 1) {
+          reservationHeld = true;
           stage = "admin_email_send";
           const summary = importantEvents.slice(0, 10).map((event) => ({
             occurredAt: event.occurred_at,
@@ -325,24 +353,29 @@ Deno.serve(async (req: Request) => {
               from: emailFrom,
               to: emailTo,
               subject: "[FORGE-TS] Session diagnostics summary",
-              text: "FORGE-TS received a background-session diagnostics report.\n\n" +
+              text: "FORGE-TS received a background-session diagnostics report.\\n\\n" +
                 JSON.stringify(summary, null, 2) +
-                "\n\nFull event records remain in the protected FORGE-TS diagnostics backend.",
+                "\\n\\nFull event records remain in the protected FORGE-TS diagnostics backend.",
             }),
             signal: AbortSignal.timeout(7000),
           });
           if (mailResponse.ok) emailAlert = "sent";
           else {
+            await releaseEmailReservation(redisEndpoint, redisToken!, reservationId);
+            reservationHeld = false;
             console.error("diagnostic_admin_email_rejected", { status: mailResponse.status });
             emailAlert = "provider_rejected";
           }
-        } else if (Number.isFinite(emailCount) && emailCount > 1) {
+        } else if (Number.isFinite(emailCount) && emailCount === 0) {
           emailAlert = "throttled";
         } else {
           console.error("diagnostic_admin_email_rate_limit_unavailable");
           emailAlert = "rate_limit_unavailable";
         }
       } catch (error) {
+        if (reservationHeld) {
+          await releaseEmailReservation(redisEndpoint, redisToken!, reservationId);
+        }
         console.error("diagnostic_admin_email_failed", { error_name: errorName(error) });
         emailAlert = "delivery_failed";
       }

@@ -29,7 +29,7 @@ No mail-provider key is embedded in the Android app or Git repository. If any of
 ## Alert volume
 
 - When Resend is configured, only accepted ERROR, CRITICAL, and CRASH events can trigger a privacy-filtered summary.
-- Email summaries are throttled globally to at most one message every 30 minutes. This is a shared project-wide limit, not a per-installation limit.
+- Email summaries are throttled globally to at most one message every 30 minutes. A short-lived Redis reservation serializes concurrent senders; failed provider requests release the reservation so a temporary Resend outage does not suppress alerts for the full window. A process crash after reservation can still hold the slot until its 30-minute expiry.
 - The email omits raw stack traces and installation identifiers. Full event records remain in the protected diagnostics table.
 
 ## Deployment state
@@ -39,4 +39,4 @@ No mail-provider key is embedded in the Android app or Git repository. If any of
 - The Android worker sends the bounded local journal in one request, and the Edge Function accepts up to 200 events within its 64 KiB request limit.
 - Supabase migration `20261111220653_expand_diagnostic_device_metadata` remains applied; no new table or database was added.
 - The deployed Edge Function version is tracked in the live Supabase project and must be checked against GitHub before each release.
-- The Edge Function accepts both the plural and legacy singular sender-secret names. Deployment does not prove a real email was delivered; no synthetic event or test email is sent during static validation.
+- The Edge Function accepts both the plural and legacy singular sender-secret names. The crash-report store keeps a bounded queue of up to five pending reports rather than overwriting the only saved report; when full, it preserves existing pending reports and does not persist a newer crash. Deployment does not prove a real email was delivered; no synthetic event or test email is sent during static validation.
