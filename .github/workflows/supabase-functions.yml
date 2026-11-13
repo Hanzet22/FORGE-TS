@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - "supabase/functions/**"
+      - "deno.lock"
       - ".github/workflows/supabase-functions.yml"
   pull_request:
     branches: [main]
     paths:
       - "supabase/functions/**"
+      - "deno.lock"
       - ".github/workflows/supabase-functions.yml"
   workflow_dispatch:
 
