@@ -3,6 +3,8 @@ package com.HG.Forge.Ts.data.simulation
 import android.app.ActivityManager
 import android.content.Context
 import android.os.StatFs
+import android.os.SystemClock
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -345,16 +347,25 @@ class HybridRuntimeManager(
             return RuntimeOperationResult(false, "Adapter capability inspection failed: ${it.message ?: "unknown error"}.")
         }
         if (!capability.available) return RuntimeOperationResult(false, "Adapter unavailable: ${capability.detail}")
-        setRuntimeState(id, distribution, RuntimeLifecycleState.STARTING)
+        val traceId = ForgeDiagnostics.newTraceId()
+        val startedAt = SystemClock.elapsedRealtime()
+        ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.start.requested", traceId = traceId)
+        setRuntimeState(id, distribution, RuntimeLifecycleState.STARTING, traceId)
         val result = runCatching { adapter.start(request) }.getOrElse {
-            setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED)
+            setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED, traceId)
+            ForgeDiagnostics.log(appContext, "ERROR", "Runtime", "runtime.start.failed", it, traceId)
+            ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.start.duration_${(SystemClock.elapsedRealtime() - startedAt).coerceAtMost(600000)}ms", traceId = traceId)
             return RuntimeOperationResult(false, "Adapter start failed: ${it.message ?: "unknown error"}.")
         }
-        return when {
-            result.accepted && result.confirmedRunning -> { setRuntimeState(id, distribution, RuntimeLifecycleState.RUNNING); RuntimeOperationResult(true, result.message) }
-            !result.accepted -> { setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED); RuntimeOperationResult(false, result.message) }
+        val outcome = when {
+            result.accepted && result.confirmedRunning -> { setRuntimeState(id, distribution, RuntimeLifecycleState.RUNNING, traceId); RuntimeOperationResult(true, result.message) }
+            !result.accepted -> { setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED, traceId); RuntimeOperationResult(false, result.message) }
             else -> RuntimeOperationResult(true, "Start accepted but activity is not confirmed; lifecycle remains STARTING. ${result.message}")
         }
+        ForgeDiagnostics.log(appContext, if (outcome.accepted) "INFO" else "WARNING", "Runtime",
+            if (outcome.accepted) "runtime.start.accepted" else "runtime.start.rejected", traceId = traceId)
+        ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.start.duration_${(SystemClock.elapsedRealtime() - startedAt).coerceAtMost(600000)}ms", traceId = traceId)
+        return outcome
     }
 
     suspend fun writeProotTerminalInput(distribution: ProotDistribution, input: String): RuntimeInteractiveResult =
@@ -632,13 +643,21 @@ echo "FORGE_VNC_STOP_REQUESTED"
         val root = roots.getValue(id)
         val workspace = if (distribution == null) root else File(root, distribution.directoryName)
         val request = RuntimeAdapterStartRequest(id, distribution?.directoryName, workspace.absolutePath)
-        setRuntimeState(id, distribution, RuntimeLifecycleState.STOPPING)
+        val traceId = ForgeDiagnostics.newTraceId()
+        val startedAt = SystemClock.elapsedRealtime()
+        ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.stop.requested", traceId = traceId)
+        setRuntimeState(id, distribution, RuntimeLifecycleState.STOPPING, traceId)
         val result = runCatching { adapter.stop(request) }.getOrElse {
-            setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED)
+            setRuntimeState(id, distribution, RuntimeLifecycleState.FAILED, traceId)
+            ForgeDiagnostics.log(appContext, "ERROR", "Runtime", "runtime.stop.failed", it, traceId)
+            ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.stop.duration_${(SystemClock.elapsedRealtime() - startedAt).coerceAtMost(600000)}ms", traceId = traceId)
             return RuntimeOperationResult(false, "Adapter stop failed: " + (it.message ?: "unknown error") + ".")
         }
         val next = if (result.stopped) RuntimeLifecycleState.STOPPED else RuntimeLifecycleState.FAILED
-        setRuntimeState(id, distribution, next)
+        setRuntimeState(id, distribution, next, traceId)
+        ForgeDiagnostics.log(appContext, if (result.stopped) "INFO" else "WARNING", "Runtime",
+            if (result.stopped) "runtime.stop.completed" else "runtime.stop.incomplete", traceId = traceId)
+        ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.stop.duration_${(SystemClock.elapsedRealtime() - startedAt).coerceAtMost(600000)}ms", traceId = traceId)
         return RuntimeOperationResult(result.stopped, result.message)
     }
 
@@ -682,9 +701,22 @@ echo "FORGE_VNC_STOP_REQUESTED"
 
     suspend fun lastManagerEvent(): String = registry.lastEvent() ?: "No manager event recorded."
 
-    private suspend fun setRuntimeState(id: RuntimeEnvironmentId, distribution: ProotDistribution?, next: RuntimeLifecycleState) {
+    private suspend fun setRuntimeState(
+        id: RuntimeEnvironmentId,
+        distribution: ProotDistribution?,
+        next: RuntimeLifecycleState,
+        traceId: String? = null
+    ) {
         if (distribution == null) { states[id] = next; registry.write(id, next, id in prepared) }
         else { prootInstanceStates[distribution] = next; registry.writeProotInstance(distribution, next, distribution in preparedProotInstances) }
+        val target = distribution?.name?.lowercase() ?: id.name.lowercase()
+        ForgeDiagnostics.log(
+            appContext,
+            if (next == RuntimeLifecycleState.FAILED) "ERROR" else "INFO",
+            "Runtime",
+            "runtime.lifecycle.${target}.${next.name.lowercase()}",
+            traceId = traceId
+        )
     }
 
     private fun createSafeDirectory(directory: File, parent: File): Boolean {
