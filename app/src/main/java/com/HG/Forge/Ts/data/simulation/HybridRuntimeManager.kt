@@ -459,21 +459,21 @@ class HybridRuntimeManager(
 
         onProgress("Updating ${plan.packageManager} package indexes for ${distribution.name}…")
         val update = executeProotCommand(distribution, plan.updateArguments, 900L)
-        if (!update.accepted || update.exitCode != 0) {
+        if (!update.completed || update.exitCode != 0) {
             val detail = update.output.takeLast(1200).trim()
             return RuntimeOperationResult(false, "Package index update failed: ${update.message} ${detail}")
         }
 
         onProgress("Installing XFCE4 and D-Bus X11 packages in ${distribution.name}…")
         val install = executeProotCommand(distribution, plan.installArguments, 900L)
-        if (!install.accepted || install.exitCode != 0) {
+        if (!install.completed || install.exitCode != 0) {
             val detail = install.output.takeLast(1600).trim()
             return RuntimeOperationResult(false, "XFCE4 package installation failed: ${install.message} ${detail}")
         }
 
         onProgress("Checking XFCE4 session and D-Bus launcher…")
         val verify = executeProotCommand(distribution, plan.verifyArguments, 60L)
-        if (!verify.accepted || verify.exitCode != 0) {
+        if (!verify.completed || verify.exitCode != 0) {
             val detail = verify.output.takeLast(1000).trim()
             return RuntimeOperationResult(false, "Packages installed, but required launch commands were not found. ${detail}")
         }
@@ -487,6 +487,7 @@ class HybridRuntimeManager(
             "XFCE4 and D-Bus X11 packages are installed and command-verified. A compatible Android X11 display backend is still required to show the desktop."
         )
     }
+
     suspend fun requestStop(id: RuntimeEnvironmentId, distribution: ProotDistribution? = null): RuntimeOperationResult {
         if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) return RuntimeOperationResult(false, "Select the Debian, Ubuntu, or Alpine instance to stop.")
         if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) return RuntimeOperationResult(false, "A PRoot distribution can only be stopped through XFCE_PROOT.")
