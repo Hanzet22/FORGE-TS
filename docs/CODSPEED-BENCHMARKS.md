@@ -70,3 +70,8 @@ from the CPU-simulation baseline.
 - [CodSpeed: C++ Google Benchmark integration](https://codspeed.io/docs/benchmarks/cpp)
 - [CodSpeed: Walltime instrument](https://codspeed.io/docs/instruments/walltime)
 - [CodSpeed C++ integration source](https://github.com/CodSpeedHQ/codspeed-cpp/tree/v1.0.0)
+
+
+## Measurement scope and caveats
+
+The current harness measures two native helper microbenchmarks: terminal dimension validation and argv/environment C-string pointer-table construction. It does not yet measure full PRoot startup, PTY throughput, Android UI frame time, or end-to-end network operations. These measurements now use CodSpeed walltime because the previous simulation runs flagged both benchmarks as system-call dominated. GitHub-hosted runners are shared, so treat this as an initial walltime baseline rather than a low-noise regression threshold; a dedicated CodSpeed macro runner would be needed for tighter timing comparisons.

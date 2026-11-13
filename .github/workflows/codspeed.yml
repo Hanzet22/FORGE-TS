@@ -1,4 +1,4 @@
-name: CodSpeed Native PTY Helper Microbenchmarks
+name: CodSpeed Native PTY Helper Walltime Benchmarks
 
 on:
   push:
@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   benchmarks:
-    name: PTY helper microbenchmarks
+    name: PTY helper walltime benchmarks
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,8 +39,8 @@ jobs:
       - name: Build benchmark executable
         run: cmake --build build/benchmarks --parallel 2
 
-      - name: Run and upload PTY helper measurements
+      - name: Run and upload PTY helper walltime measurements
         uses: CodSpeedHQ/action@v5
         with:
-          mode: simulation
+          mode: walltime
           run: ./build/benchmarks/forge_pty_bench
