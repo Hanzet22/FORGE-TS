@@ -30,16 +30,30 @@ object ForgeDiagnosticsConsent {
             .getBoolean(KEY_UPLOADS_ENABLED, false)
 
     fun setEnabled(context: Context, enabled: Boolean) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_UPLOADS_ENABLED, enabled)
-            .apply()
+        val preferences = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val wasEnabled = preferences.getBoolean(KEY_UPLOADS_ENABLED, false)
+        if (wasEnabled == enabled) {
+            if (enabled) {
+                ForgeDiagnosticsUploadScheduler.enqueue(context)
+                CrashReportUploadScheduler.enqueue(context)
+            }
+            return
+        }
         if (enabled) {
+            ForgeDiagnostics.clearPendingUploadJournal(context)
+            check(preferences.edit().putBoolean(KEY_UPLOADS_ENABLED, true).commit()) {
+                "Unable to persist diagnostics consent."
+            }
             ForgeDiagnosticsUploadScheduler.enqueue(context)
             CrashReportUploadScheduler.enqueue(context)
         } else {
+            check(preferences.edit().putBoolean(KEY_UPLOADS_ENABLED, false).commit()) {
+                "Unable to persist diagnostics consent."
+            }
             WorkManager.getInstance(context).cancelUniqueWork("forge-ts-diagnostic-upload")
             WorkManager.getInstance(context).cancelUniqueWork("forge-ts-crash-report-upload")
+            ForgeDiagnostics.clearPendingUploadJournal(context)
+            CrashReportStore.disableRemoteUploadForPending(context)
         }
     }
 }
@@ -189,6 +203,17 @@ object ForgeDiagnostics {
         if (!file.isFile || file.length() > MAX_FILE_BYTES) JSONArray()
         else JSONArray(file.readText(Charsets.UTF_8))
     }.getOrDefault(JSONArray())
+
+    @Synchronized
+    fun clearPendingUploadJournal(context: Context) {
+        val journal = File(context.filesDir, FILE_NAME)
+        val temporary = File(context.filesDir, "$FILE_NAME.tmp")
+        listOf(journal, temporary).forEach { file ->
+            if (file.exists() && !file.delete() && file.exists()) {
+                throw IOException("Unable to clear pending diagnostics journal")
+            }
+        }
+    }
 
     @Synchronized
     fun acknowledge(context: Context, uploadedIds: Set<String>) {

@@ -184,3 +184,12 @@ Runtime lifecycle instrumentation is emitted from the existing `HybridRuntimeMan
 - The TextureView center-crop transform is recalculated on view-size and surface-size changes. It fills the available intro bounds without distorting the source aspect ratio, including resizable split-screen windows.
 - Playback duration is measured with monotonic elapsed time and capped at ten minutes.
 - This is instrumentation and adaptive rendering logic only; it does not assert that playback has been verified on physical devices in every orientation or multi-window mode.
+
+
+## Consent revocation and re-enrollment semantics — 2026-11-13
+
+- Remote diagnostics remain opt-in; local technical event recording remains available.
+- Turning remote diagnostics off persists the disabled state before cancelling queued work, clears the pending diagnostic upload journal, and marks queued crash reports as ineligible for later upload. Crash recovery records remain available locally.
+- Turning remote diagnostics on after an opt-out starts a clean upload window: events accumulated while remote consent was off are not retroactively uploaded.
+- A request already accepted by the network stack at the instant consent is revoked cannot be recalled; workers re-check consent immediately before starting each upload.
+- Legacy crash reports without an explicit remote-upload eligibility flag are treated as local-only by default.

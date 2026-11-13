@@ -36,6 +36,7 @@ internal object CrashReportStore {
                 .put("exceptionType", throwable.javaClass.name.take(200))
                 .put("stackTrace", safeStackTrace(throwable))
                 .put("uploadedAnonymously", false)
+                .put("remoteUploadEligible", CrashReportConsent.isEnabled(context))
             val pending = pendingFiles(context)
             if (pending.size >= MAX_PENDING_REPORTS) {
                 Log.w("FORGE/CrashStore", "Pending crash queue is full; newest report was not persisted")
@@ -54,6 +55,31 @@ internal object CrashReportStore {
     }.getOrNull()
 
     @Synchronized
+    fun disableRemoteUploadForPending(context: Context) {
+        pendingFiles(context).forEach { file ->
+            runCatching {
+                if (file.length() > 48 * 1024) return@runCatching
+                val report = JSONObject(file.readText(Charsets.UTF_8))
+                if (report.optBoolean("remoteUploadEligible", false)) {
+                    report.put("remoteUploadEligible", false)
+                    writeAtomically(file, report.toString())
+                }
+            }
+        }
+    }
+
+    @Synchronized
+    fun readNextEligibleForAccountUpload(context: Context): JSONObject? = runCatching {
+        val file = pendingFiles(context).firstOrNull { candidate ->
+            runCatching {
+                candidate.length() <= 48 * 1024 &&
+                    JSONObject(candidate.readText(Charsets.UTF_8)).optBoolean("remoteUploadEligible", false)
+            }.getOrDefault(false)
+        } ?: return@runCatching null
+        JSONObject(file.readText(Charsets.UTF_8))
+    }.getOrNull()
+
+    @Synchronized
     fun markAnonymousUploaded(context: Context, crashId: String) {
         updateReport(context, crashId) { it.put("uploadedAnonymously", true) }
     }
@@ -63,6 +89,7 @@ internal object CrashReportStore {
         val file = pendingFiles(context).firstOrNull { candidate ->
             runCatching {
                 candidate.length() <= 48 * 1024 &&
+                    JSONObject(candidate.readText(Charsets.UTF_8)).optBoolean("remoteUploadEligible", false) &&
                     !JSONObject(candidate.readText(Charsets.UTF_8)).optBoolean("uploadedAnonymously")
             }.getOrDefault(false)
         } ?: return@runCatching null

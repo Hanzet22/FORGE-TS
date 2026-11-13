@@ -81,7 +81,7 @@ object CrashReportUploader {
     suspend fun uploadPending(context: Context, accessToken: String): String? =
         withContext(Dispatchers.IO) {
             if (!CrashReportConsent.isEnabled(context)) return@withContext null
-            val report = CrashReportStore.read(context) ?: return@withContext null
+            val report = CrashReportStore.readNextEligibleForAccountUpload(context) ?: return@withContext null
             try {
                 if (!CrashReportConsent.isEnabled(context)) return@withContext null
                 val linkOnly = report.optBoolean("uploadedAnonymously")
