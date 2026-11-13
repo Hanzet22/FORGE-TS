@@ -68,7 +68,7 @@ from the CPU-simulation baseline.
 - [CodSpeed: GitHub Actions integration](https://codspeed.io/docs/integrations/ci/github-actions)
 - [CodSpeed: GitHub Actions configuration and OIDC](https://codspeed.io/docs/integrations/ci/github-actions/configuration)
 - [CodSpeed: C++ Google Benchmark integration](https://codspeed.io/docs/benchmarks/cpp)
-- [CodSpeed: Walltime instrument](https://codspeed.io/docs/instruments/walltime)
+- [CodSpeed: CPU simulation instrument](https://codspeed.io/docs/instruments/walltime)
 - [CodSpeed C++ integration source](https://github.com/CodSpeedHQ/codspeed-cpp/tree/v1.0.0)
 
 
