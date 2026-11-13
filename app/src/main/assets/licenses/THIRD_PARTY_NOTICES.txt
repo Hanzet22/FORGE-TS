@@ -33,7 +33,7 @@ SIL Open Font License 1.1
 -------------------------
 Kaushan Script, Anton, Archivo, Azeret Mono, Crimson Pro, and Lora.
 
-The original OFL 1.1 texts are retained with each font family under assets/fonts/. Kaushan Script includes its Reserved Font Name terms. DejaVu Sans and related variants retain their original Bitstream Vera / Arev license in assets/fonts/LICENSE.txt.
+Complete font license texts, including the Kaushan Script Reserved Font Name terms and the DejaVu Bitstream Vera / Arev notice, are included in licenses/FONT-LICENSES.txt.
 
 Native runtime components
 -------------------------
