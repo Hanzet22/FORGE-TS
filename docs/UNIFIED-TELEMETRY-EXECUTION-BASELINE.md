@@ -164,3 +164,13 @@ Runtime lifecycle instrumentation is emitted from the existing `HybridRuntimeMan
 - Per-keystroke PTY input/output is deliberately not instrumented.
 - Existing app-private runtime journal remains a local state-transition journal; cloud telemetry uses the existing consent-gated diagnostics pipeline.
 - Native PTY and PRoot execution internals are not modified by this increment.
+
+
+### Runtime execution and PTY session increment
+
+- Added operation-level telemetry around `executeProotCommand` at the `HybridRuntimeManager` boundary: requested, completed, non-zero exit, incomplete, failed, cancelled, and bounded duration outcomes.
+- Added native PRoot PTY session lifecycle events: start requested, start confirmed, startup verification failure, early exit during startup, reader closure, and bounded successful-start duration.
+- PRoot distribution is represented only by the existing fixed enum context where already available; no command text, argument values, stdin, stdout/stderr, terminal bytes, workspace paths, environment variables, hostnames, or process output are included in cloud events.
+- PTY instrumentation is session-level only. No per-keystroke, per-read, per-write, or resize telemetry is emitted.
+- No Supabase schema or Edge Function change was required; events continue through the existing consent-gated diagnostics pipeline.
+- This increment is committed to `main`; Android Debug APK and CodeQL validation for the latest commit are pending. CI success is not inferred from an in-progress run.
