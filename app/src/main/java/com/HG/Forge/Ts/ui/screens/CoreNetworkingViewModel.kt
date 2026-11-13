@@ -1,5 +1,8 @@
 package com.HG.Forge.Ts.ui.screens
 
+import android.content.Context
+import android.os.SystemClock
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -42,17 +45,28 @@ class CoreNetworkingViewModel : ViewModel() {
         }
     }
 
-    fun loadPublicIp() {
+    fun loadPublicIp(context: Context) {
         viewModelScope.launch {
             isLoadingIp = true
             publicIpError = null
-            try { publicIp = repository.fetchPublicIp() }
-            catch (error: Exception) { publicIpError = error.message ?: "Unable to retrieve public IP" }
-            finally { isLoadingIp = false }
+            val traceId = ForgeDiagnostics.newTraceId()
+            val started = SystemClock.elapsedRealtime()
+            ForgeDiagnostics.log(context, "INFO", "Network", "network.public_ip.started", traceId = traceId)
+            try {
+                publicIp = repository.fetchPublicIp()
+                ForgeDiagnostics.log(context, "INFO", "Network", "network.public_ip.succeeded", traceId = traceId)
+            } catch (error: Exception) {
+                publicIpError = error.message ?: "Unable to retrieve public IP"
+                ForgeDiagnostics.log(context, "WARNING", "Network", "network.public_ip.failed", traceId = traceId)
+            } finally {
+                val elapsed = SystemClock.elapsedRealtime() - started
+                ForgeDiagnostics.log(context, "INFO", "Network", "network.public_ip.duration_${elapsed.coerceAtMost(600000)}ms", traceId = traceId)
+                isLoadingIp = false
+            }
         }
     }
 
-    fun checkHost(host: String, port: String, tls: Boolean) {
+    fun checkHost(context: Context, host: String, port: String, tls: Boolean) {
         val parsedPort = port.toIntOrNull()
         if (parsedPort == null) {
             hostError = "Enter a valid port number"
@@ -62,9 +76,20 @@ class CoreNetworkingViewModel : ViewModel() {
             isCheckingHost = true
             hostError = null
             hostResult = null
-            try { hostResult = repository.checkHost(host, parsedPort, tls) }
-            catch (error: Exception) { hostError = error.message ?: "Host check failed" }
-            finally { isCheckingHost = false }
+            val traceId = ForgeDiagnostics.newTraceId()
+            val started = SystemClock.elapsedRealtime()
+            ForgeDiagnostics.log(context, "INFO", "Network", "network.host_check.started", traceId = traceId)
+            try {
+                hostResult = repository.checkHost(host, parsedPort, tls)
+                ForgeDiagnostics.log(context, "INFO", "Network", "network.host_check.succeeded", traceId = traceId)
+            } catch (error: Exception) {
+                hostError = error.message ?: "Host check failed"
+                ForgeDiagnostics.log(context, "WARNING", "Network", "network.host_check.failed", traceId = traceId)
+            } finally {
+                val elapsed = SystemClock.elapsedRealtime() - started
+                ForgeDiagnostics.log(context, "INFO", "Network", "network.host_check.duration_${elapsed.coerceAtMost(600000)}ms", traceId = traceId)
+                isCheckingHost = false
+            }
         }
     }
 }
