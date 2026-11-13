@@ -38,3 +38,17 @@ Sources:
 - Archive digest verification does not make archive filesystem semantics safe; extraction checks remain mandatory.
 - No scripts from the guest archive are executed. PRoot shares the Android host kernel and is not VM-grade isolation.
 - CI green does not establish successful installation or runtime on a physical Android device.
+
+## XFCE4 guest bootstrap
+
+The optional Prepare / Repair XFCE4 action is user-triggered and requires the selected PRoot instance to be running. It does not run during rootfs download or installation.
+
+| Guest distribution | Package index | XFCE4 packages |
+| --- | --- | --- |
+| Debian 12 Bookworm | apt-get update | xfce4 dbus-x11 via noninteractive APT with recommends disabled |
+| Ubuntu 24.04 Noble | apt-get update | xfce4 dbus-x11 via noninteractive APT with recommends disabled |
+| Alpine 3.24 | apk update | apk add --no-cache xfce4 dbus-x11 |
+
+The bootstrap uses fixed argument lists, bounded command timeouts, and checks for both startxfce4 and dbus-launch before writing the guest marker .forge-xfce4.json. A failed update, install, or verification is reported to the UI and does not mark the desktop as prepared.
+
+**Scope boundary:** package installation prepares the guest desktop environment only. It does not install or configure an Android X11 server, create a display session, or claim that XFCE4 is visibly launchable. Display integration remains a separate milestone.
