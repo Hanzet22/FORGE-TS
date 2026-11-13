@@ -46,8 +46,12 @@ internal class IntroVideoTextureView(
     }
 
     private fun preparePlayer() {
-        if (mediaPlayer != null || videoSurface == null) return
+        if (finished || mediaPlayer != null || videoSurface == null) return
 
+        // A recreated surface starts a new playback trace and first-frame window.
+        terminalEventLogged = false
+        firstFrameLogged = false
+        playbackStartedAtMs = null
         val traceId = ForgeDiagnostics.newTraceId()
         playbackTraceId = traceId
         ForgeDiagnostics.log(
