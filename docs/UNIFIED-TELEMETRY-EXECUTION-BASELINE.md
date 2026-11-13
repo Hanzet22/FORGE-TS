@@ -146,3 +146,6 @@ Validation boundary:
 - Added nullable database columns and partial indexes. Older app versions remain compatible because the new fields are optional at the server/database boundary.
 - Trace propagation is now available in the API; operation-specific instrumentation still needs to pass a shared trace ID at the relevant paired log callsites.
 - No synthetic events were submitted. One CI validation pass is expected from the commit; no repeated test loop.
+
+- Added primary navigation instrumentation for Home, Learn, Network, Simulate, Tools, and Settings. A tab-selection event and its corresponding tab-entry event share the same trace ID.
+- Home-screen tool shortcuts now pass through the same navigation instrumentation when they switch tabs.
