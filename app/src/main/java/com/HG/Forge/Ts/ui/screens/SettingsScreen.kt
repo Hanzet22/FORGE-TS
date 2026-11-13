@@ -1,6 +1,7 @@
 package com.HG.Forge.Ts.ui.screens
 
 import android.net.Uri
+import android.os.Build
 import android.widget.VideoView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.HG.Forge.Ts.R
 import com.HG.Forge.Ts.data.preferences.AppPreferencesRepository
+import com.HG.Forge.Ts.data.preferences.ForgeThemeMode
 import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
@@ -57,6 +59,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val repository = remember(context) { AppPreferencesRepository(context) }
     val scope = rememberCoroutineScope()
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
+    val selectedTheme by repository.themeMode.collectAsState(initial = ForgeThemeMode.DYNAMIC_COLOR)
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
     var showOpenSourceLicenses by rememberSaveable { mutableStateOf(false) }
     val openSourceNotices = remember(context) {
@@ -100,6 +103,26 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             }
         }
         Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Appearance", style = MaterialTheme.typography.titleMedium)
+        ForgeThemeMode.entries.forEach { mode ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(mode.label, style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        if (mode == ForgeThemeMode.DYNAMIC_COLOR && Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+                            "Android 12+ required; this device uses the app fallback palette."
+                        else mode.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                FilterChip(
+                    selected = selectedTheme == mode,
+                    onClick = { scope.launch { repository.setThemeMode(mode) } },
+                    label = { Text(if (selectedTheme == mode) "Selected" else "Use") }
+                )
+            }
+        }
         Text("Crash recovery & diagnostics", style = MaterialTheme.typography.titleMedium)
         Text(
             "Local technical logging is always on. After you allow remote diagnostics, FORGE-TS automatically sends one bounded report when the app moves to the background and retries when connectivity returns. Reports can include Info, Warning, Error, Crash and Critical Error events; app and Android versions; device brand/model, RAM and display resolution; CPU chipset and architecture; event labels; and a pseudonymous installation ID. Technical exception traces are bounded. No IMEI/serial number, location, passwords, terminal input/output, message contents, files or network payloads are collected. Remote upload can be disabled here at any time.",

@@ -2,6 +2,13 @@ package com.HG.Forge.Ts.ui
 
 import android.app.Activity
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -175,7 +182,19 @@ fun ForgeApp() {
                 }
             }
         ) { padding ->
-            when (selectedTab) {
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    (fadeIn(tween(180)) + slideInHorizontally(
+                        animationSpec = tween(220), initialOffsetX = { width -> width / 18 }
+                    )) togetherWith
+                        (fadeOut(tween(140)) + slideOutHorizontally(
+                            animationSpec = tween(180), targetOffsetX = { width -> -width / 24 }
+                        ))
+                },
+                label = "forge_tab_transition"
+            ) { destination ->
+                when (destination) {
                 0 -> HomeScreen(
                     modifier = Modifier.padding(padding),
                     onToolSelected = { destinationTab, toolsSubtab ->
@@ -201,7 +220,8 @@ fun ForgeApp() {
                         ToolsScreen(Modifier.weight(1f), selectedToolsSubtab)
                     }
                 }
-                else -> SettingsScreen(Modifier.padding(padding))
+                    else -> SettingsScreen(Modifier.padding(padding))
+                }
             }
         }
 
