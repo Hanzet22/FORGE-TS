@@ -1,7 +1,8 @@
 c4622833be9a9c433968dc8f08d9149e47023003df85868297e9e59697dcbe6f  ./arm64-v8a/libproot.so
 be8635349125a2ad645269ac7c095db5cea104fa1bf03719cc5a9677e010e629  ./arm64-v8a/libproot_loader.so
-db01ff378ed073e67ad4c229b532b884dcd2e91a8301b12bd0cdc9001e1b6fa9  ./build-manifest.txt
+975e9cdd3ab11090b5a3e83a3f5a14fda891add1ae6fb58ae21dbdfd114c3f07  ./build-manifest.txt
 0ffa6454acbe7e410ac6f0007df83b9b3161fe55484c1f4b87487c0f2d228a6d  ./licenses/PRoot-COPYING
+da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768  ./licenses/TALLOC-LICENSE
 b76466305c18f4b3910f2ed32c92dc32f3dd2be759ef9be3cde850661663c1ec  ./loader-elf-header.txt
 913a3d2a0c407a8203c8d92960177a3200384ad214fd85718937b673b11f0fb4  ./loader-elf-program-headers.txt
 848479b877baf646a5211ba796721cc830892ce68499ffaf567621b06cbfceb8  ./proot-elf-dynamic.txt
