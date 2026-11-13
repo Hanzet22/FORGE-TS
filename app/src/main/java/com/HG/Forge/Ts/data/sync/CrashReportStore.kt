@@ -5,6 +5,9 @@ import android.os.Build
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.time.Instant
 import java.util.UUID
 
@@ -100,9 +103,15 @@ internal object CrashReportStore {
             stream.write(content.toByteArray(Charsets.UTF_8))
             stream.fd.sync()
         }
-        if (!temporary.renameTo(target)) {
-            target.writeText(content, Charsets.UTF_8)
-            temporary.delete()
+        try {
+            Files.move(
+                temporary.toPath(),
+                target.toPath(),
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING
+            )
+        } catch (_: AtomicMoveNotSupportedException) {
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
     }
 }
