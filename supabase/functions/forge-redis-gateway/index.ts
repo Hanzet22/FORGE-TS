@@ -31,7 +31,8 @@ export default {
 
     // Optional MFA: users with a verified factor must present an AAL2 JWT.
     // Accounts without a verified factor retain the normal AAL1 password flow.
-    if (ctx.userClaims?.aal !== "aal2") {
+    const verifiedTokenAal = (ctx.userClaims as unknown as { aal?: string } | undefined)?.aal;
+    if (verifiedTokenAal !== "aal2") {
       const supabaseUrl = Deno.env.get("SUPABASE_URL");
       const publishableKey = Deno.env.get("SUPABASE_ANON_KEY") ??
         Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
