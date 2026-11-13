@@ -172,7 +172,6 @@ object ForgeDiagnostics {
 
     @Synchronized
     private fun append(context: Context, event: JSONObject) {
-        val file = File(context.filesDir, FILE_NAME)
         val events = read(context)
         events.put(event)
         while (events.length() > MAX_EVENTS) events.remove(0)

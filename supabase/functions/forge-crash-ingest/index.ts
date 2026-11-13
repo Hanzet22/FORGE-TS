@@ -106,7 +106,6 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  const installHash = await sha256(installationId.toLowerCase());
   const rateKey = `forge-ts:crash-ingest:${installHash}:${new Date().toISOString().slice(0, 10)}`;
   try {
     const rateResponse = await fetch(redisEndpoint, {
