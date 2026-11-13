@@ -61,9 +61,24 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     var showOpenSourceLicenses by rememberSaveable { mutableStateOf(false) }
     val openSourceNotices = remember(context) {
         runCatching {
-            context.assets.open("licenses/THIRD_PARTY_NOTICES.txt")
-                .bufferedReader(Charsets.UTF_8).use { it.readText() }
-        }.getOrElse { "Open-source notices are unavailable in this build. See ATTRIBUTIONS.md in the FORGE-TS source repository." }
+            val licensePaths = listOf(
+                "licenses/THIRD_PARTY_NOTICES.txt",
+                "licenses/PROJECT-AGPL-3.0.txt",
+                "licenses/APACHE-2.0.txt",
+                "licenses/COMMONS-COMPRESS-NOTICE.txt",
+                "licenses/LIBVTERM-MIT.txt",
+                "licenses/XZ-0BSD.txt",
+                "licenses/FONT-LICENSES.txt",
+                "licenses/proot-runtime/PRoot-COPYING",
+                "licenses/proot-runtime/TALLOC-LICENSE"
+            )
+            licensePaths.joinToString("\n\n") { path ->
+                "===== $path =====\n" +
+                    context.assets.open(path).bufferedReader(Charsets.UTF_8).use { it.readText() }
+            }
+        }.getOrElse {
+            "Open-source notices are unavailable in this build. See ATTRIBUTIONS.md in the FORGE-TS source repository."
+        }
     }
     var diagnosticsUploadsEnabled by remember { mutableStateOf(ForgeDiagnosticsConsent.isEnabled(context)) }
 
