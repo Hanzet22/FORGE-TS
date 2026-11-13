@@ -41,6 +41,8 @@ object ForgeDiagnosticsConsent {
         }
         if (enabled) {
             ForgeDiagnostics.clearPendingUploadJournal(context)
+            ForgeDiagnostics.rotateInstallationId(context)
+            CrashReportStore.rotateInstallationId(context)
             check(preferences.edit().putBoolean(KEY_UPLOADS_ENABLED, true).commit()) {
                 "Unable to persist diagnostics consent."
             }
@@ -54,6 +56,8 @@ object ForgeDiagnosticsConsent {
             WorkManager.getInstance(context).cancelUniqueWork("forge-ts-crash-report-upload")
             ForgeDiagnostics.clearPendingUploadJournal(context)
             CrashReportStore.disableRemoteUploadForPending(context)
+            ForgeDiagnostics.rotateInstallationId(context)
+            CrashReportStore.rotateInstallationId(context)
         }
     }
 }
@@ -135,6 +139,15 @@ object ForgeDiagnostics {
                 ForgeDiagnosticsUploadScheduler.enqueue(context)
             }
         }
+    }
+
+    @Synchronized
+    fun rotateInstallationId(context: Context) {
+        val created = UUID.randomUUID().toString()
+        check(
+            context.getSharedPreferences("forge_diagnostics", Context.MODE_PRIVATE)
+                .edit().putString("installation_id", created).commit()
+        ) { "Unable to rotate diagnostics installation ID." }
     }
 
     private fun installationId(context: Context): String {

@@ -149,6 +149,15 @@ internal object CrashReportStore {
             }
     }
 
+    @Synchronized
+    fun rotateInstallationId(context: Context) {
+        val created = UUID.randomUUID().toString()
+        check(
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit().putString(INSTALLATION_ID, created).commit()
+        ) { "Unable to rotate crash-report installation ID." }
+    }
+
     private fun installationId(context: Context): String {
         val preferences = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val existing = preferences.getString(INSTALLATION_ID, null)

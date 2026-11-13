@@ -193,3 +193,10 @@ Runtime lifecycle instrumentation is emitted from the existing `HybridRuntimeMan
 - Turning remote diagnostics on after an opt-out starts a clean upload window: events accumulated while remote consent was off are not retroactively uploaded.
 - A request already accepted by the network stack at the instant consent is revoked cannot be recalled; workers re-check consent immediately before starting each upload.
 - Legacy crash reports without an explicit remote-upload eligibility flag are treated as local-only by default.
+
+
+## Pseudonymous installation identity — 2026-11-13
+
+- The random installation identifier is pseudonymous, not anonymous; it supports rate limiting and event correlation without using an account identifier.
+- The identifier is rotated whenever remote diagnostics consent changes. Pending diagnostics are purged on opt-out and old crash reports are marked local-only, preventing cross-consent correlation and retroactive upload.
+- Device metadata remains disclosed in Settings and is only uploaded while remote diagnostics consent is enabled.
