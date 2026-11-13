@@ -549,18 +549,26 @@ class HybridRuntimeManager(
         if (existing.completed && existing.exitCode == 0) {
             return RuntimeOperationResult(false, "A VNC desktop process is already running. Stop Desktop before replacing its temporary password.")
         }
+        val passwordFile = executeProotCommand(
+            distribution,
+            listOf(
+                "/bin/sh", "-c",
+                "mkdir -p /root/.vnc && printf '%s\\\\n' '$password' | vncpasswd -f > /root/.vnc/passwd && chmod 600 /root/.vnc/passwd"
+            ),
+            15L
+        )
+        if (!passwordFile.completed || passwordFile.exitCode != 0) {
+            return RuntimeOperationResult(false, "Could not create the private VNC password file: ${passwordFile.message}")
+        }
         val launchScript = """
-mkdir -p /root/.vnc &&
-printf '%s\n' '$password' | vncpasswd -f > /root/.vnc/passwd &&
-chmod 600 /root/.vnc/passwd &&
 VNC_SERVER="$(command -v Xtigervnc || command -v Xvnc)" &&
 if [ -n "${'$'}VNC_SERVER" ]; then
   "${'$'}VNC_SERVER" :1 -localhost -SecurityTypes VncAuth -PasswordFile /root/.vnc/passwd -rfbport 5901 -geometry 960x540 -depth 16 -FrameRate 20 > /tmp/forge-xvnc.log 2>&1 &
-  echo $! > /tmp/forge-xvnc.pid
+  echo ${'$'}! > /tmp/forge-xvnc.pid
   sleep 2
   if kill -0 "$(cat /tmp/forge-xvnc.pid)" 2>/dev/null && [ -S /tmp/.X11-unix/X1 ]; then
     DISPLAY=:1 dbus-launch --exit-with-session startxfce4 > /tmp/forge-xfce4.log 2>&1 &
-    echo $! > /tmp/forge-xfce4.pid
+    echo ${'$'}! > /tmp/forge-xfce4.pid
     echo "FORGE_VNC_START_REQUESTED port=5901 display=:1 geometry=960x540 depth=16 localhost=yes auth=VncAuth"
   else
     echo "FORGE_VNC_START_FAILED; inspect /tmp/forge-xvnc.log"
