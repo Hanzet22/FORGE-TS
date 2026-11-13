@@ -52,3 +52,19 @@ The optional Prepare / Repair XFCE4 action is user-triggered and requires the se
 The bootstrap uses fixed argument lists, bounded command timeouts, and checks for both startxfce4 and dbus-launch before writing the guest marker .forge-xfce4.json. A failed update, install, or verification is reported to the UI and does not mark the desktop as prepared.
 
 **Scope boundary:** package installation prepares the guest desktop environment only. It does not install or configure an Android X11 server, create a display session, or claim that XFCE4 is visibly launchable. Display integration remains a separate milestone.
+
+## Local TigerVNC display bridge
+
+The optional VNC server bootstrap is a separate user-triggered step after XFCE4 is command-verified.
+
+| Guest | Server package | Password utility |
+| --- | --- | --- |
+| Debian 12 Bookworm ARM64 | `tigervnc-standalone-server` | `tigervnc-tools` |
+| Ubuntu 24.04 Noble ARM64 | `tigervnc-standalone-server` | `tigervnc-tools` |
+| Alpine 3.24 aarch64 | `tigervnc` | included in `tigervnc` |
+
+The session uses TigerVNC's virtual X server, not an Android X11 server. FORGE-TS generates a temporary eight-character VNC password, writes the VNC password file with mode 0600, and starts the guest X server with `-localhost`, `-SecurityTypes VncAuth`, and an explicit password file. The initial framebuffer is 960x540 at 16-bit depth and a 20 fps cap to limit load on mobile hardware. The endpoint is `127.0.0.1:5901`; no LAN listener is intended.
+
+The in-app action opens a compatible external Android viewer through the standard `vnc://127.0.0.1:5901` URI. AVNC documents support for `vnc://` URIs, but is GPL-3.0; it is not bundled or linked as an app dependency. If no compatible viewer is installed, the user must install one separately. The temporary password is shown in the FORGE-TS screen and is not embedded in the URI.
+
+**Lifecycle boundary:** the VNC and XFCE processes are started from the existing PRoot PTY shell so they remain children of the active PRoot session. Stopping the PRoot runtime ends that session. The desktop stop action requests termination of the saved process IDs and removes the guest password file. This implementation is CI/build-validated only; listener binding, VNC authentication, rendering, and process shutdown still require physical-device validation.

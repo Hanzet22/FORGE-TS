@@ -1,5 +1,9 @@
 package com.HG.Forge.Ts.ui.screens
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +34,7 @@ import com.HG.Forge.Ts.data.simulation.RuntimeEnvironmentId
 import kotlinx.coroutines.launch
 import org.connectbot.terminal.Terminal
 import org.connectbot.terminal.TerminalEmulatorFactory
+import java.security.SecureRandom
 
 @Composable
 fun ProotTerminalPanel() {
@@ -40,6 +45,8 @@ fun ProotTerminalPanel() {
     var lifecycle by remember { mutableStateOf("Loading runtime registry…") }
     var status by remember { mutableStateOf("Native PTY terminal is ready.") }
     var busy by remember { mutableStateOf(false) }
+    var vncPassword by remember { mutableStateOf("") }
+    var vncReady by remember { mutableStateOf(false) }
 
     val terminalEmulator = remember(manager, distribution) {
         TerminalEmulatorFactory.create(
@@ -75,6 +82,8 @@ fun ProotTerminalPanel() {
 
     LaunchedEffect(distribution) {
         terminalEmulator.clearScreen()
+        vncPassword = ""
+        vncReady = false
         refreshState()
     }
 
@@ -162,6 +171,87 @@ fun ProotTerminalPanel() {
                     enabled = !busy && lifecycle == "RUNNING"
                 ) { Text("Prepare / Repair XFCE4") }
             }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            status = "Preparing TigerVNC server…"
+                            try {
+                                val result = manager.prepareProotVncServer(distribution) { stage -> status = stage }
+                                status = result.message
+                            } finally {
+                                busy = false
+                                refreshState()
+                            }
+                        }
+                    },
+                    enabled = !busy && lifecycle == "RUNNING"
+                ) { Text("Install / Repair VNC Server") }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        val alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+                        val random = SecureRandom()
+                        val password = buildString { repeat(8) { append(alphabet[random.nextInt(alphabet.length)]) } }
+                        scope.launch {
+                            busy = true
+                            status = "Starting localhost-only TigerVNC and XFCE4…"
+                            try {
+                                val result = manager.startProotDesktop(distribution, password)
+                                status = result.message
+                                vncReady = result.accepted
+                                vncPassword = if (result.accepted) password else ""
+                            } finally {
+                                busy = false
+                                refreshState()
+                            }
+                        }
+                    },
+                    enabled = !busy && lifecycle == "RUNNING"
+                ) { Text("Start Desktop") }
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            try {
+                                val result = manager.stopProotDesktop(distribution)
+                                status = result.message
+                                vncReady = false
+                                vncPassword = ""
+                            } finally {
+                                busy = false
+                            }
+                        }
+                    },
+                    enabled = !busy && lifecycle == "RUNNING" && vncReady
+                ) { Text("Stop Desktop") }
+            }
+            if (vncReady) {
+                Text("VNC endpoint: 127.0.0.1:5901", style = MaterialTheme.typography.labelMedium)
+                Text("Temporary VNC password: $vncPassword", style = MaterialTheme.typography.bodyMedium)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = {
+                            val clipboard = context.getSystemService(ClipboardManager::class.java)
+                            clipboard?.setPrimaryClip(ClipData.newPlainText("FORGE-TS VNC password", vncPassword))
+                            status = "Temporary VNC password copied to clipboard."
+                        }
+                    ) { Text("Copy Password") }
+                    Button(
+                        onClick = {
+                            runCatching {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("vnc://127.0.0.1:5901")))
+                            }.onFailure {
+                                status = "No VNC viewer is registered. Install a compatible viewer such as AVNC, then open the endpoint again."
+                            }
+                        }
+                    ) { Text("Open VNC Viewer") }
+                }
+            }
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = {

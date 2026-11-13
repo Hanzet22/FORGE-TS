@@ -488,6 +488,133 @@ class HybridRuntimeManager(
         )
     }
 
+
+    suspend fun prepareProotVncServer(
+        distribution: ProotDistribution,
+        onProgress: suspend (String) -> Unit = {}
+    ): RuntimeOperationResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING) {
+            return RuntimeOperationResult(false, "Start the selected PRoot instance before preparing the VNC server.")
+        }
+        if (distribution !in preparedProotInstances) {
+            return RuntimeOperationResult(false, "The selected PRoot workspace is not registered as prepared.")
+        }
+        val root = File(File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName), "rootfs")
+        if (!File(root, ".forge-xfce4.json").isFile) {
+            return RuntimeOperationResult(false, "A command-verified XFCE4 installation is required before the VNC server.")
+        }
+        val plan = ProotVncBootstrapSpec.forDistribution(distribution)
+        onProgress("Updating ${plan.packageManager} package indexes for TigerVNC…")
+        val update = executeProotCommand(distribution, plan.updateArguments, 900L)
+        if (!update.completed || update.exitCode != 0) {
+            return RuntimeOperationResult(false, "VNC package index update failed: ${update.message} ${update.output.takeLast(1200).trim()}")
+        }
+        onProgress("Installing TigerVNC server and password utility…")
+        val install = executeProotCommand(distribution, plan.installArguments, 900L)
+        if (!install.completed || install.exitCode != 0) {
+            return RuntimeOperationResult(false, "TigerVNC installation failed: ${install.message} ${install.output.takeLast(1600).trim()}")
+        }
+        onProgress("Verifying Xvnc and VNC password utility…")
+        val verify = executeProotCommand(distribution, plan.verifyArguments, 60L)
+        if (!verify.completed || verify.exitCode != 0) {
+            return RuntimeOperationResult(false, "TigerVNC packages installed, but server/password/session commands were not verified. ${verify.output.takeLast(1200).trim()}")
+        }
+        File(root, ".forge-vnc.json").writeText(
+            """{"distribution":"${distribution.directoryName}","server":"TigerVNC","listener":"127.0.0.1","port":5901,"authentication":"VncAuth","verifiedAt":"${System.currentTimeMillis()}"}"""
+        )
+        registry.recordEvent("TigerVNC server package bootstrap completed for ${distribution.name}; listener is configured loopback-only at session start.")
+        return RuntimeOperationResult(true, "TigerVNC server and password utility are installed and command-verified. Start Desktop to create the localhost-only XFCE4 session.")
+    }
+
+    suspend fun startProotDesktop(
+        distribution: ProotDistribution,
+        password: String
+    ): RuntimeOperationResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING ||
+            distribution !in preparedProotInstances) {
+            return RuntimeOperationResult(false, "The selected PRoot instance must be RUNNING before starting its desktop.")
+        }
+        if (!password.matches(Regex("[A-HJ-NP-Z2-9]{8}"))) {
+            return RuntimeOperationResult(false, "The temporary VNC password must contain exactly eight generated characters.")
+        }
+        val root = File(File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName), "rootfs")
+        if (!File(root, ".forge-xfce4.json").isFile || !File(root, ".forge-vnc.json").isFile) {
+            return RuntimeOperationResult(false, "Prepare XFCE4 and install the VNC server before starting the desktop.")
+        }
+        val existing = executeProotCommand(
+            distribution,
+            listOf("/bin/sh", "-c", "test -s /tmp/forge-xvnc.pid && kill -0 \"$(cat /tmp/forge-xvnc.pid)\" 2>/dev/null"),
+            10L
+        )
+        if (existing.completed && existing.exitCode == 0) {
+            return RuntimeOperationResult(false, "A VNC desktop process is already running. Stop Desktop before replacing its temporary password.")
+        }
+        val launchScript = """
+mkdir -p /root/.vnc &&
+printf '%s\\n' '$password' | vncpasswd -f > /root/.vnc/passwd &&
+chmod 600 /root/.vnc/passwd &&
+VNC_SERVER="$(command -v Xtigervnc || command -v Xvnc)" &&
+if [ -n "$VNC_SERVER" ]; then
+  "$VNC_SERVER" :1 -localhost -SecurityTypes VncAuth -PasswordFile /root/.vnc/passwd -rfbport 5901 -geometry 960x540 -depth 16 -FrameRate 20 > /tmp/forge-xvnc.log 2>&1 &
+  echo $! > /tmp/forge-xvnc.pid
+  sleep 2
+  if kill -0 "$(cat /tmp/forge-xvnc.pid)" 2>/dev/null && [ -S /tmp/.X11-unix/X1 ]; then
+    DISPLAY=:1 dbus-launch --exit-with-session startxfce4 > /tmp/forge-xfce4.log 2>&1 &
+    echo $! > /tmp/forge-xfce4.pid
+    echo "FORGE_VNC_START_REQUESTED port=5901 display=:1 geometry=960x540 depth=16 localhost=yes auth=VncAuth"
+  else
+    echo "FORGE_VNC_START_FAILED; inspect /tmp/forge-xvnc.log"
+  fi
+else
+  echo "FORGE_VNC_START_FAILED: Xtigervnc/Xvnc was not found."
+fi
+""".trim()
+        val sent = writeProotTerminalInput(distribution, launchScript + "\n")
+        if (!sent.accepted) return RuntimeOperationResult(false, "Could not send the desktop launch command to the active PRoot PTY: ${sent.message}")
+        kotlinx.coroutines.delay(1800)
+        val verify = executeProotCommand(
+            distribution,
+            listOf(
+                "/bin/sh", "-c",
+                "test -s /tmp/forge-xvnc.pid && kill -0 \"$(cat /tmp/forge-xvnc.pid)\" 2>/dev/null && test -s /tmp/forge-xfce4.pid && kill -0 \"$(cat /tmp/forge-xfce4.pid)\" 2>/dev/null && test -S /tmp/.X11-unix/X1"
+            ),
+            15L
+        )
+        if (!verify.completed || verify.exitCode != 0) {
+            val logs = executeProotCommand(
+                distribution,
+                listOf("/bin/sh", "-c", "cat /tmp/forge-xvnc.log /tmp/forge-xfce4.log 2>/dev/null | tail -n 35"),
+                10L
+            )
+            return RuntimeOperationResult(false, "Desktop launch was requested but the VNC/XFCE processes were not confirmed. ${logs.output.takeLast(1800).trim()}")
+        }
+        File(root, ".forge-vnc-session.json").writeText(
+            """{"display":":1","host":"127.0.0.1","port":5901,"geometry":"960x540","depth":16,"authentication":"VncAuth","startedAt":"${System.currentTimeMillis()}"}"""
+        )
+        registry.recordEvent("XFCE4 VNC desktop session confirmed on loopback port 5901 for ${distribution.name}.")
+        return RuntimeOperationResult(true, "XFCE4 desktop session confirmed. Connect the Android VNC viewer to 127.0.0.1:5901 and enter the temporary password shown in FORGE-TS.")
+    }
+
+    suspend fun stopProotDesktop(distribution: ProotDistribution): RuntimeOperationResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING ||
+            distribution !in preparedProotInstances) {
+            return RuntimeOperationResult(false, "The selected PRoot instance must remain RUNNING to stop its desktop session cleanly.")
+        }
+        val script = """
+for pidfile in /tmp/forge-xfce4.pid /tmp/forge-xvnc.pid; do
+  if [ -s "$pidfile" ]; then kill -TERM "$(cat "$pidfile")" 2>/dev/null || true; rm -f "$pidfile"; fi
+done
+rm -f /root/.vnc/passwd /tmp/forge-vnc-session.json
+echo "FORGE_VNC_STOP_REQUESTED"
+""".trim()
+        val result = writeProotTerminalInput(distribution, script + "\n")
+        if (!result.accepted) return RuntimeOperationResult(false, "Could not send desktop shutdown to the PRoot PTY: ${result.message}")
+        val root = File(File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName), "rootfs")
+        File(root, ".forge-vnc-session.json").delete()
+        registry.recordEvent("XFCE4 VNC desktop shutdown requested for ${distribution.name}.")
+        return RuntimeOperationResult(true, "Desktop shutdown requested. The PRoot terminal remains running.")
+    }
+
     suspend fun requestStop(id: RuntimeEnvironmentId, distribution: ProotDistribution? = null): RuntimeOperationResult {
         if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) return RuntimeOperationResult(false, "Select the Debian, Ubuntu, or Alpine instance to stop.")
         if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) return RuntimeOperationResult(false, "A PRoot distribution can only be stopped through XFCE_PROOT.")
