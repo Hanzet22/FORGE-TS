@@ -136,3 +136,13 @@ Validation boundary:
 - The Android Debug APK GitHub Actions run was observed in progress at the `Assemble debug APK` step. No claim of build success is made until GitHub reports its conclusion.
 - No synthetic telemetry event was sent and no repeated build/test cycle was started.
 - Full module instrumentation, session/trace correlation fields, queue redesign, and runtime delivery confirmation remain pending.
+
+
+## Execution log — 2026-11-13 (session and trace correlation)
+
+- Added a process-scoped `sessionId` to every Android diagnostic event. It is generated locally and is not a device/account identifier.
+- Added optional `traceId` support to `ForgeDiagnostics.log`; callers can generate one via `ForgeDiagnostics.newTraceId()` and pass the same ID to related log calls.
+- Updated the diagnostic ingest function to validate optional UUID correlation fields and persist them as `session_id` and `trace_id`.
+- Added nullable database columns and partial indexes. Older app versions remain compatible because the new fields are optional at the server/database boundary.
+- Trace propagation is now available in the API; operation-specific instrumentation still needs to pass a shared trace ID at the relevant paired log callsites.
+- No synthetic events were submitted. One CI validation pass is expected from the commit; no repeated test loop.
