@@ -86,6 +86,8 @@ Deno.serve(async (req: Request) => {
       const event = rawEvent as Record<string, unknown>;
       const eventId = cleanText(event.eventId, 36);
       const currentInstallationId = cleanText(event.installationId, 36);
+      const sessionId = cleanText(event.sessionId, 36);
+      const traceId = cleanText(event.traceId, 36);
       const occurredAt = cleanText(event.occurredAt, 40);
       const appVersion = cleanText(event.appVersion, 32);
       const androidRelease = cleanText(event.androidRelease, 32);
@@ -105,6 +107,8 @@ Deno.serve(async (req: Request) => {
 
       if (!/^[0-9a-fA-F-]{36}$/.test(eventId) ||
           !/^[0-9a-fA-F-]{36}$/.test(currentInstallationId) ||
+          (sessionId !== "" && !/^[0-9a-fA-F-]{36}$/.test(sessionId)) ||
+          (traceId !== "" && !/^[0-9a-fA-F-]{36}$/.test(traceId)) ||
           !Number.isFinite(Date.parse(occurredAt)) ||
           !appVersion || !androidRelease ||
           !["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", "CRASH"].includes(level) ||
@@ -122,6 +126,8 @@ Deno.serve(async (req: Request) => {
       installationId = currentInstallationId;
       normalized.push({
         event_id: eventId,
+        session_id: sessionId || null,
+        trace_id: traceId || null,
         occurred_at: new Date(occurredAt).toISOString(),
         app_version: appVersion,
         android_sdk: sdk,
