@@ -1,4 +1,4 @@
-name: CodSpeed PTY Benchmarks
+name: CodSpeed PTY Benchmarks (Walltime)
 
 on:
   push:
@@ -39,8 +39,8 @@ jobs:
       - name: Build benchmark executable
         run: cmake --build build/benchmarks --parallel 2
 
-      - name: Run and upload PTY setup benchmarks
+      - name: Run and upload PTY walltime benchmarks
         uses: CodSpeedHQ/action@v5
         with:
-          mode: simulation
+          mode: walltime
           run: ./build/benchmarks/forge_pty_bench
