@@ -13,7 +13,34 @@ object ForgeAuthSessionState {
     var passwordRecoveryPending by mutableStateOf(false)
         private set
 
+    var mfaGateReady by mutableStateOf(false)
+        private set
+
+    var mfaFactorId by mutableStateOf<String?>(null)
+        private set
+
+    var mfaGateError by mutableStateOf<String?>(null)
+        private set
+
+    fun beginMfaCheck() {
+        mfaGateReady = false
+        mfaFactorId = null
+        mfaGateError = null
+    }
+
+    fun completeMfaCheck(verifiedFactorId: String?) {
+        mfaFactorId = verifiedFactorId
+        mfaGateError = null
+        mfaGateReady = true
+    }
+
+    fun failMfaCheck(message: String) {
+        mfaGateError = message.take(180)
+        mfaGateReady = false
+    }
+
     fun setSession(context: Context, value: SupabaseAuthSession) {
+        beginMfaCheck()
         session = value
         ForgeAuthSessionStore.save(context.applicationContext, value)
     }
@@ -31,6 +58,9 @@ object ForgeAuthSessionState {
     fun clearSession(context: Context) {
         session = null
         passwordRecoveryPending = false
+        mfaFactorId = null
+        mfaGateError = null
+        mfaGateReady = true
         ForgeAuthSessionStore.clear(context.applicationContext)
     }
 
@@ -45,6 +75,7 @@ object ForgeAuthSessionState {
         val restored = runCatching { authClient.validSession(stored) }.getOrDefault(stored)
         if (restored.expiresAtEpochSeconds > System.currentTimeMillis() / 1000L) {
             session = restored
+            beginMfaCheck()
             if (restored.accessToken != stored.accessToken ||
                 restored.refreshToken != stored.refreshToken
             ) {

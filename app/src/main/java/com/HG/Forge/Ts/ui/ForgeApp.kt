@@ -55,6 +55,8 @@ import com.HG.Forge.Ts.ui.screens.CoreNetworkingScreen
 import com.HG.Forge.Ts.ui.screens.ToolsScreen
 import com.HG.Forge.Ts.ui.screens.SimulationScreen
 import com.HG.Forge.Ts.ui.screens.SettingsScreen
+import com.HG.Forge.Ts.ui.screens.MfaChallengeScreen
+import com.HG.Forge.Ts.ui.screens.MfaGateStatusScreen
 
 @Composable
 fun ForgeApp() {
@@ -71,8 +73,14 @@ fun ForgeApp() {
     }
     val authSession = ForgeAuthSessionState.session
     val passwordRecoveryPending = ForgeAuthSessionState.passwordRecoveryPending
+    val mfaGateReady = ForgeAuthSessionState.mfaGateReady
+    val mfaFactorId = ForgeAuthSessionState.mfaFactorId
+    val mfaGateError = ForgeAuthSessionState.mfaGateError
+    var mfaCheckNonce by remember { mutableIntStateOf(0) }
     val nowEpochSeconds = System.currentTimeMillis() / 1000L
-    val hasActiveSession = authSession?.expiresAtEpochSeconds?.let { it > nowEpochSeconds } == true
+    val sessionNotExpired = authSession?.expiresAtEpochSeconds?.let { it > nowEpochSeconds } == true
+    val hasActiveSession = sessionNotExpired && mfaGateReady && mfaGateError == null &&
+        (mfaFactorId == null || authSession?.assuranceLevel == "aal2")
     val tabNames = listOf("home", "learn", "network", "simulate", "tools", "settings")
     fun navigateToTab(destination: Int) {
         val safeDestination = destination.coerceIn(0, 5)
@@ -100,6 +108,30 @@ fun ForgeApp() {
                     ForgeAuthSessionState.beginPasswordRecovery(context)
                 }
             }.onFailure { Log.w("FORGE-TS Auth", "Supabase callback processing failed", it) }
+        }
+    }
+
+    LaunchedEffect(authSession?.accessToken, mfaCheckNonce, passwordRecoveryPending) {
+        val active = authSession
+        if (passwordRecoveryPending || active == null ||
+            active.expiresAtEpochSeconds <= System.currentTimeMillis() / 1000L
+        ) {
+            ForgeAuthSessionState.completeMfaCheck(null)
+        } else {
+            ForgeAuthSessionState.beginMfaCheck()
+            val factorResult = withContext(Dispatchers.IO) {
+                runCatching { authClient.listMfaFactors(active) }
+            }
+            factorResult.onSuccess { factors ->
+                val verifiedTotp = factors.firstOrNull {
+                    it.status == "verified" && it.factorType.equals("totp", ignoreCase = true)
+                }
+                ForgeAuthSessionState.completeMfaCheck(verifiedTotp?.id)
+            }.onFailure { error ->
+                ForgeAuthSessionState.failMfaCheck(
+                    error.message ?: "Unable to verify authenticator status. Retry before using protected tools."
+                )
+            }
         }
     }
 
@@ -236,6 +268,25 @@ fun ForgeApp() {
             ) {
                 Text("Skip intro")
             }
+        }
+
+        if (sessionNotExpired && !passwordRecoveryPending && !mfaGateReady) {
+            MfaGateStatusScreen(
+                message = mfaGateError,
+                onRetry = { mfaCheckNonce++ },
+                modifier = Modifier.fillMaxSize().padding(20.dp)
+            )
+        }
+
+        if (sessionNotExpired && !passwordRecoveryPending && mfaGateReady &&
+            mfaFactorId != null && authSession?.assuranceLevel != "aal2"
+        ) {
+            MfaChallengeScreen(
+                session = requireNotNull(authSession),
+                factorId = mfaFactorId,
+                onVerified = { upgraded -> ForgeAuthSessionState.setSession(context, upgraded) },
+                modifier = Modifier.fillMaxSize().padding(20.dp)
+            )
         }
 
         if (passwordRecoveryPending) {
