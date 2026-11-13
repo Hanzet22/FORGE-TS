@@ -143,6 +143,26 @@ fun ProotTerminalPanel() {
                 ) { Text("Refresh") }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            status = "Preparing XFCE4 bootstrap…"
+                            try {
+                                val result = manager.prepareProotDesktop(distribution) { stage ->
+                                    status = stage
+                                }
+                                status = result.message
+                            } finally {
+                                busy = false
+                                refreshState()
+                            }
+                        }
+                    },
+                    enabled = !busy && lifecycle == "RUNNING"
+                ) { Text("Prepare / Repair XFCE4") }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = {
                         scope.launch {
