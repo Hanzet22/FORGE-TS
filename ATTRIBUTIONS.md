@@ -18,6 +18,12 @@ FORGE-TS application source is licensed under **GNU AGPL-3.0** (see [LICENSE](LI
 
 AndroidX, Kotlin, Ktor, Apache Commons Compress, and ConnectBot termlib use the Apache License 2.0. The full license text is retained at `third_party/licenses/APACHE-2.0.txt`. The exact transitive dependency closure still needs to be generated from Gradle resolution before release.
 
+## Supabase Edge Function dependencies
+
+| Component / npm coordinate | Version | License | Use / notes |
+|---|---:|---|---|
+| `@supabase/server` | 1.9.2 (exactly pinned) | MIT | `withSupabase` authentication/context wrapper used by `forge-redis-gateway`; transitive npm dependencies are captured by the Deno lockfile when generated |
+
 ## Build tooling (not shipped as app runtime libraries)
 
 | Tool | Version | License / terms | Notes |

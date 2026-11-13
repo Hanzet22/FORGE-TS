@@ -29,6 +29,8 @@ jobs:
           deno-version: v2.1.4
       - name: Type-check Edge Functions
         run: |
-          deno check supabase/functions/forge-crash-ingest/index.ts
-          deno check supabase/functions/forge-diagnostic-ingest/index.ts
-          deno check supabase/functions/forge-redis-gateway/index.ts
+          deno check --lock=deno.lock supabase/functions/forge-crash-ingest/index.ts
+          deno check --lock=deno.lock supabase/functions/forge-diagnostic-ingest/index.ts
+          deno check --lock=deno.lock supabase/functions/forge-redis-gateway/index.ts
+          echo '===== GENERATED DENO LOCKFILE ====='
+          cat deno.lock
