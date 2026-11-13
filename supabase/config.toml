@@ -3,3 +3,6 @@ verify_jwt = true
 
 [functions.forge-crash-ingest]
 verify_jwt = false
+
+[functions.forge-diagnostic-ingest]
+verify_jwt = false

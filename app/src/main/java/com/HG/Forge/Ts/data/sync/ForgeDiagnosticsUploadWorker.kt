@@ -3,7 +3,10 @@ package com.HG.Forge.Ts.data.sync
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -16,6 +19,8 @@ class ForgeDiagnosticsUploadWorker(context: Context, params: WorkerParameters) :
         if (!ForgeDiagnosticsConsent.isEnabled(applicationContext)) return@withContext Result.success()
 
         while (true) {
+            currentCoroutineContext().ensureActive()
+            if (!ForgeDiagnosticsConsent.isEnabled(applicationContext)) return@withContext Result.success()
             val all = ForgeDiagnostics.read(applicationContext)
             if (all.length() == 0) return@withContext Result.success()
 
@@ -28,6 +33,8 @@ class ForgeDiagnosticsUploadWorker(context: Context, params: WorkerParameters) :
             if (uploadedIds.isEmpty()) return@withContext Result.success()
 
             try {
+                currentCoroutineContext().ensureActive()
+                if (!ForgeDiagnosticsConsent.isEnabled(applicationContext)) return@withContext Result.success()
                 val payload = JSONObject()
                     .put("schemaVersion", 1)
                     .put("deliveryMode", "app_background_session")
@@ -47,11 +54,14 @@ class ForgeDiagnosticsUploadWorker(context: Context, params: WorkerParameters) :
                 } finally {
                     connection.disconnect()
                 }
+                currentCoroutineContext().ensureActive()
                 when {
                     code in 200..299 -> ForgeDiagnostics.acknowledge(applicationContext, uploadedIds)
                     code == 429 || code >= 500 -> return@withContext Result.retry()
                     else -> return@withContext Result.failure()
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (_: Exception) {
                 return@withContext Result.retry()
             }

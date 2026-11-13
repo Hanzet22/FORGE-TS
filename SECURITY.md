@@ -1,21 +1,30 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+FORGE-TS has not published a stable release. Security fixes are currently targeted at the latest `main` branch.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Version | Support |
+| --- | --- |
+| Latest `main` | Security fixes are reviewed and prioritized |
+| Unreleased snapshots and older debug APKs | No security-update guarantee |
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-Use this section to tell people how to report a vulnerability.
+Please do not publish exploit details, credentials, personal data, or a reproducible attack in a public issue.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+If GitHub's private vulnerability reporting is enabled for this repository, use the repository's **Security → Report a vulnerability** flow. If that option is unavailable, contact the maintainer through a private channel listed on the maintainer's GitHub profile and include only the minimum information needed to reproduce the issue.
+
+A useful report includes:
+- Affected commit, release or component.
+- Impact and realistic attack conditions.
+- Minimal reproduction steps or a proof of concept that does not access other people's data.
+- Any relevant logs with secrets, tokens, personal data and device identifiers removed.
+
+## Response expectations
+
+The maintainer will aim to acknowledge a report within 7 calendar days and provide a status update within 30 calendar days. These are targets, not a guarantee. Coordinated disclosure timing should be agreed with the reporter.
+
+## Scope
+
+The policy covers the Android application, native components, GitHub Actions workflows, Supabase Edge Functions, database migrations, and the project's dependency and release-supply-chain configuration.

@@ -40,11 +40,9 @@ internal object CrashReportStore {
     }.getOrNull()
 
     fun markAnonymousUploaded(context: Context) {
-        runCatching {
-            val report = read(context) ?: return
-            report.put("uploadedAnonymously", true)
-            writeAtomically(File(context.filesDir, REPORT_FILE), report.toString())
-        }
+        val report = read(context) ?: return
+        report.put("uploadedAnonymously", true)
+        writeAtomically(File(context.filesDir, REPORT_FILE), report.toString())
     }
 
     fun markRecoveryAcknowledged(context: Context) {

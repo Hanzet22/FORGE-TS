@@ -1,51 +1,37 @@
 # Phase 31 — Authenticator MFA (TOTP)
 
-## Scope
-- Optional time-based one-time password (TOTP) MFA using authenticator applications.
-- Supabase Auth remains the authority for factor enrollment, challenge, verification and session assurance.
-- QR enrollment and manual setup-key fallback are both supported.
-- Sign-in requires a TOTP challenge after password authentication whenever the account has a verified TOTP factor.
+## Status: Planned, not implemented
 
-## Enrollment
-1. An authenticated user opens Settings → Authenticator MFA.
-2. FORGE-TS calls the Supabase Auth factor enrollment endpoint for a TOTP factor.
-3. The app displays the Supabase-generated QR SVG and the same enrollment secret as a manual setup key.
-4. If QR scanning is unavailable, the user copies the setup key into a compatible authenticator application.
-5. FORGE-TS creates a TOTP challenge and accepts a six-digit code.
-6. Supabase verifies the code and promotes the current session to AAL2.
-7. The app refreshes the factor list and clears the transient enrollment secret from UI state.
+The current FORGE-TS source does not contain a TOTP enrollment, factor-listing, challenge, verification, unenrollment, or AAL2 sign-in enforcement flow. The existing sign-in implementation is password-based.
 
-## Sign-in enforcement
-- Password sign-in is completed first, yielding a temporary AAL1 session.
-- FORGE-TS lists the account's TOTP factors and acts only on factors with status `verified`.
-- If a verified factor exists, the app creates a challenge and displays a six-digit authenticator prompt.
-- The temporary session is not persisted in ForgeAuthSessionStore and protected tabs are not unlocked until verification succeeds.
-- After successful verification, the returned or refreshed session is saved through the existing Android-Keystore-backed session store.
-- If no verified TOTP factor exists, the existing password-only sign-in path remains available.
+This document is a design boundary, not a statement of delivered functionality. Do not advertise or rely on TOTP protection until the implementation is present in the native client and verified against the configured Supabase Auth project.
 
-## Factor management
-- Settings shows whether a verified TOTP factor is enabled.
-- A verified factor can be unenrolled through Supabase Auth. The current session is refreshed after removal so the assurance claim reflects the new factor state.
-- Incomplete, unverified enrollment factors can be removed and enrollment restarted.
-- Supabase controls factor limits and verification policy.
+## Intended scope
 
-## Secret handling
-- The QR SVG, TOTP secret and otpauth URI are received from Supabase Auth.
-- The manual setup secret is shown only during the enrollment flow and can be copied to the device clipboard.
-- The secret is not written to Redis, DataStore, crash reports, diagnostic events, README files or application logs.
-- Users must keep the setup key private. Anyone who obtains it can generate valid TOTP codes.
-- The app does not generate or validate TOTP secrets locally.
+- Optional authenticator-app TOTP enrollment through Supabase Auth.
+- QR code and manual setup-key presentation during enrollment.
+- Six-digit challenge and server-side verification.
+- Factor status and safe unenrollment.
+- Sign-in enforcement for accounts with verified TOTP factors.
+- Session persistence only after the required assurance level is reached.
+- No TOTP secrets in Redis, DataStore, logs, crash reports, or diagnostic events.
 
-## Infrastructure boundaries
-- No database schema or migration changes.
-- No new Supabase project, table, Edge Function, provider or credential.
-- No Redis storage for TOTP secrets, challenges, passwords or sessions.
-- Existing Supabase Auth, publishable key, Android Keystore session store and Redis gateway remain in place.
-- This phase enforces the second-factor step in the native app sign-in gate; it does not change the Redis gateway to require an AAL2 claim on every request. Backend-wide AAL2 enforcement is a separate policy decision and must preserve access for accounts that have not enabled optional MFA.
-- Existing phone authentication remains disabled; this phase is TOTP-only.
+## Required verification before marking implemented
 
-## Verification boundary
-- Implementation was committed directly to `main`.
-- No signup, reset-password, MFA enrollment or live authenticator test was run.
-- No Android build success is claimed here. GitHub Actions build status remains the build authority.
-- Runtime verification still needs a real account with a compatible authenticator app. Do not use production account enrollment as a throwaway test.
+1. Confirm the supported Supabase Auth TOTP API contract against current documentation.
+2. Implement enrollment, challenge, verification, factor listing, and unenrollment in the native client.
+3. Keep enrollment secrets transient and clear them after completion or cancellation.
+4. Confirm that password-only accounts retain the intended sign-in behavior.
+5. Verify that protected app features do not unlock before the required challenge succeeds.
+6. Verify session assurance claims after enrollment, challenge, refresh, and unenrollment.
+7. Test using a dedicated non-production account; do not use a throwaway production enrollment.
+8. Update README and this document only after source and runtime verification are complete.
+
+## Backend policy boundary
+
+The Redis gateway currently requires an authenticated user, but it does not enforce AAL2 for every request. A future backend-wide AAL2 policy must account for users who have not opted into optional MFA and must not rely only on client-side navigation gates.
+
+## References
+
+- https://supabase.com/docs/guides/auth/auth-mfa
+- https://supabase.com/docs/guides/auth/sessions

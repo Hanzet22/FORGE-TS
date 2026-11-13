@@ -9,6 +9,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -177,15 +181,7 @@ object ForgeDiagnostics {
             events.remove(0)
             encoded = events.toString()
         }
-        val temp = File(context.filesDir, "$FILE_NAME.tmp")
-        FileOutputStream(temp).use { stream ->
-            stream.write(encoded.toByteArray(Charsets.UTF_8))
-            stream.fd.sync()
-        }
-        if (!temp.renameTo(file)) {
-            file.writeText(encoded, Charsets.UTF_8)
-            temp.delete()
-        }
+        writeJournalAtomically(context, encoded)
     }
 
     @Synchronized
@@ -205,9 +201,30 @@ object ForgeDiagnostics {
         }
         val file = File(context.filesDir, FILE_NAME)
         if (remaining.length() == 0) {
-            file.delete()
+            if (!file.delete() && file.exists()) {
+                throw IOException("Unable to remove acknowledged diagnostic journal")
+            }
         } else {
-            file.writeText(remaining.toString(), Charsets.UTF_8)
+            writeJournalAtomically(context, remaining.toString())
+        }
+    }
+
+    private fun writeJournalAtomically(context: Context, content: String) {
+        val target = File(context.filesDir, FILE_NAME)
+        val temporary = File(context.filesDir, "$FILE_NAME.tmp")
+        FileOutputStream(temporary).use { stream ->
+            stream.write(content.toByteArray(Charsets.UTF_8))
+            stream.fd.sync()
+        }
+        try {
+            Files.move(
+                temporary.toPath(),
+                target.toPath(),
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING
+            )
+        } catch (_: AtomicMoveNotSupportedException) {
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
     }
 }

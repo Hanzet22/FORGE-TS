@@ -40,6 +40,12 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
   }
 
+  // The publishable key is public and is not caller authentication. This check
+  // enforces the expected Supabase client request contract only.
+  if (req.headers.get("apikey") !== publishableKey) {
+    return json({ ok: false, error: "invalid_api_key" }, 401);
+  }
+
   const raw = await req.text();
   if (raw.length > MAX_BODY) return json({ ok: false, error: "request_too_large" }, 413);
 
@@ -69,6 +75,35 @@ Deno.serve(async (req: Request) => {
   const sdk = Number(input.androidSdk);
   if (!Number.isInteger(sdk) || sdk < 1 || sdk > 100) {
     return json({ ok: false, error: "invalid_android_sdk" }, 400);
+  }
+
+  const installHash = await sha256(installationId.toLowerCase());
+
+  // WorkManager may retry after the server stored a report but before the
+  // response reached the device. Detect that duplicate before consuming quota.
+  if (input.linkOnly !== true) {
+    const existingUrl = new URL(`${supabaseUrl}/rest/v1/forge_ts_crash_events`);
+    existingUrl.searchParams.set("select", "crash_id");
+    existingUrl.searchParams.set("crash_id", `eq.${crashId}`);
+    existingUrl.searchParams.set("install_hash", `eq.${installHash}`);
+    try {
+      const existingResponse = await fetch(existingUrl, {
+        headers: {
+          apikey: serviceRoleKey,
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!existingResponse.ok) {
+        return json({ ok: false, error: "crash_storage_unavailable" }, 502);
+      }
+      const existingRows = await existingResponse.json();
+      if (Array.isArray(existingRows) && existingRows.length > 0) {
+        return json({ ok: true, duplicate: true, linkedToAccount: false });
+      }
+    } catch {
+      return json({ ok: false, error: "crash_storage_unavailable" }, 502);
+    }
   }
 
   const installHash = await sha256(installationId.toLowerCase());
@@ -132,13 +167,15 @@ Deno.serve(async (req: Request) => {
     return json({ ok: true, linkedToAccount: true });
   }
 
-  const insertResponse = await fetch(`${supabaseUrl}/rest/v1/forge_ts_crash_events`, {
+  const insertUrl = new URL(`${supabaseUrl}/rest/v1/forge_ts_crash_events`);
+  insertUrl.searchParams.set("on_conflict", "crash_id");
+  const insertResponse = await fetch(insertUrl, {
     method: "POST",
     headers: {
       apikey: serviceRoleKey,
       Authorization: `Bearer ${serviceRoleKey}`,
       "Content-Type": "application/json",
-      Prefer: "return=minimal",
+      Prefer: "resolution=ignore-duplicates,return=minimal",
     },
     body: JSON.stringify({
       crash_id: crashId,

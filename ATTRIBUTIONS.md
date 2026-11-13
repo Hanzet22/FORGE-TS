@@ -22,6 +22,40 @@ Third-party libraries, fonts, datasets, documentation sources and their applicab
 - License: SIL Open Font License 1.1, including the Reserved Font Name “Kaushan Script”; included at `third_party/licenses/KAUSHAN-SCRIPT-OFL.txt` and the original `assets/fonts/OFL.txt`.
 - The font is bundled unmodified.
 
+## Additional font families
+
+The following font families were added under `assets/fonts/`. Their original OFL 1.1 license notices are retained in each family directory.
+
+### Anton
+- Copyright: Vernon Adams.
+- Source: https://github.com/googlefonts/AntonFont
+- License: SIL Open Font License 1.1.
+- License notice: `assets/fonts/Anton/OFL.txt`.
+
+### Archivo
+- Copyright: Omnibus-Type.
+- Source: https://github.com/Omnibus-Type/Archivo
+- License: SIL Open Font License 1.1.
+- License notice: `assets/fonts/Archivo/OFL.txt`.
+
+### Azeret Mono
+- Copyright: Displaay, Martin Vácha and Daniel Quisek.
+- Source: https://github.com/displaay/Azeret/
+- License: SIL Open Font License 1.1.
+- License notice: `assets/fonts/AzeretMono/OFL.txt`.
+
+### Crimson Pro
+- Copyright: Jacques Le Bailly.
+- Source: https://github.com/Fonthausen/CrimsonPro
+- License: SIL Open Font License 1.1.
+- License notice: `assets/fonts/CrimsonPro/OFL.txt`.
+
+### Lora
+- Copyright: Cyreal, Olga Karpushina and Alexei Vanyashin.
+- Source: https://github.com/cyrealtype/Lora-Cyrillic
+- License: SIL Open Font License 1.1.
+- License notice: `assets/fonts/Lora/OFL.txt`.
+
 ## OSINT Web reference
 - Web-Check — Copyright (c) 2023 Alicia Sykes; MIT License.
 - Source: https://github.com/lissy93/web-check
