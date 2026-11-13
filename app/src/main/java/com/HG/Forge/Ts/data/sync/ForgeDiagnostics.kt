@@ -41,6 +41,11 @@ object ForgeDiagnosticsConsent {
 }
 
 object ForgeDiagnostics {
+    private val processSessionId: String = UUID.randomUUID().toString()
+
+    /** Generate one correlation ID and pass it to related log calls in the same operation. */
+    fun newTraceId(): String = UUID.randomUUID().toString()
+
     private fun inferCategory(tag: String, event: String, level: String): String {
         if (level == "CRASH" || tag.contains("Crash", ignoreCase = true)) return "CRASH"
         return when {
@@ -67,7 +72,8 @@ object ForgeDiagnostics {
         level: String,
         tag: String,
         event: String,
-        throwable: Throwable? = null
+        throwable: Throwable? = null,
+        traceId: String? = null
     ) {
         val normalizedLevel = level.uppercase().take(8)
         val safeTag = tag.replace(Regex("[^A-Za-z0-9_.-]"), "_").take(48)
@@ -86,6 +92,7 @@ object ForgeDiagnostics {
             val eventJson = JSONObject()
                 .put("eventId", UUID.randomUUID().toString())
                 .put("installationId", installationId(context))
+                .put("sessionId", processSessionId)
                 .put("occurredAt", Instant.now().toString())
                 .put("appVersion", appVersion(context))
                 .put("androidSdk", Build.VERSION.SDK_INT)
@@ -102,6 +109,7 @@ object ForgeDiagnostics {
                 .put("eventName", safeEvent)
                 .put("exceptionType", throwable?.javaClass?.name?.take(200) ?: "")
                 .put("stackTrace", throwable?.let(::safeStackTrace) ?: "")
+            if (!traceId.isNullOrBlank()) eventJson.put("traceId", traceId.take(36))
             append(context, eventJson)
             if (ForgeDiagnosticsConsent.isEnabled(context) &&
                 (normalizedLevel == "ERROR" || normalizedLevel == "WARNING" || normalizedLevel == "WARN" || normalizedLevel == "CRITICAL" || normalizedLevel == "CRASH" ||
