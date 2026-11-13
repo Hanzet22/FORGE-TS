@@ -447,9 +447,28 @@ class HybridRuntimeManager(
         if (!isSafeDirectory(workspace, root)) return RuntimeCommandResult(false, null, "", "The selected PRoot workspace failed its containment check.")
         val adapter = adapterRegistry.find(RuntimeEnvironmentId.XFCE_PROOT) ?: return RuntimeCommandResult(false, null, "", "No PRoot execution adapter is registered.")
         val request = RuntimeAdapterStartRequest(RuntimeEnvironmentId.XFCE_PROOT, distribution.directoryName, workspace.absolutePath)
-        return runCatching { adapter.execute(request, arguments, timeoutSeconds) }.getOrElse {
-            RuntimeCommandResult(false, null, "", "Guest command execution failed: ${it.message ?: "unknown error"}")
+        val traceId = ForgeDiagnostics.newTraceId()
+        val startedAt = SystemClock.elapsedRealtime()
+        ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.command.requested", traceId = traceId)
+        val result = try {
+            adapter.execute(request, arguments, timeoutSeconds)
+        } catch (cancelled: CancellationException) {
+            ForgeDiagnostics.log(appContext, "WARNING", "Runtime", "runtime.command.cancelled", traceId = traceId)
+            throw cancelled
+        } catch (error: Exception) {
+            ForgeDiagnostics.log(appContext, "ERROR", "Runtime", "runtime.command.failed", error, traceId)
+            RuntimeCommandResult(false, null, "", "Guest command execution failed: ${error.message ?: "unknown error"}")
         }
+        val durationMs = (SystemClock.elapsedRealtime() - startedAt).coerceAtMost(1_800_000L)
+        val outcome = when {
+            !result.completed -> "runtime.command.incomplete"
+            result.exitCode != 0 -> "runtime.command.nonzero_exit"
+            else -> "runtime.command.completed"
+        }
+        ForgeDiagnostics.log(appContext, if (result.completed && result.exitCode == 0) "INFO" else "WARNING",
+            "Runtime", outcome, traceId = traceId)
+        ForgeDiagnostics.log(appContext, "INFO", "Runtime", "runtime.command.duration_${durationMs}ms", traceId = traceId)
+        return result
     }
 
     suspend fun prepareProotDesktop(
