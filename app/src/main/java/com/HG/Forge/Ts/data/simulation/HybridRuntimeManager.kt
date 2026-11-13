@@ -451,7 +451,7 @@ class HybridRuntimeManager(
         if (distribution !in preparedProotInstances) {
             return RuntimeOperationResult(false, "The selected PRoot workspace is not registered as prepared.")
         }
-        val root = File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName, "rootfs")
+        val root = File(File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName), "rootfs")
         if (!root.isDirectory || !File(root, ".forge-rootfs.json").isFile) {
             return RuntimeOperationResult(false, "A verified rootfs is required before XFCE4 bootstrap.")
         }
