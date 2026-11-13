@@ -5,8 +5,25 @@ const json = (body: Record<string, unknown>, status = 200) =>
   });
 
 const MAX_BODY = 48 * 1024;
-const RATE_LIMIT_SCRIPT =
-  "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],86400) end; return n";
+const RATE_LIMIT_SCRIPT = [
+  "local ttl=tonumber(ARGV[1])",
+  "local maxGlobal=tonumber(ARGV[2])",
+  "local maxInstall=tonumber(ARGV[3])",
+  "local global=tonumber(redis.call('GET',KEYS[1]) or '0')",
+  "local install=tonumber(redis.call('GET',KEYS[2]) or '0')",
+  "local already=redis.call('SISMEMBER',KEYS[3],ARGV[4]) == 1",
+  "local increment=already and 0 or 1",
+  "if global+increment>maxGlobal or install+increment>maxInstall then return {-1,global,install} end",
+  "if increment==1 then",
+  "  redis.call('SADD',KEYS[3],ARGV[4])",
+  "  redis.call('INCRBY',KEYS[1],1)",
+  "  redis.call('INCRBY',KEYS[2],1)",
+  "  redis.call('EXPIRE',KEYS[1],ttl)",
+  "  redis.call('EXPIRE',KEYS[2],ttl)",
+  "  redis.call('EXPIRE',KEYS[3],ttl*2)",
+  "end",
+  "return {global+increment,install+increment,increment}",
+].join(" ");
 
 async function sha256(value: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
@@ -106,21 +123,35 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  const rateKey = `forge-ts:crash-ingest:${installHash}:${new Date().toISOString().slice(0, 10)}`;
-  try {
-    const rateResponse = await fetch(redisEndpoint, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${redisToken}`, "Content-Type": "application/json" },
-      body: JSON.stringify(["EVAL", RATE_LIMIT_SCRIPT, "1", rateKey]),
-      signal: AbortSignal.timeout(4000),
-    });
-    if (!rateResponse.ok) return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
-    const ratePayload = await rateResponse.json();
-    const count = Number(ratePayload?.result);
-    if (!Number.isFinite(count)) return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
-    if (count > 10) return json({ ok: false, error: "daily_install_limit_reached" }, 429);
-  } catch {
-    return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
+  if (input.linkOnly !== true) {
+    const day = new Date().toISOString().slice(0, 10);
+    const globalRateKey = `forge-ts:crash-ingest:global:${day}`;
+    const installRateKey = `forge-ts:crash-ingest:install:${installHash}:${day}`;
+    const dedupeKey = `forge-ts:crash-ingest:seen:${installHash}`;
+    try {
+      const rateResponse = await fetch(redisEndpoint, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${redisToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify([
+          "EVAL", RATE_LIMIT_SCRIPT, "3",
+          globalRateKey, installRateKey, dedupeKey,
+          "86400", "500", "10", crashId,
+        ]),
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!rateResponse.ok) return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
+      const ratePayload = await rateResponse.json();
+      const values = ratePayload?.result;
+      if (!Array.isArray(values) || values.length < 3 ||
+          !values.every((value: unknown) => Number.isFinite(Number(value)))) {
+        return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
+      }
+      if (Number(values[0]) < 0) {
+        return json({ ok: false, error: "daily_ingest_limit_reached" }, 429);
+      }
+    } catch {
+      return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
+    }
   }
 
   let userId: string | null = null;

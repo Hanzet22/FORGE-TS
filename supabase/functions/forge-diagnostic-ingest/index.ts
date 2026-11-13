@@ -8,8 +8,33 @@ const json = (body: Record<string, unknown>, status = 200) =>
   });
 
 const MAX_BODY = 64 * 1024;
-const RATE_LIMIT_SCRIPT =
-  "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],86400) end; return n";
+const EVENT_RATE_LIMIT_SCRIPT = [
+  "local ttl=tonumber(ARGV[1])",
+  "local maxGlobal=tonumber(ARGV[2])",
+  "local maxInstall=tonumber(ARGV[3])",
+  "local seen={}",
+  "local newIds={}",
+  "for i=4,#ARGV do",
+  "  local id=ARGV[i]",
+  "  if not seen[id] then",
+  "    seen[id]=true",
+  "    if redis.call('SISMEMBER',KEYS[3],id)==0 then table.insert(newIds,id) end",
+  "  end",
+  "end",
+  "local increment=#newIds",
+  "local global=tonumber(redis.call('GET',KEYS[1]) or '0')",
+  "local install=tonumber(redis.call('GET',KEYS[2]) or '0')",
+  "if global+increment>maxGlobal or install+increment>maxInstall then return {-1,global,install,increment} end",
+  "if increment>0 then",
+  "  for _,id in ipairs(newIds) do redis.call('SADD',KEYS[3],id) end",
+  "  redis.call('INCRBY',KEYS[1],increment)",
+  "  redis.call('INCRBY',KEYS[2],increment)",
+  "  redis.call('EXPIRE',KEYS[1],ttl)",
+  "  redis.call('EXPIRE',KEYS[2],ttl)",
+  "  redis.call('EXPIRE',KEYS[3],ttl*2)",
+  "end",
+  "return {global+increment,install+increment,increment}",
+].join(" ");
 const EMAIL_RATE_LIMIT_SCRIPT =
   "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],1800) end; return n";
 
@@ -165,14 +190,21 @@ Deno.serve(async (req: Request) => {
 
     stage = "redis_rate_limit";
     const installHash = await sha256(installationId.toLowerCase());
-    const rateKey = "forge-ts:diagnostic-ingest:" + installHash + ":" +
-      new Date().toISOString().slice(0, 10);
+    const day = new Date().toISOString().slice(0, 10);
+    const globalRateKey = "forge-ts:diagnostic-ingest:global:" + day;
+    const installRateKey = "forge-ts:diagnostic-ingest:install:" + installHash + ":" + day;
+    const dedupeKey = "forge-ts:diagnostic-ingest:seen:" + installHash;
     let rateResponse: Response;
     try {
       rateResponse = await fetch(redisEndpoint, {
         method: "POST",
         headers: { Authorization: "Bearer " + redisToken, "Content-Type": "application/json" },
-        body: JSON.stringify(["EVAL", RATE_LIMIT_SCRIPT, "1", rateKey]),
+        body: JSON.stringify([
+          "EVAL", EVENT_RATE_LIMIT_SCRIPT, "3",
+          globalRateKey, installRateKey, dedupeKey,
+          "86400", "3000", "300",
+          ...normalized.map((event) => String(event.event_id)),
+        ]),
         signal: AbortSignal.timeout(4000),
       });
     } catch (error) {
@@ -195,12 +227,15 @@ Deno.serve(async (req: Request) => {
       console.error("diagnostic_ingest_redis_command_failed");
       return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
     }
-    const count = Number(ratePayload.result);
-    if (!Number.isFinite(count)) {
+    const rateValues = ratePayload.result;
+    if (!Array.isArray(rateValues) || rateValues.length < 4 ||
+        !rateValues.every((value: unknown) => Number.isFinite(Number(value)))) {
       console.error("diagnostic_ingest_redis_result_invalid");
       return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
     }
-    if (count > 300) return json({ ok: false, error: "daily_install_limit_reached" }, 429);
+    if (Number(rateValues[0]) < 0) {
+      return json({ ok: false, error: "daily_ingest_limit_reached" }, 429);
+    }
 
     stage = "database_insert";
     let insertUrl: URL;
@@ -242,10 +277,14 @@ Deno.serve(async (req: Request) => {
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const emailFrom = Deno.env.get("DIAGNOSTICS_EMAIL_FROM") ||
       Deno.env.get("DIAGNOSTIC_EMAIL_FROM");
-    const importantEvents = normalized;
-    if (resendKey && emailFrom && importantEvents.length > 0) {
+    const emailTo = (Deno.env.get("DIAGNOSTICS_EMAIL_TO") || "")
+      .split(",").map((address) => address.trim()).filter(Boolean);
+    const importantEvents = normalized.filter((event) =>
+      ["ERROR", "CRITICAL", "CRASH"].includes(String(event.level))
+    );
+    if (resendKey && emailFrom && emailTo.length > 0 && importantEvents.length > 0) {
       stage = "admin_email_rate_limit";
-      const emailRateKey = "forge-ts:diagnostic-email:" + installHash;
+      const emailRateKey = "forge-ts:diagnostic-email:global";
       try {
         const emailLimitResponse = await fetch(redisEndpoint, {
           method: "POST",
@@ -284,7 +323,7 @@ Deno.serve(async (req: Request) => {
             },
             body: JSON.stringify({
               from: emailFrom,
-              to: ["papakjamsutnoruu@gmail.com"],
+              to: emailTo,
               subject: "[FORGE-TS] Session diagnostics summary",
               text: "FORGE-TS received a background-session diagnostics report.\n\n" +
                 JSON.stringify(summary, null, 2) +
