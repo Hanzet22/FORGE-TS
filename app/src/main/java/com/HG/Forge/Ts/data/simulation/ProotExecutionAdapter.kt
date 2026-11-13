@@ -233,7 +233,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     ): RuntimeCommandResult = withContext(Dispatchers.IO) {
         if (arguments.isEmpty() || arguments.size > 64 ||
             arguments.any { it.isEmpty() || it.length > 4096 || it.indexOf('\u0000') >= 0 } ||
-            timeoutSeconds !in 1L..120L) {
+            timeoutSeconds !in 1L..1800L) {
             return@withContext RuntimeCommandResult(false, null, "", "Command arguments or timeout are outside the supported bounds.")
         }
         val paths = resolvePaths(request)
