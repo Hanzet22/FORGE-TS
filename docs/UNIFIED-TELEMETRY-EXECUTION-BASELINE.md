@@ -174,3 +174,13 @@ Runtime lifecycle instrumentation is emitted from the existing `HybridRuntimeMan
 - PTY instrumentation is session-level only. No per-keystroke, per-read, per-write, or resize telemetry is emitted.
 - No Supabase schema or Edge Function change was required; events continue through the existing consent-gated diagnostics pipeline.
 - This increment is committed to `main`; Android Debug APK and CodeQL validation for the latest commit are pending. CI success is not inferred from an in-progress run.
+
+### Media telemetry and adaptive intro layout
+
+- Added one playback-scoped trace ID covering intro preparation, prepared state, playback start, first rendered frame, terminal outcome, and bounded playback duration.
+- Added terminal outcomes for natural completion, playback error/start failure, surface destruction, and view detachment. Duplicate terminal events are suppressed.
+- First-frame telemetry is latched once; no per-frame events are collected.
+- Added layout-change events for the actual intro view bounds and a portrait/landscape classification. Repeated identical dimensions are deduplicated. This records layout dimensions only; no media URI, file path, content, audio, or frame data is collected.
+- The TextureView center-crop transform is recalculated on view-size and surface-size changes. It fills the available intro bounds without distorting the source aspect ratio, including resizable split-screen windows.
+- Playback duration is measured with monotonic elapsed time and capped at ten minutes.
+- This is instrumentation and adaptive rendering logic only; it does not assert that playback has been verified on physical devices in every orientation or multi-window mode.
