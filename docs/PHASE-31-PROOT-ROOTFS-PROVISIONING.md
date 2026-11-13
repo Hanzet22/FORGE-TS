@@ -68,3 +68,11 @@ Debian and Ubuntu expose the password utility as `tigervncpasswd`; Alpine expose
 The in-app action opens a compatible external Android viewer through the standard `vnc://127.0.0.1:5901` URI. AVNC documents support for `vnc://` URIs, but is GPL-3.0; it is not bundled or linked as an app dependency. If no compatible viewer is installed, the user must install one separately. The temporary password is shown in the FORGE-TS screen and is not embedded in the URI.
 
 **Lifecycle boundary:** the VNC and XFCE processes are started from the existing PRoot PTY shell so they remain children of the active PRoot session. Stopping the PRoot runtime ends that session. The desktop stop action requests termination of the saved process IDs and removes the guest password file. This implementation is CI/build-validated only; listener binding, VNC authentication, rendering, and process shutdown still require physical-device validation.
+
+## Phase 32 — VNC Session Lifecycle Manager
+
+- The desktop launcher wraps `dbus-launch --exit-with-session startxfce4` in a tracked shell supervisor. On termination, the supervisor forwards `TERM` to its XFCE/D-Bus launcher child and waits for it.
+- The session inspector checks the tracked VNC and XFCE PIDs, X11 display socket, and temporary password-file presence. It reports `RUNNING`, `STOPPED`, or `PARTIAL`; inspection does not start or stop guest processes.
+- Stop sends `TERM`, waits up to six seconds, then uses `KILL` only for tracked PIDs that remain alive. Password and session files are removed only after both tracked processes are confirmed stopped. If shutdown remains incomplete, the password file is retained for recovery instead of falsely reporting success.
+- Stale X11 lock/socket cleanup is attempted only after both tracked processes have exited.
+- This is process-level lifecycle verification, not proof that every possible orphaned desktop child has exited. Full end-to-end verification still requires an Android device session with a supported VNC viewer.

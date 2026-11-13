@@ -47,6 +47,7 @@ fun ProotTerminalPanel() {
     var busy by remember { mutableStateOf(false) }
     var vncPassword by remember { mutableStateOf("") }
     var vncReady by remember { mutableStateOf(false) }
+    var vncSessionState by remember { mutableStateOf("UNKNOWN") }
 
     val terminalEmulator = remember(manager, distribution) {
         TerminalEmulatorFactory.create(
@@ -74,6 +75,13 @@ fun ProotTerminalPanel() {
         lifecycle = instance?.lifecycle?.name ?: "UNKNOWN"
     }
 
+    fun refreshVncState() {
+        scope.launch {
+            val result = manager.inspectProotDesktopSession(distribution)
+            vncSessionState = if (result.accepted) result.message else "UNAVAILABLE"
+        }
+    }
+
     LaunchedEffect(manager) {
         val result = manager.initialize()
         lifecycle = if (result.accepted) "Registry ready" else result.message
@@ -85,6 +93,7 @@ fun ProotTerminalPanel() {
         vncPassword = ""
         vncReady = false
         refreshState()
+        refreshVncState()
     }
 
     LaunchedEffect(distribution, lifecycle) {
@@ -128,6 +137,7 @@ fun ProotTerminalPanel() {
                 }
             }
             Text("Lifecycle: $lifecycle", style = MaterialTheme.typography.labelMedium)
+            Text("VNC session: $vncSessionState", style = MaterialTheme.typography.labelMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
                     onClick = {
@@ -147,7 +157,7 @@ fun ProotTerminalPanel() {
                     enabled = !busy && lifecycle !in setOf("RUNNING", "STARTING", "RECOVERY_REQUIRED")
                 ) { Text(if (lifecycle == "READY" || lifecycle == "STOPPED") "Repair RootFS" else "Install RootFS") }
                 OutlinedButton(
-                    onClick = { refreshState() },
+                    onClick = { refreshState(); refreshVncState() },
                     enabled = !busy
                 ) { Text("Refresh") }
             }
@@ -204,6 +214,7 @@ fun ProotTerminalPanel() {
                                 status = result.message
                                 vncReady = result.accepted
                                 vncPassword = if (result.accepted) password else ""
+                                refreshVncState()
                             } finally {
                                 busy = false
                                 refreshState()
@@ -221,6 +232,7 @@ fun ProotTerminalPanel() {
                                 status = result.message
                                 vncReady = false
                                 vncPassword = ""
+                                refreshVncState()
                             } finally {
                                 busy = false
                             }
