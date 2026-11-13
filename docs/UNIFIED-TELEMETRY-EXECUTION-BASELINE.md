@@ -1,0 +1,122 @@
+# FORGE-TS Unified Telemetry — Execution Baseline
+
+Status: implementation baseline adopted from repository audit  
+Target: `Hanzet22/FORGE-TS` / `main`  
+Package: `com.HG.Forge.Ts`
+
+## 1. Repository facts verified
+
+The current Android telemetry path is already composed of:
+
+- `ForgeDiagnostics`: bounded local JSON journal (`forge-diagnostic-events.json`), capped at 200 events and 48 KiB.
+- `ForgeDiagnosticsUploadWorker`: WorkManager delivery with network constraint, exponential backoff, unique work, and acknowledgement by event ID.
+- `CrashReportStore` / `CrashReportUploadWorker`: separate crash report capture and upload path.
+- Supabase Edge Functions: `forge-diagnostic-ingest` and `forge-crash-ingest`.
+- Upstash Redis: per-installation request limits and email throttling.
+- Resend: minimized administrative digest to the configured recipient.
+- RLS and SQL grants: telemetry tables are server-only; ingestion is performed by trusted Edge Functions.
+
+Room and WorkManager dependencies are present in Gradle, but the inspected telemetry implementation currently persists its bounded journal as an app-private JSON file. Room is not yet the active telemetry queue.
+
+## 2. Architecture decision
+
+Do not replace the live ingestion path with a public Apps Script endpoint in this execution.
+
+Reason: a static shared token embedded in an Android APK is extractable. A public Apps Script Web App that executes as its owner and sends MailApp messages would expose owner-authorized quota and mail-sending capability to abuse unless an independently trustworthy authorization and abuse-control layer is established. Apps Script/MailApp may be considered later as an email relay, not as an unauthenticated replacement for the existing ingest gateway.
+
+Keep the current runtime path until a migration has equivalent authentication, rate limiting, deduplication, privacy controls, and a tested rollback route:
+
+`Android instrumentation -> local durable journal -> WorkManager -> Supabase Edge Function -> Upstash rate limit -> protected Supabase table -> minimized Resend digest`
+
+No Supabase, Upstash, GitHub Actions, Auth, database policy, or deployment configuration is removed by this baseline.
+
+## 3. Canonical event envelope
+
+The next implementation increment should standardize event naming and metadata without breaking the current server contract.
+
+Required fields:
+- `schemaVersion`: integer, initially 1.
+- `eventId`: UUID generated once at event creation and retained across retries.
+- `occurredAt`: UTC ISO-8601 timestamp.
+- `appVersion`, `androidSdk`, `androidRelease`.
+- `level`: DEBUG, INFO, WARNING, ERROR, CRITICAL, or CRASH.
+- `category`: canonical category from the registry below.
+- `component`: stable module or subsystem identifier.
+- `eventName`: lowercase dot-separated canonical event name.
+- `attributes`: bounded, allowlisted scalar metadata only.
+
+Correlation fields to add in a backward-compatible schema revision:
+- `sessionId`: random per foreground session.
+- `traceId`: optional identifier for a multi-step operation.
+- `parentEventId`: optional causal event reference.
+
+Do not generate a new event ID during retry. Server acknowledgement must continue to identify exactly which events can be removed from the local queue.
+
+## 4. Canonical category registry
+
+| Category | Scope | Example event names |
+|---|---|---|
+| APP_LIFECYCLE | Application/process | `application.created`, `session.foreground`, `session.background`, `session.interrupted_detected` |
+| ACTIVITY | Android Activity | `activity.created`, `activity.resumed`, `activity.paused` |
+| NAVIGATION | Screens and routes | `navigation.screen_entered`, `navigation.route_failed` |
+| FEATURE | User-facing feature operations | `feature.started`, `feature.completed`, `feature.failed` |
+| NETWORK | Connectivity and HTTP | `network.connectivity_changed`, `network.request_failed` |
+| DNS | DNS lookup and records | `dns.lookup_started`, `dns.lookup_completed`, `dns.lookup_failed` |
+| STORAGE | Local persistence/cache | `storage.read_failed`, `storage.write_failed` |
+| DATABASE | Room or other local database | `database.query_failed`, `database.migration_failed` |
+| BACKGROUND | WorkManager tasks | `background.work_started`, `background.work_retry`, `background.work_completed` |
+| PERMISSION | Runtime permissions | `permission.requested`, `permission.result` |
+| RUNTIME | PRoot, PTY, display/session runtime | `runtime.start_requested`, `runtime.ready`, `runtime.failed`, `runtime.stopped` |
+| MEDIA | Intro/video/audio playback | `media.prepare_failed`, `media.first_frame`, `media.playback_error` |
+| PERFORMANCE | Startup, memory, frame and responsiveness | `performance.startup_completed`, `performance.memory_pressure`, `performance.frame_slow` |
+| SECURITY | Local security and validation boundaries | `security.validation_rejected`, `security.permission_denied` |
+| CRASH | Fatal and recoverable failures | `crash.uncaught_exception`, `crash.recovery_shown` |
+| TELEMETRY | Telemetry pipeline health | `telemetry.queue_full`, `telemetry.upload_started`, `telemetry.upload_accepted`, `telemetry.upload_rejected` |
+
+## 5. Module coverage map
+
+- Home: screen entry, startup readiness, intro media lifecycle, navigation actions.
+- Learn: lesson open/complete, simulation start/complete/fail.
+- Network: CIDR/VLSM calculations, DNS lookup, RDAP and HTTP operation outcomes.
+- Tools: tool invocation, operation outcome, validation failures.
+- Settings: preference changes, consent changes, permission state.
+- Hybrid runtime: PRoot provisioning, PTY lifecycle, display-session lifecycle, runtime state transitions.
+- Shared platform: application/session lifecycle, Activity lifecycle, background work, connectivity, storage, crash recovery.
+
+Instrumentation must not log from a Compose body during recomposition. Use lifecycle-aware effects, navigation callbacks, repository/service boundaries, or explicit user-operation callbacks.
+
+## 6. Privacy and data minimization
+
+Never collect or transmit:
+- passwords, access tokens, API keys, cookies, authorization headers, or secrets;
+- email/message contents, clipboard contents, or user-entered command text;
+- raw DNS/HTTP payloads or arbitrary request/response bodies;
+- precise location, contacts, or unrelated device identifiers;
+- full stack traces in administrator email.
+
+Raw crash stack frames may remain in the existing protected crash-report path subject to explicit consent and the existing user review/share controls. Administrative email must contain only minimized event summaries and exception class names. All new attributes must be allowlisted, length-bounded, and scrubbed before persistence.
+
+## 7. Delivery and failure semantics
+
+- Local persistence precedes network upload.
+- Upload only under the existing diagnostic consent setting.
+- Use WorkManager with a connected-network constraint and exponential backoff.
+- Preserve unique-work behavior to prevent concurrent duplicate uploaders.
+- Treat delivery as at-least-once; server-side event-ID deduplication is required.
+- Remove locally queued events only after a successful server acknowledgement.
+- Never interpret process destruction as a guaranteed `APP_EXIT`; detect an interrupted prior session on the next launch instead.
+- Telemetry failure must never block normal app startup or core features.
+
+## 8. Implementation order
+
+1. Introduce canonical category/event constants and a backward-compatible event API.
+2. Add session/correlation identifiers and a versioned event envelope.
+3. Instrument app lifecycle, navigation, feature/repository boundaries, network, background work, runtime, and media.
+4. Extend the ingest schema and server validation compatibly; preserve RLS and server-only writes.
+5. Add pipeline self-diagnostics and a minimized email digest.
+6. Evaluate Room migration only if measured journal contention, crash-consistency, or queue requirements justify it; do not add a second persistence path merely because the dependency exists.
+7. Consider Apps Script/MailApp only after a secure relay design and quota/abuse controls are independently established.
+
+## 9. Execution boundary
+
+This document records the architecture and schema baseline. It does not claim that runtime instrumentation, database migrations, endpoint deployment, or end-to-end delivery have been implemented. Those changes must be made in focused commits with one bounded validation pass, not repeated test loops.
