@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -105,10 +106,11 @@ private fun CidrTool(viewModel: CoreNetworkingViewModel) {
 
 @Composable
 private fun PublicIpTool(viewModel: CoreNetworkingViewModel) {
+    val context = LocalContext.current.applicationContext
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Public IP address", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Text("Fetches the public address visible to an external service. This is not your device's private LAN address.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Button(onClick = { viewModel.loadPublicIp() }, enabled = !viewModel.isLoadingIp, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = { viewModel.loadPublicIp(context) }, enabled = !viewModel.isLoadingIp, modifier = Modifier.fillMaxWidth()) {
             if (viewModel.isLoadingIp) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Check public IP")
         }
         viewModel.publicIpError?.let { ErrorText(it) }
@@ -125,6 +127,7 @@ private fun PublicIpTool(viewModel: CoreNetworkingViewModel) {
 
 @Composable
 private fun HostTool(viewModel: CoreNetworkingViewModel) {
+    val context = LocalContext.current.applicationContext
     var host by remember { mutableStateOf("example.com") }
     var port by remember { mutableStateOf("443") }
     var checkTls by remember { mutableStateOf(true) }
@@ -136,7 +139,7 @@ private fun HostTool(viewModel: CoreNetworkingViewModel) {
             Checkbox(checked = checkTls, onCheckedChange = { checkTls = it })
             Text("Verify TLS certificate and hostname")
         }
-        Button(onClick = { viewModel.checkHost(host, port, checkTls) }, enabled = !viewModel.isCheckingHost, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = { viewModel.checkHost(context, host, port, checkTls) }, enabled = !viewModel.isCheckingHost, modifier = Modifier.fillMaxWidth()) {
             if (viewModel.isCheckingHost) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Check host")
         }
         viewModel.hostError?.let { ErrorText(it) }
