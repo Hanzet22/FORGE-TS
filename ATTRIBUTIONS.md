@@ -65,6 +65,23 @@ The following font families were added under `assets/fonts/`. Their original OFL
 Recheck dependency versions and license notices before distribution.
 
 
+## Native PRoot runtime
+
+### PRoot
+- Version: 5.1.107.102, Termux fork.
+- Source archive: https://github.com/termux/proot/archive/v5.1.107.102.zip
+- SHA-256: `30d12a6e2cc4147123756ff58edea262d3083bbc238c12d0ab9b39e3d1c40852`.
+- License evidence: Termux package metadata declares `GPL-2.0`; the PRoot upstream project identifies its license as `GPL-2.0-or-later`. The bundled COPYING file contains the GPL version 2 text but does not itself resolve the exact later-version grant for this fork. Confirm the tag-level grant before public binary distribution.
+- License text: `app/src/main/assets/licenses/proot-runtime/PRoot-COPYING`.
+
+### talloc
+- Version: 2.5.0; statically linked into the PRoot executable by the native build script.
+- Source archive: https://www.samba.org/ftp/talloc/talloc-2.5.0.tar.gz
+- SHA-256: `912afa237510ae542a7733998eb18a12bcda35ab6729c8e2ddb43e8d0ebab007`.
+- License: GNU Lesser General Public License 3.0 or later (LGPL-3.0-or-later).
+- License text: `app/src/main/assets/licenses/proot-runtime/TALLOC-LICENSE`.
+- Static-link distribution must preserve the LGPL relinking and corresponding-source requirements. The repository's native build script pins both source archives and records the build configuration; verify that the release source package and relinking materials accompany every distributed binary.
+
 ## Terminal emulator
 
 ### ConnectBot termlib

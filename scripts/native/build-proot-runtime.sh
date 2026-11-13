@@ -160,10 +160,15 @@ if grep -q "libtalloc\\.so" "$STAGE/proot-elf-dynamic.txt"; then
 fi
 
 cp "$WORK/proot-src/COPYING" "$STAGE/licenses/PRoot-COPYING"
-if [[ -f "$WORK/talloc/COPYING" ]]; then
-  cp "$WORK/talloc/COPYING" "$STAGE/licenses/talloc-COPYING"
+if [[ -f "$WORK/talloc/LICENSE" ]]; then
+  cp "$WORK/talloc/LICENSE" "$STAGE/licenses/TALLOC-LICENSE"
 elif [[ -f "$WORK/talloc/COPYING.LESSER" ]]; then
-  cp "$WORK/talloc/COPYING.LESSER" "$STAGE/licenses/talloc-COPYING.LESSER"
+  cp "$WORK/talloc/COPYING.LESSER" "$STAGE/licenses/TALLOC-LICENSE"
+elif [[ -f "$WORK/talloc/COPYING" ]]; then
+  cp "$WORK/talloc/COPYING" "$STAGE/licenses/TALLOC-LICENSE"
+else
+  echo "Missing talloc license file in the pinned source archive." >&2
+  exit 6
 fi
 cat > "$STAGE/build-manifest.txt" <<MANIFEST
 FORGE-TS PRoot native build
@@ -175,7 +180,8 @@ PRoot_SHA256=$PROOT_SHA256
 PRoot_LICENSE=GPL-2.0 (Termux package recipe declaration; inspect bundled COPYING)
 TALLOC_SOURCE=https://www.samba.org/ftp/talloc/talloc-$TALLOC_VERSION.tar.gz
 TALLOC_SHA256=$TALLOC_SHA256
-TALLOC_LICENSE=Bundled upstream COPYING file (Termux package recipe declares GPL-3.0)
+TALLOC_LICENSE_FILE=licenses/TALLOC-LICENSE
+TALLOC_LICENSE=LGPL-3.0-or-later (upstream talloc 2.5.0 license)
 LIBANDROID_SHMEM=disabled
 TALLOC_LINKAGE=static
 ELF_MAX_PAGE_SIZE=16384
