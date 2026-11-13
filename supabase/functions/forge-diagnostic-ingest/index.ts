@@ -33,7 +33,7 @@ const EVENT_RATE_LIMIT_SCRIPT = [
   "  redis.call('EXPIRE',KEYS[2],ttl)",
   "  redis.call('EXPIRE',KEYS[3],ttl*2)",
   "end",
-  "return {global+increment,install+increment,increment}",
+  "return {0,global+increment,install+increment,increment}",
 ].join(" ");
 const EMAIL_RESERVATION_SCRIPT =
   "return redis.call('SET',KEYS[1],ARGV[1],'NX','EX',1800) and 1 or 0";
