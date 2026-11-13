@@ -37,4 +37,5 @@ The app's in-memory Redis and Supabase simulators remain available when connecti
 - Diagnostic ingestion has a Redis-backed daily ceiling of 3,000 unique event IDs globally and 300 per installation.
 - Diagnostic event IDs are deduplicated in Redis before quota accounting so WorkManager retries of the same batch do not consume the daily event quota again.
 - These are downstream workload and storage caps, not a complete network-layer DDoS defense. The publishable Supabase key is public and is not caller authentication.
+- No client-IP header is currently treated as a trusted identity: Supabase's documented Edge Function contract does not establish that forwarded IP headers cannot be caller-spoofed. Add network-layer protection only after the trusted ingress/header behavior is confirmed for this deployment.
 - Email alerts are limited globally to one message per 30 minutes and only include ERROR, CRITICAL, or CRASH events. Configure recipients through `DIAGNOSTICS_EMAIL_TO`; do not commit recipient addresses.

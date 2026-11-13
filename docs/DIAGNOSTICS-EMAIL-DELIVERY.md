@@ -24,7 +24,7 @@ The Supabase project owner must configure these Edge Function secrets before ema
 - `DIAGNOSTICS_EMAIL_FROM` — sender address on a domain verified with Resend. The function also accepts the legacy singular spelling `DIAGNOSTIC_EMAIL_FROM`.
 - `DIAGNOSTICS_EMAIL_TO` — one or more comma-separated recipient addresses.
 
-No mail-provider key is embedded in the Android app or Git repository. If either secret is absent, diagnostics still upload to Supabase and the function reports `emailAlert: not_configured`.
+No mail-provider key is embedded in the Android app or Git repository. If any of the three email settings is absent, diagnostics still upload to Supabase and the function reports `emailAlert: not_configured`.
 
 ## Alert volume
 

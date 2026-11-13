@@ -1,4 +1,4 @@
-name: CodSpeed PTY Benchmarks
+name: CodSpeed Native PTY Helper Microbenchmarks
 
 on:
   push:
@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   benchmarks:
-    name: Native PTY setup benchmarks
+    name: PTY helper microbenchmarks
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,7 +39,7 @@ jobs:
       - name: Build benchmark executable
         run: cmake --build build/benchmarks --parallel 2
 
-      - name: Run and upload PTY setup benchmarks
+      - name: Run and upload PTY helper measurements
         uses: CodSpeedHQ/action@v5
         with:
           mode: simulation
