@@ -28,27 +28,35 @@ object ForgeCrashBackendConfig {
 class CrashReportUploadWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        if (!CrashReportConsent.isEnabled(applicationContext)) return@withContext Result.success()
-        val report = CrashReportStore.read(applicationContext) ?: return@withContext Result.success()
-        if (report.optBoolean("uploadedAnonymously")) return@withContext Result.success()
-        try {
+        while (true) {
             currentCoroutineContext().ensureActive()
             if (!CrashReportConsent.isEnabled(applicationContext)) return@withContext Result.success()
-            val responseCode = postCrashReport(report, accessToken = null, linkOnly = false)
-            currentCoroutineContext().ensureActive()
-            if (responseCode in 200..299) {
-                CrashReportStore.markAnonymousUploaded(applicationContext, report.optString("crashId"))
-                Result.success()
-            } else if (responseCode == 429 || responseCode >= 500) {
-                Result.retry()
-            } else {
-                Result.failure()
+            val report = CrashReportStore.readNextForAnonymousUpload(applicationContext)
+                ?: return@withContext Result.success()
+            try {
+                currentCoroutineContext().ensureActive()
+                if (!CrashReportConsent.isEnabled(applicationContext)) return@withContext Result.success()
+                val responseCode = postCrashReport(report, accessToken = null, linkOnly = false)
+                currentCoroutineContext().ensureActive()
+                if (responseCode in 200..299) {
+                    CrashReportStore.markAnonymousUploaded(
+                        applicationContext,
+                        report.optString("crashId")
+                    )
+                } else if (responseCode == 429 || responseCode >= 500) {
+                    return@withContext Result.retry()
+                } else {
+                    return@withContext Result.failure()
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                return@withContext Result.retry()
             }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
-        } catch (_: Exception) {
-            Result.retry()
         }
+        @Suppress("UNREACHABLE_CODE")
+        Result.success()
+
     }
 }
 

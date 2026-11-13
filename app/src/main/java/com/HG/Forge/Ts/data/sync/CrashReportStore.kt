@@ -58,6 +58,17 @@ internal object CrashReportStore {
     }
 
     @Synchronized
+    fun readNextForAnonymousUpload(context: Context): JSONObject? = runCatching {
+        val file = pendingFiles(context).firstOrNull { candidate ->
+            runCatching {
+                candidate.length() <= 48 * 1024 &&
+                    !JSONObject(candidate.readText(Charsets.UTF_8)).optBoolean("uploadedAnonymously")
+            }.getOrDefault(false)
+        } ?: return@runCatching null
+        JSONObject(file.readText(Charsets.UTF_8))
+    }.getOrNull()
+
+    @Synchronized
     fun markRecoveryAcknowledged(context: Context) {
         val file = pendingFiles(context).firstOrNull() ?: return
         val report = JSONObject(file.readText(Charsets.UTF_8))
