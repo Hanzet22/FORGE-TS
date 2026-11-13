@@ -42,6 +42,10 @@ internal class IntroVideoTextureView(
     override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
         videoSurface = Surface(surfaceTexture)
         preparePlayer()
+        ForgeDiagnostics.log(
+            context, "DEBUG", "IntroVideo", "intro.surface.available",
+            traceId = playbackTraceId
+        )
         logLayoutIfChanged(width, height)
     }
 
@@ -242,6 +246,10 @@ internal class IntroVideoTextureView(
             )
         }
 
+        ForgeDiagnostics.log(
+            context, "DEBUG", "IntroVideo", "intro.player.released_\${reason}",
+            traceId = playbackTraceId
+        )
         runCatching { player.stop() }
         runCatching { player.release() }
         playbackStartedAtMs = null
