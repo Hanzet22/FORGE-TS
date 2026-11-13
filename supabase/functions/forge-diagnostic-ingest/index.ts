@@ -251,7 +251,7 @@ Deno.serve(async (req: Request) => {
       return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
     }
     const rateValues = ratePayload.result;
-    if (!Array.isArray(rateValues) || rateValues.length < 4 ||
+    if (!Array.isArray(rateValues) || rateValues.length < 3 ||
         !rateValues.every((value: unknown) => Number.isFinite(Number(value)))) {
       console.error("diagnostic_ingest_redis_result_invalid");
       return json({ ok: false, error: "rate_limiter_unavailable" }, 503);
