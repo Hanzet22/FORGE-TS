@@ -3,7 +3,7 @@ FORGE-TS — Third-Party Notices
 
 Project license
 ---------------
-FORGE-TS application source is licensed under GNU AGPL-3.0. The complete project license is provided in the source repository's LICENSE file.
+FORGE-TS application source is licensed under GNU AGPL-3.0. The complete project license is provided in licenses/PROJECT-AGPL-3.0.txt.
 
 Scope
 -----
@@ -14,6 +14,8 @@ Apache License 2.0
 AndroidX platform and Compose libraries; Kotlin runtime/compiler tooling; ConnectBot termlib 0.0.12; Ktor 3.3.1; Apache Commons Compress 1.28.0.
 
 Full text: licenses/APACHE-2.0.txt
+
+Apache Commons Compress 1.28.0 upstream notice: licenses/COMMONS-COMPRESS-NOTICE.txt.
 
 MIT License
 -----------

@@ -13,7 +13,7 @@ FORGE-TS application source is licensed under **GNU AGPL-3.0** (see [LICENSE](LI
 | `org.connectbot:termlib` | 0.0.12 | Apache-2.0 | Terminal emulator library; license text: `third_party/licenses/APACHE-2.0.txt` |
 | libvterm (bundled inside ConnectBot termlib source/artifact) | As included by termlib 0.0.12 | MIT | Native terminal parser; upstream notice: `third_party/licenses/LIBVTERM-MIT.txt` |
 | `io.ktor:ktor-client-core`, `ktor-client-android`, `ktor-client-content-negotiation`, `ktor-serialization-kotlinx-json` | 3.3.1 | Apache-2.0 | HTTP client and JSON serialization |
-| `org.apache.commons:commons-compress` | 1.28.0 | Apache-2.0 | Archive handling |
+| `org.apache.commons:commons-compress` | 1.28.0 | Apache-2.0 | Archive handling; upstream NOTICE retained in `third_party/notices/COMMONS-COMPRESS-NOTICE.txt` |
 | `org.tukaani:xz` | 1.10 | 0BSD | XZ/LZMA compression; notice text: `third_party/licenses/XZ-0BSD.txt` |
 
 AndroidX, Kotlin, Ktor, Apache Commons Compress, and ConnectBot termlib use the Apache License 2.0. The full license text is retained at `third_party/licenses/APACHE-2.0.txt`. The exact transitive dependency closure still needs to be generated from Gradle resolution before release.
