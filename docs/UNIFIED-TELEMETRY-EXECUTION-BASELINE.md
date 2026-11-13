@@ -149,3 +149,7 @@ Validation boundary:
 
 - Added primary navigation instrumentation for Home, Learn, Network, Simulate, Tools, and Settings. A tab-selection event and its corresponding tab-entry event share the same trace ID.
 - Home-screen tool shortcuts now pass through the same navigation instrumentation when they switch tabs.
+
+- Added operation-level network telemetry for DNS lookup, public-IP lookup, and authorized single-host TCP/TLS checks. Each operation emits started/succeeded/failed plus bounded duration events correlated by trace ID.
+- Network telemetry intentionally excludes the supplied domain, hostname, IP address, port, DNS answer contents, and response body. No request payloads or traffic contents are captured.
+- Local CIDR/VLSM planning remains local and is not uploaded as network telemetry.
