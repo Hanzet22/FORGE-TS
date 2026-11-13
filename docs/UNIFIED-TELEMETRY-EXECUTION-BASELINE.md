@@ -153,3 +153,14 @@ Validation boundary:
 - Added operation-level network telemetry for DNS lookup, public-IP lookup, and authorized single-host TCP/TLS checks. Each operation emits started/succeeded/failed plus bounded duration events correlated by trace ID.
 - Network telemetry intentionally excludes the supplied domain, hostname, IP address, port, DNS answer contents, and response body. No request payloads or traffic contents are captured.
 - Local CIDR/VLSM planning remains local and is not uploaded as network telemetry.
+
+## Runtime Telemetry
+
+Runtime lifecycle instrumentation is emitted from the existing `HybridRuntimeManager` orchestration boundary. Start and stop operations receive a shared trace ID across their lifecycle transitions, outcome, and bounded duration events. Events contain only fixed runtime identifiers and lifecycle states; they never include terminal input, command arguments, command output, workspace paths, environment variables, or process output.
+
+- Start: requested, STARTING/RUNNING/FAILED transition, accepted/rejected outcome, bounded duration.
+- Stop: requested, STOPPING/STOPPED/FAILED transition, completed/incomplete outcome, bounded duration.
+- Duration values are capped at ten minutes and encoded only in the event name.
+- Per-keystroke PTY input/output is deliberately not instrumented.
+- Existing app-private runtime journal remains a local state-transition journal; cloud telemetry uses the existing consent-gated diagnostics pipeline.
+- Native PTY and PRoot execution internals are not modified by this increment.
