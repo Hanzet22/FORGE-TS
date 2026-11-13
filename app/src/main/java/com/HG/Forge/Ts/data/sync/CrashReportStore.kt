@@ -71,10 +71,12 @@ internal object CrashReportStore {
 
     @Synchronized
     fun markRecoveryAcknowledged(context: Context) {
-        val file = pendingFiles(context).firstOrNull() ?: return
-        val report = JSONObject(file.readText(Charsets.UTF_8))
-        report.put("recoveryAcknowledged", true)
-        writeAtomically(file, report.toString())
+        runCatching {
+            val file = pendingFiles(context).firstOrNull() ?: return@runCatching
+            val report = JSONObject(file.readText(Charsets.UTF_8))
+            report.put("recoveryAcknowledged", true)
+            writeAtomically(file, report.toString())
+        }
     }
 
     @Synchronized
@@ -111,7 +113,13 @@ internal object CrashReportStore {
         }?.toList().orEmpty()
         return (listOfNotNull(legacy.takeIf { it.isFile }) + queued)
             .distinctBy { it.absolutePath }
-            .sortedBy { it.lastModified() }
+            .sortedBy { file ->
+                runCatching {
+                    Instant.parse(
+                        JSONObject(file.readText(Charsets.UTF_8)).optString("occurredAt")
+                    ).toEpochMilli()
+                }.getOrDefault(file.lastModified())
+            }
     }
 
     private fun installationId(context: Context): String {
