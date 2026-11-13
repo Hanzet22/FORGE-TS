@@ -59,11 +59,11 @@ The optional VNC server bootstrap is a separate user-triggered step after XFCE4 
 
 | Guest | Server package | Password utility |
 | --- | --- | --- |
-| Debian 12 Bookworm ARM64 | `tigervnc-standalone-server` | `tigervnc-tools` |
-| Ubuntu 24.04 Noble ARM64 | `tigervnc-standalone-server` | `tigervnc-tools` |
-| Alpine 3.24 aarch64 | `tigervnc` | included in `tigervnc` |
+| Debian 12 Bookworm ARM64 | `tigervnc-standalone-server` | `tigervnc-tools` (`tigervncpasswd`) |
+| Ubuntu 24.04 Noble ARM64 | `tigervnc-standalone-server` | `tigervnc-tools` (`tigervncpasswd`) |
+| Alpine 3.24 aarch64 | `tigervnc` | included in `tigervnc` (`vncpasswd`) |
 
-The session uses TigerVNC's virtual X server, not an Android X11 server. FORGE-TS generates a temporary eight-character VNC password, writes the VNC password file with mode 0600, and starts the guest X server with `-localhost`, `-SecurityTypes VncAuth`, and an explicit password file. The initial framebuffer is 960x540 at 16-bit depth and a 20 fps cap to limit load on mobile hardware. The endpoint is `127.0.0.1:5901`; no LAN listener is intended.
+Debian and Ubuntu expose the password utility as `tigervncpasswd`; Alpine exposes `vncpasswd`. The bootstrap detects either executable name. The session uses TigerVNC's virtual X server, not an Android X11 server. FORGE-TS generates a temporary eight-character VNC password, writes the VNC password file with mode 0600, and starts the guest X server with `-localhost`, `-SecurityTypes VncAuth`, and an explicit password file. The initial framebuffer is 960x540 at 16-bit depth and a 20 fps cap to limit load on mobile hardware. The endpoint is `127.0.0.1:5901`; no LAN listener is intended.
 
 The in-app action opens a compatible external Android viewer through the standard `vnc://127.0.0.1:5901` URI. AVNC documents support for `vnc://` URIs, but is GPL-3.0; it is not bundled or linked as an app dependency. If no compatible viewer is installed, the user must install one separately. The temporary password is shown in the FORGE-TS screen and is not embedded in the URI.
 

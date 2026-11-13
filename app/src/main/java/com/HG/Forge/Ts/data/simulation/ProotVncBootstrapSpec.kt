@@ -22,7 +22,7 @@ internal object ProotVncBootstrapSpec {
                 ),
                 verifyArguments = listOf(
                     "/bin/sh", "-c",
-                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && command -v vncpasswd >/dev/null 2>&1 && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
+                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && (command -v tigervncpasswd || command -v vncpasswd) >/dev/null 2>&1 && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
                 )
             )
             ProotDistribution.ALPINE -> ProotVncBootstrapPlan(
@@ -31,7 +31,7 @@ internal object ProotVncBootstrapSpec {
                 installArguments = listOf("apk", "add", "--no-cache", "tigervnc"),
                 verifyArguments = listOf(
                     "/bin/sh", "-c",
-                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && command -v vncpasswd >/dev/null 2>&1 && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
+                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && (command -v tigervncpasswd || command -v vncpasswd) >/dev/null 2>&1 && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
                 )
             )
         }

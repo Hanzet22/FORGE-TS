@@ -226,7 +226,7 @@ fun ProotTerminalPanel() {
                             }
                         }
                     },
-                    enabled = !busy && lifecycle == "RUNNING" && vncReady
+                    enabled = !busy && lifecycle == "RUNNING"
                 ) { Text("Stop Desktop") }
             }
             if (vncReady) {

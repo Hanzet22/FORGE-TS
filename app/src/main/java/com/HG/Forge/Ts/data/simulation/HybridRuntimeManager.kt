@@ -553,7 +553,7 @@ class HybridRuntimeManager(
             distribution,
             listOf(
                 "/bin/sh", "-c",
-                "mkdir -p /root/.vnc && printf '%s\\n' '$password' | vncpasswd -f > /root/.vnc/passwd && chmod 600 /root/.vnc/passwd"
+                "mkdir -p /root/.vnc && printf '%s\\n' '$password' | \"$(command -v tigervncpasswd || command -v vncpasswd)\" -f > /root/.vnc/passwd && chmod 600 /root/.vnc/passwd"
             ),
             15L
         )
