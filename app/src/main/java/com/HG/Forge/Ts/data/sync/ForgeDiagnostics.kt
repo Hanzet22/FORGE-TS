@@ -41,6 +41,23 @@ object ForgeDiagnosticsConsent {
 }
 
 object ForgeDiagnostics {
+    private fun inferCategory(tag: String, event: String, level: String): String {
+        if (level == "CRASH" || tag.contains("Crash", ignoreCase = true)) return "CRASH"
+        return when {
+            tag.contains("Application", ignoreCase = true) || event.startsWith("session.") || event.startsWith("application.") -> "APP_LIFECYCLE"
+            tag.contains("Activity", ignoreCase = true) || event.startsWith("activity.") -> "ACTIVITY"
+            tag.contains("Navigation", ignoreCase = true) || event.startsWith("navigation.") -> "NAVIGATION"
+            tag.contains("Network", ignoreCase = true) || event.startsWith("network.") -> "NETWORK"
+            tag.contains("Dns", ignoreCase = true) || event.startsWith("dns.") -> "DNS"
+            tag.contains("Runtime", ignoreCase = true) || tag.contains("Pty", ignoreCase = true) || tag.contains("Proot", ignoreCase = true) -> "RUNTIME"
+            tag.contains("Media", ignoreCase = true) || tag.contains("Video", ignoreCase = true) || tag.contains("Intro", ignoreCase = true) -> "MEDIA"
+            tag.contains("Work", ignoreCase = true) || event.startsWith("background.") -> "BACKGROUND"
+            tag.contains("Storage", ignoreCase = true) || tag.contains("Database", ignoreCase = true) -> "STORAGE"
+            tag.contains("Telemetry", ignoreCase = true) || tag.contains("Diagnostic", ignoreCase = true) -> "TELEMETRY"
+            else -> "FEATURE"
+        }
+    }
+
     private const val FILE_NAME = "forge-diagnostic-events.json"
     private const val MAX_EVENTS = 200
     private const val MAX_FILE_BYTES = 48 * 1024
@@ -80,6 +97,7 @@ object ForgeDiagnostics {
                 .put("cpuChipset", chipsetModel())
                 .put("cpuArchitecture", Build.SUPPORTED_ABIS.firstOrNull().orEmpty().take(40))
                 .put("level", if (normalizedLevel == "WARN") "WARNING" else normalizedLevel)
+                .put("category", inferCategory(safeTag, safeEvent, normalizedLevel))
                 .put("tag", safeTag)
                 .put("eventName", safeEvent)
                 .put("exceptionType", throwable?.javaClass?.name?.take(200) ?: "")
