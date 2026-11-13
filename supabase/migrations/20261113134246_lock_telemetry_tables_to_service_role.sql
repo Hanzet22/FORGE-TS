@@ -1,7 +1,5 @@
--- Telemetry tables are server-only. Keep RLS enabled and explicitly
--- remove Supabase's broad public-schema default table grants from API roles.
--- Ingestion and crash linking are performed by trusted Edge Functions only.
-
+-- Telemetry tables are server-only. Remove broad API-role grants and
+-- grant only the operations required by the trusted Edge Functions.
 revoke all privileges on table public.forge_ts_crash_events
   from public, anon, authenticated, service_role;
 revoke all privileges on table public.forge_ts_diagnostic_events
@@ -15,6 +13,11 @@ grant select, insert, update on table public.forge_ts_crash_events
 -- Diagnostic ingestion only inserts sanitized batches through its Edge Function.
 grant insert on table public.forge_ts_diagnostic_events
   to service_role;
+
+-- Lab rows remain owner-scoped by RLS; authenticated clients do not need
+-- table-level TRUNCATE, REFERENCES, or TRIGGER privileges.
+revoke truncate, references, trigger on table public.forge_ts_lab_records
+  from authenticated;
 
 comment on table public.forge_ts_crash_events is
   'Server-only crash telemetry. No direct anon/authenticated table access; use forge-crash-ingest.';
