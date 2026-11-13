@@ -218,8 +218,8 @@ fun ProotTerminalPanel() {
                 initialFontSize = 10.sp,
                 backgroundColor = Color(0xFF080B10),
                 foregroundColor = Color(0xFFE6EDF3),
-                keyboardEnabled = lifecycle == "RUNNING",
-                showSoftKeyboard = lifecycle == "RUNNING"
+                keyboardEnabled = lifecycle == "RUNNING" && !busy,
+                showSoftKeyboard = lifecycle == "RUNNING" && !busy
             )
         }
     }
