@@ -441,6 +441,52 @@ class HybridRuntimeManager(
         }
     }
 
+    suspend fun prepareProotDesktop(
+        distribution: ProotDistribution,
+        onProgress: suspend (String) -> Unit = {}
+    ): RuntimeOperationResult {
+        if (prootInstanceStates.getValue(distribution) != RuntimeLifecycleState.RUNNING) {
+            return RuntimeOperationResult(false, "Start the selected PRoot instance before preparing XFCE4.")
+        }
+        if (distribution !in preparedProotInstances) {
+            return RuntimeOperationResult(false, "The selected PRoot workspace is not registered as prepared.")
+        }
+        val root = File(roots.getValue(RuntimeEnvironmentId.XFCE_PROOT), distribution.directoryName, "rootfs")
+        if (!root.isDirectory || !File(root, ".forge-rootfs.json").isFile) {
+            return RuntimeOperationResult(false, "A verified rootfs is required before XFCE4 bootstrap.")
+        }
+        val plan = ProotDesktopBootstrapSpec.forDistribution(distribution)
+
+        onProgress("Updating ${plan.packageManager} package indexes for ${distribution.name}…")
+        val update = executeProotCommand(distribution, plan.updateArguments, 900L)
+        if (!update.accepted || update.exitCode != 0) {
+            val detail = update.output.takeLast(1200).trim()
+            return RuntimeOperationResult(false, "Package index update failed: ${update.message} ${detail}")
+        }
+
+        onProgress("Installing XFCE4 and D-Bus X11 packages in ${distribution.name}…")
+        val install = executeProotCommand(distribution, plan.installArguments, 900L)
+        if (!install.accepted || install.exitCode != 0) {
+            val detail = install.output.takeLast(1600).trim()
+            return RuntimeOperationResult(false, "XFCE4 package installation failed: ${install.message} ${detail}")
+        }
+
+        onProgress("Checking XFCE4 session and D-Bus launcher…")
+        val verify = executeProotCommand(distribution, plan.verifyArguments, 60L)
+        if (!verify.accepted || verify.exitCode != 0) {
+            val detail = verify.output.takeLast(1000).trim()
+            return RuntimeOperationResult(false, "Packages installed, but required launch commands were not found. ${detail}")
+        }
+
+        File(root, ".forge-xfce4.json").writeText(
+            """{"distribution":"${distribution.directoryName}","desktop":"xfce4","displayBackend":"not-configured","verifiedAt":"${System.currentTimeMillis()}"}"""
+        )
+        registry.recordEvent("XFCE4 package bootstrap completed for ${distribution.name}; display backend remains separate.")
+        return RuntimeOperationResult(
+            true,
+            "XFCE4 and D-Bus X11 packages are installed and command-verified. A compatible Android X11 display backend is still required to show the desktop."
+        )
+    }
     suspend fun requestStop(id: RuntimeEnvironmentId, distribution: ProotDistribution? = null): RuntimeOperationResult {
         if (id == RuntimeEnvironmentId.XFCE_PROOT && distribution == null) return RuntimeOperationResult(false, "Select the Debian, Ubuntu, or Alpine instance to stop.")
         if (id != RuntimeEnvironmentId.XFCE_PROOT && distribution != null) return RuntimeOperationResult(false, "A PRoot distribution can only be stopped through XFCE_PROOT.")
