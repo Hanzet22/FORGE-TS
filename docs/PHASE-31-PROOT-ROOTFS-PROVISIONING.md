@@ -1,6 +1,6 @@
 # Phase 31 — PRoot RootFS Provisioning
 
-Status: Debian, Ubuntu, and Alpine ARM64 gzip rootfs sources are pinned in the provisioner. Runtime installation and on-device PRoot execution still require device validation.
+Status: Debian, Ubuntu, and Alpine ARM64 gzip rootfs sources are pinned and exposed through the PRoot terminal installation control. Runtime installation and on-device PRoot execution still require device validation.
 
 ## Verified upstream artifacts (2026-11-11)
 
