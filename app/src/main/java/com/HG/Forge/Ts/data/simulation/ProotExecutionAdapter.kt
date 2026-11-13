@@ -30,7 +30,6 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val readLock: Mutex,
         var droppedOutputBytes: Long = 0L,
         val outputAvailable: Channel<Unit>,
-        val traceId: String,
         @Volatile var reader: Thread? = null
     )
 
@@ -140,7 +139,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Mutex(), 0L, Channel(Channel.CONFLATED), traceId)
+            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Mutex(), 0L, Channel(Channel.CONFLATED))
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
