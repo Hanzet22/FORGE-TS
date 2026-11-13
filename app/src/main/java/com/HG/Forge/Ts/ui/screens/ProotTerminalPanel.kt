@@ -120,23 +120,49 @@ fun ProotTerminalPanel() {
             }
             Text("Lifecycle: $lifecycle", style = MaterialTheme.typography.labelMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            status = "Preparing ${distribution.name} rootfs: downloading, verifying SHA-256 and extracting…"
+                            try {
+                                val result = manager.installProotRootfs(distribution)
+                                status = result.message
+                                refreshState()
+                                terminalEmulator.clearScreen()
+                            } finally {
+                                busy = false
+                            }
+                        }
+                    },
+                    enabled = !busy && lifecycle !in setOf("RUNNING", "STARTING", "RECOVERY_REQUIRED")
+                ) { Text(if (lifecycle == "READY" || lifecycle == "STOPPED") "Repair RootFS" else "Install RootFS") }
+                OutlinedButton(
+                    onClick = { refreshState() },
+                    enabled = !busy
+                ) { Text("Refresh") }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = {
                         scope.launch {
                             busy = true
-                            val result = manager.requestStart(
-                                RuntimeEnvironmentId.XFCE_PROOT,
-                                distribution
-                            )
-                            status = result.message
-                            refreshState()
-                            val dimensions = terminalEmulator.dimensions
-                            manager.resizeProotTerminal(
-                                distribution,
-                                dimensions.rows,
-                                dimensions.columns
-                            )
-                            busy = false
+                            try {
+                                val result = manager.requestStart(
+                                    RuntimeEnvironmentId.XFCE_PROOT,
+                                    distribution
+                                )
+                                status = result.message
+                                refreshState()
+                                val dimensions = terminalEmulator.dimensions
+                                manager.resizeProotTerminal(
+                                    distribution,
+                                    dimensions.rows,
+                                    dimensions.columns
+                                )
+                            } finally {
+                                busy = false
+                            }
                         }
                     },
                     enabled = !busy && lifecycle != "RUNNING"
@@ -145,22 +171,21 @@ fun ProotTerminalPanel() {
                     onClick = {
                         scope.launch {
                             busy = true
-                            val result = manager.requestStop(
-                                RuntimeEnvironmentId.XFCE_PROOT,
-                                distribution
-                            )
-                            status = result.message
-                            refreshState()
-                            terminalEmulator.clearScreen()
-                            busy = false
+                            try {
+                                val result = manager.requestStop(
+                                    RuntimeEnvironmentId.XFCE_PROOT,
+                                    distribution
+                                )
+                                status = result.message
+                                refreshState()
+                                terminalEmulator.clearScreen()
+                            } finally {
+                                busy = false
+                            }
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
                 ) { Text("Stop") }
-                OutlinedButton(
-                    onClick = { refreshState() },
-                    enabled = !busy
-                ) { Text("Refresh") }
             }
             Text(
                 status,
