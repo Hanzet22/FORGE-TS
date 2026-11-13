@@ -68,7 +68,7 @@ Static linking requires preserving the LGPL relinking and corresponding-source o
 | Crimson Pro | Jacques Le Bailly; https://github.com/Fonthausen/CrimsonPro | SIL Open Font License 1.1 | `assets/fonts/CrimsonPro/OFL.txt` |
 | Lora | Cyreal, Olga Karpushina and Alexei Vanyashin; https://github.com/cyrealtype/Lora-Cyrillic | SIL Open Font License 1.1 | `assets/fonts/Lora/OFL.txt` |
 
-The font files are retained in their family directories. Keep the original OFL text and Reserved Font Name terms with redistributed font files.
+The font files are retained in their family directories. Keep the original OFL text and Reserved Font Name terms with redistributed font files. The Android app exposes a Settings → Open-source licenses viewer backed by `app/src/main/assets/licenses/THIRD_PARTY_NOTICES.txt` and the adjacent full license texts.
 
 ## Reference material
 

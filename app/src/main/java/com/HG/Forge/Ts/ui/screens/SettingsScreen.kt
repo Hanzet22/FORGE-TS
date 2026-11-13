@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -57,6 +58,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
     var showAboutApps by rememberSaveable { mutableStateOf(false) }
+    var showOpenSourceLicenses by rememberSaveable { mutableStateOf(false) }
+    val openSourceNotices = remember(context) {
+        runCatching {
+            context.assets.open("licenses/THIRD_PARTY_NOTICES.txt")
+                .bufferedReader(Charsets.UTF_8).use { it.readText() }
+        }.getOrElse { "Open-source notices are unavailable in this build. See ATTRIBUTIONS.md in the FORGE-TS source repository." }
+    }
     var diagnosticsUploadsEnabled by remember { mutableStateOf(ForgeDiagnosticsConsent.isEnabled(context)) }
 
     Column(
@@ -110,7 +118,28 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         OutlinedButton(onClick = { showAboutApps = true }) { Text("About Apps") }
+        OutlinedButton(onClick = { showOpenSourceLicenses = true }) { Text("Open-source licenses") }
         Text("FORGE-TS 0.1.0", style = MaterialTheme.typography.labelMedium)
+    }
+
+
+    if (showOpenSourceLicenses) {
+        AlertDialog(
+            onDismissRequest = { showOpenSourceLicenses = false },
+            title = { Text("Open-source licenses") },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .heightIn(max = 420.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(openSourceNotices, style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showOpenSourceLicenses = false }) { Text("Close") }
+            }
+        )
     }
 
     if (showAboutApps) {

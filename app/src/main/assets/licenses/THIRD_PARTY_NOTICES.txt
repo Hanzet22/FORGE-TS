@@ -1,0 +1,53 @@
+FORGE-TS — Third-Party Notices
+=================================
+
+Project license
+---------------
+FORGE-TS application source is licensed under GNU AGPL-3.0. The complete project license is provided in the source repository's LICENSE file.
+
+Scope
+-----
+This in-app notice lists identified direct runtime dependencies and bundled components. It is not a complete resolved transitive SBOM. See ATTRIBUTIONS.md in the source repository for versions, upstream links, build-tool notes, and the current release checklist.
+
+Apache License 2.0
+------------------
+AndroidX platform and Compose libraries; Kotlin runtime/compiler tooling; ConnectBot termlib 0.0.12; Ktor 3.3.1; Apache Commons Compress 1.28.0.
+
+Full text: licenses/APACHE-2.0.txt
+
+MIT License
+-----------
+libvterm, bundled inside the ConnectBot termlib terminal library.
+
+Full text and copyright notice: licenses/LIBVTERM-MIT.txt
+
+BSD Zero Clause License (0BSD)
+------------------------------
+XZ for Java 1.10.
+
+Full text: licenses/XZ-0BSD.txt
+
+SIL Open Font License 1.1
+-------------------------
+Kaushan Script, Anton, Archivo, Azeret Mono, Crimson Pro, and Lora.
+
+The original OFL 1.1 texts are retained with each font family under assets/fonts/. Kaushan Script includes its Reserved Font Name terms. DejaVu Sans and related variants retain their original Bitstream Vera / Arev license in assets/fonts/LICENSE.txt.
+
+Native runtime components
+-------------------------
+PRoot (Termux fork), version 5.1.107.102:
+- Source: https://github.com/termux/proot/tree/v5.1.107.102
+- License text: licenses/proot-runtime/PRoot-COPYING
+- The precise GPL grant for the pinned fork is still under review.
+
+talloc (Samba), version 2.5.0:
+- Source: https://www.samba.org/ftp/talloc/talloc-2.5.0.tar.gz
+- License: LGPL-3.0-or-later
+- License text: licenses/proot-runtime/TALLOC-LICENSE
+- Statically linked into the PRoot executable; relinking and corresponding-source obligations apply.
+
+Important distribution note
+---------------------------
+The PRoot fork's exact license grant and its compatibility with statically linked LGPL-3.0-or-later talloc are not yet cleared for public binary distribution. This notice does not represent a legal clearance. See docs/LICENSING-RELEASE-GATE.md in the source repository.
+
+The project is still preparing a complete resolved transitive dependency inventory. This notice must be updated when that SBOM is generated and before a public release.
