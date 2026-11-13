@@ -13,8 +13,6 @@ import java.time.Instant
 
 /** Creates a deliberately minimized report for a human-reviewed email handoff. */
 object DiagnosticEmailExporter {
-    const val RECIPIENT = "papakjamsutnoruu@gmail.com"
-
     fun createShareIntent(context: Context): Intent {
         val report = JSONObject()
             .put("reportType", "FORGE-TS diagnostic summary")
@@ -41,7 +39,6 @@ object DiagnosticEmailExporter {
         )
         return Intent(Intent.ACTION_SEND).apply {
             type = "application/json"
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(RECIPIENT))
             putExtra(Intent.EXTRA_SUBJECT, "FORGE-TS diagnostic report")
             putExtra(Intent.EXTRA_TEXT, "Attached is a minimized FORGE-TS diagnostic summary. Please review the attachment before sending.")
             putExtra(Intent.EXTRA_STREAM, uri)

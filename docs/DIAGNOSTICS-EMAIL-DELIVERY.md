@@ -12,25 +12,24 @@
 
 Remote diagnostic events may contain the agreed categories: Info, Warning, Error, Crash, Critical error, Device Specs (manufacturer/model, total RAM and display resolution), CPU Type (chipset model and ABI architecture), and Android Version (release and SDK). Event metadata also includes app version, timestamp, component/event labels, exception class, a per-installation pseudonymous identifier, and technical stack trace. This path does not collect IMEI, serial number, advertising ID, location, account activity, files, network payloads, terminal input/output, passwords, or message contents.
 
-Admin email alerts are limited to WARNING, ERROR, CRITICAL, and CRASH events. Alerts include device specifications, CPU type, Android version, app version, event name, component, and exception class; they omit installation identifiers and stack traces. INFO events remain stored remotely when consented but do not generate email.
+Admin email alerts are limited to ERROR, CRITICAL, and CRASH events. Alerts include device specifications, CPU type, Android version, app version, event name, component, and exception class; they omit installation identifiers and stack traces. INFO and WARNING events remain stored remotely when consented but do not generate email.
 
 ## Email delivery configuration
 
-The Edge Function `forge-diagnostic-ingest` supports optional Resend delivery to:
-
-- `papakjamsutnoruu@gmail.com`
+The Edge Function `forge-diagnostic-ingest` supports optional Resend delivery. Recipients are configured only in Supabase secrets; no personal address is hard-coded in the Android app or backend source. The Android manual-export flow opens the user's email app without preselecting a recipient.
 
 The Supabase project owner must configure these Edge Function secrets before email delivery can work:
 
 - `RESEND_API_KEY` — Resend API key, stored only as a Supabase secret.
 - `DIAGNOSTICS_EMAIL_FROM` — sender address on a domain verified with Resend. The function also accepts the legacy singular spelling `DIAGNOSTIC_EMAIL_FROM`.
+- `DIAGNOSTICS_EMAIL_TO` — one or more comma-separated recipient addresses.
 
 No mail-provider key is embedded in the Android app or Git repository. If either secret is absent, diagnostics still upload to Supabase and the function reports `emailAlert: not_configured`.
 
 ## Alert volume
 
-- When Resend is configured, the accepted envelope produces a privacy-filtered session summary containing all accepted event levels and technical device metadata.
-- Email summaries are throttled to at most one per installation every 30 minutes to prevent repeated notifications.
+- When Resend is configured, only accepted ERROR, CRITICAL, and CRASH events can trigger a privacy-filtered summary.
+- Email summaries are throttled globally to at most one message every 30 minutes. This is a shared project-wide limit, not a per-installation limit.
 - The email omits raw stack traces and installation identifiers. Full event records remain in the protected diagnostics table.
 
 ## Deployment state
@@ -39,5 +38,5 @@ No mail-provider key is embedded in the Android app or Git repository. If either
 - ProcessLifecycleOwner queues upload when the app enters the background; WorkManager handles connectivity and retries.
 - The Android worker sends the bounded local journal in one request, and the Edge Function accepts up to 200 events within its 64 KiB request limit.
 - Supabase migration `20261111220653_expand_diagnostic_device_metadata` remains applied; no new table or database was added.
-- `forge-diagnostic-ingest` deployed as version 9 with `verify_jwt=false` preserved.
-- The Edge Function accepts both the plural and legacy singular sender-secret names. Deployment does not prove a real email was delivered; no synthetic event or test email was sent.
+- The deployed Edge Function version is tracked in the live Supabase project and must be checked against GitHub before each release.
+- The Edge Function accepts both the plural and legacy singular sender-secret names. Deployment does not prove a real email was delivered; no synthetic event or test email is sent during static validation.
