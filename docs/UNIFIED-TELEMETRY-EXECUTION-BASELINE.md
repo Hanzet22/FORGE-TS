@@ -120,3 +120,19 @@ Raw crash stack frames may remain in the existing protected crash-report path su
 ## 9. Execution boundary
 
 This document records the architecture and schema baseline. It does not claim that runtime instrumentation, database migrations, endpoint deployment, or end-to-end delivery have been implemented. Those changes must be made in focused commits with one bounded validation pass, not repeated test loops.
+
+
+## 10. Execution log — 2026-11-13
+
+Completed:
+- Added category inference to the Android diagnostic event writer.
+- Added category validation and persistence to `forge-diagnostic-ingest`.
+- Added category to the minimized administrative email summary.
+- Applied the additive database migration to project `FORGE-TS-LAB`; database migration history reports version `20261113093925`.
+- Deployed `forge-diagnostic-ingest` as Edge Function version 15. Existing `verify_jwt=false` setting was preserved; request API-key validation and Upstash rate limiting remain in the function.
+- Aligned the repository migration filename with the version recorded by the database.
+
+Validation boundary:
+- The Android Debug APK GitHub Actions run was observed in progress at the `Assemble debug APK` step. No claim of build success is made until GitHub reports its conclusion.
+- No synthetic telemetry event was sent and no repeated build/test cycle was started.
+- Full module instrumentation, session/trace correlation fields, queue redesign, and runtime delivery confirmation remain pending.
