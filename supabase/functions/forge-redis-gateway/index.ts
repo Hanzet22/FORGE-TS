@@ -40,26 +40,26 @@ export default {
         return json({ ok: false, error: "mfa_status_unavailable" }, 503);
       }
       try {
-        const factorResponse = await fetch(
-          `${supabaseUrl.replace(/\\/$/, "")}/auth/v1/factors`,
-          {
-            headers: {
-              "apikey": publishableKey,
-              "Authorization": authorization,
-            },
-            signal: AbortSignal.timeout(4000),
+        const supabaseBase = supabaseUrl.endsWith("/")
+          ? supabaseUrl.slice(0, -1)
+          : supabaseUrl;
+        const factorUrl = new URL(`${supabaseBase}/rest/v1/auth/factors`);
+        factorUrl.searchParams.set("select", "id,status");
+        factorUrl.searchParams.set("user_id", `eq.${userId}`);
+        const factorResponse = await fetch(factorUrl, {
+          headers: {
+            "apikey": publishableKey,
+            "Authorization": authorization,
           },
-        );
+          signal: AbortSignal.timeout(4000),
+        });
         if (!factorResponse.ok) {
           return json({ ok: false, error: "mfa_status_unavailable" }, 503);
         }
-        const factorData = await factorResponse.json();
-        const factors = Array.isArray(factorData?.all)
-          ? factorData.all
-          : [
-            ...(Array.isArray(factorData?.totp) ? factorData.totp : []),
-            ...(Array.isArray(factorData?.phone) ? factorData.phone : []),
-          ];
+        const factors = await factorResponse.json();
+        if (!Array.isArray(factors)) {
+          return json({ ok: false, error: "mfa_status_unavailable" }, 503);
+        }
         if (factors.some((factor: { status?: string }) => factor?.status === "verified")) {
           return json({ ok: false, error: "mfa_required" }, 403);
         }
