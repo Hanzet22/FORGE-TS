@@ -1,6 +1,8 @@
 package com.HG.Forge.Ts.data.simulation
 
 import android.content.Context
+import android.os.SystemClock
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
@@ -28,6 +30,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
         val readLock: Mutex,
         var droppedOutputBytes: Long = 0L,
         val outputAvailable: Channel<Unit>,
+        val traceId: String,
         @Volatile var reader: Thread? = null
     )
 
@@ -125,15 +128,19 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     "The previous PRoot PTY session has exited; drain its remaining terminal output before restarting.")
             }
 
+            val traceId = ForgeDiagnostics.newTraceId()
+            val startedAt = SystemClock.elapsedRealtime()
+            ForgeDiagnostics.log(appContext, "INFO", "Pty", "runtime.pty.start.requested", traceId = traceId)
             val argv = command(engine, root, listOf("/bin/sh", "-l")).toTypedArray()
             val envp = environment(loader, tmp).map { (name, value) -> "$name=$value" }.toTypedArray()
             val handle = NativePtyEngine.nativeStart(argv, envp, root.absolutePath, 24, 80)
             if (handle <= 0L) {
+                ForgeDiagnostics.log(appContext, "ERROR", "Pty", "runtime.pty.start.failed", traceId = traceId)
                 return@withContext RuntimeAdapterStartResult(false, false,
                     "Native PTY could not launch PRoot (errno ${-handle}).")
             }
 
-            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Mutex(), 0L, Channel(Channel.CONFLATED))
+            val session = PtySession(handle, ByteArrayOutputStream(), Any(), Mutex(), 0L, Channel(Channel.CONFLATED), traceId)
             sessions[key] = session
             val logFile = File(logs, "session.log")
             session.reader = Thread({
@@ -199,6 +206,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                     // Session shutdown closes the PTY master and ends this reader.
                 } finally {
                     session.outputAvailable.close()
+                    ForgeDiagnostics.log(appContext, "INFO", "Pty", "runtime.pty.reader.closed", traceId = traceId)
                 }
             }, "forge-proot-pty-${key.hashCode()}").apply {
                 isDaemon = true
@@ -211,6 +219,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 NativePtyEngine.nativeClose(handle, true)
                 sessions.remove(key, session)
                 runCatching { session.reader?.join(750) }
+                ForgeDiagnostics.log(appContext, "ERROR", "Pty", "runtime.pty.start.verification_failed", traceId = traceId)
                 return@withContext RuntimeAdapterStartResult(false, false,
                     "Could not verify PRoot shell startup status (errno=" + (-status) + "); inspect session.log.")
             }
@@ -218,9 +227,13 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 NativePtyEngine.nativeClose(handle, true)
                 sessions.remove(key, session)
                 runCatching { session.reader?.join(750) }
+                ForgeDiagnostics.log(appContext, "WARNING", "Pty", "runtime.pty.start.exited_early", traceId = traceId)
                 return@withContext RuntimeAdapterStartResult(false, false,
                     "PRoot shell exited during PTY startup (status=" + status + "); inspect session.log.")
             }
+            ForgeDiagnostics.log(appContext, "INFO", "Pty", "runtime.pty.start.confirmed", traceId = traceId)
+            val durationMs = (SystemClock.elapsedRealtime() - startedAt).coerceAtMost(60000L)
+            ForgeDiagnostics.log(appContext, "INFO", "Pty", "runtime.pty.start.duration_${durationMs}ms", traceId = traceId)
             RuntimeAdapterStartResult(true, true,
                 "PRoot is running in a native PTY session (24x80). Terminal job control and resize are now backed by the PTY.")
             }
