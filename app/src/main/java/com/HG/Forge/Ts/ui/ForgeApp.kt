@@ -52,6 +52,7 @@ import com.HG.Forge.Ts.ui.screens.SettingsScreen
 @Composable
 fun ForgeApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var navigationTraceId by remember { mutableStateOf<String?>(null) }
     var selectedToolsSubtab by remember { mutableIntStateOf(0) }
     val context = LocalContext.current
     val authClient = remember(context) {
@@ -65,6 +66,20 @@ fun ForgeApp() {
     val passwordRecoveryPending = ForgeAuthSessionState.passwordRecoveryPending
     val nowEpochSeconds = System.currentTimeMillis() / 1000L
     val hasActiveSession = authSession?.expiresAtEpochSeconds?.let { it > nowEpochSeconds } == true
+    val tabNames = listOf("home", "learn", "network", "simulate", "tools", "settings")
+    fun navigateToTab(destination: Int) {
+        val safeDestination = destination.coerceIn(0, 5)
+        val traceId = ForgeDiagnostics.newTraceId()
+        navigationTraceId = traceId
+        ForgeDiagnostics.log(
+            context,
+            "INFO",
+            "Navigation",
+            "navigation.tab_selected.${tabNames[safeDestination]}",
+            traceId = traceId
+        )
+        selectedTab = safeDestination
+    }
 
     LaunchedEffect(authClient) {
         ForgeAuthSessionState.restore(context.applicationContext, authClient)
@@ -123,6 +138,16 @@ fun ForgeApp() {
         ForgeDiagnostics.log(view.context, "INFO", "ForgeApp", "forge_app.compose_entered")
     }
 
+    LaunchedEffect(selectedTab, navigationTraceId) {
+        ForgeDiagnostics.log(
+            context,
+            "INFO",
+            "Navigation",
+            "navigation.tab_entered.${tabNames[selectedTab]}",
+            traceId = navigationTraceId
+        )
+    }
+
     SideEffect {
         if (window != null) {
             WindowCompat.setDecorFitsSystemWindows(window, !showIntro)
@@ -141,12 +166,12 @@ fun ForgeApp() {
         Scaffold(
             bottomBar = {
                 NavigationBar {
-                    NavigationBarItem(selected = selectedTab == 0, onClick = { selectedTab = 0 }, icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") }, label = { Text("Home") })
-                    NavigationBarItem(selected = selectedTab == 1, onClick = { selectedTab = 1 }, icon = { Icon(Icons.Outlined.MenuBook, contentDescription = "Learn") }, label = { Text("Learn") })
-                    NavigationBarItem(selected = selectedTab == 2, onClick = { selectedTab = 2 }, icon = { Icon(Icons.Outlined.Calculate, contentDescription = "Network") }, label = { Text("Network") })
-                    NavigationBarItem(selected = selectedTab == 3, onClick = { selectedTab = 3 }, icon = { Icon(Icons.Outlined.Science, contentDescription = "Simulate") }, label = { Text("Simulate") })
-                    NavigationBarItem(selected = selectedTab == 4, onClick = { selectedTab = 4 }, icon = { Icon(Icons.Outlined.Build, contentDescription = "Tools") }, label = { Text("Tools") })
-                    NavigationBarItem(selected = selectedTab == 5, onClick = { selectedTab = 5 }, icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") }, label = { Text("Settings") })
+                    NavigationBarItem(selected = selectedTab == 0, onClick = { navigateToTab(0) }, icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") }, label = { Text("Home") })
+                    NavigationBarItem(selected = selectedTab == 1, onClick = { navigateToTab(1) }, icon = { Icon(Icons.Outlined.MenuBook, contentDescription = "Learn") }, label = { Text("Learn") })
+                    NavigationBarItem(selected = selectedTab == 2, onClick = { navigateToTab(2) }, icon = { Icon(Icons.Outlined.Calculate, contentDescription = "Network") }, label = { Text("Network") })
+                    NavigationBarItem(selected = selectedTab == 3, onClick = { navigateToTab(3) }, icon = { Icon(Icons.Outlined.Science, contentDescription = "Simulate") }, label = { Text("Simulate") })
+                    NavigationBarItem(selected = selectedTab == 4, onClick = { navigateToTab(4) }, icon = { Icon(Icons.Outlined.Build, contentDescription = "Tools") }, label = { Text("Tools") })
+                    NavigationBarItem(selected = selectedTab == 5, onClick = { navigateToTab(5) }, icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") }, label = { Text("Settings") })
                 }
             }
         ) { padding ->
@@ -155,7 +180,7 @@ fun ForgeApp() {
                     modifier = Modifier.padding(padding),
                     onToolSelected = { destinationTab, toolsSubtab ->
                         selectedToolsSubtab = toolsSubtab
-                        selectedTab = destinationTab
+                        navigateToTab(destinationTab)
                     }
                 )
                 1 -> KnowledgeCenterScreen(Modifier.padding(padding))
