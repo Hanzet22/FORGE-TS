@@ -65,7 +65,7 @@ class ProotRootfsProvisioner(private val runtimeRoot: File) {
     suspend fun install(distribution: ProotDistribution): RootfsInstallResult = withContext(Dispatchers.IO) {
         val source = sources[distribution]
             ?: return@withContext RootfsInstallResult(false, distribution,
-                "Debian is gated: its official rootfs is XZ-compressed and its immutable archive endpoint is not yet pinned.")
+                "No verified ARM64 rootfs source is configured for ${distribution.name}.")
         val workspace = File(runtimeRoot, "proot/${distribution.directoryName}").canonicalFile
         val expectedParent = File(runtimeRoot, "proot").canonicalFile
         if (!workspace.path.startsWith(expectedParent.path + File.separator) ||
