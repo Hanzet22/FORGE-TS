@@ -47,7 +47,7 @@ export default {
     }
     if (
       endpoint.protocol !== "https:" ||
-      !endpoint.hostname ||
+      !endpoint.hostname.endsWith(".upstash.io") ||
       endpoint.username ||
       endpoint.password ||
       endpoint.hash
