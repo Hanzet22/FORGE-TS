@@ -551,11 +551,11 @@ class HybridRuntimeManager(
         }
         val launchScript = """
 mkdir -p /root/.vnc &&
-printf '%s\\n' '$password' | vncpasswd -f > /root/.vnc/passwd &&
+printf '%s\n' '$password' | vncpasswd -f > /root/.vnc/passwd &&
 chmod 600 /root/.vnc/passwd &&
 VNC_SERVER="$(command -v Xtigervnc || command -v Xvnc)" &&
-if [ -n "$VNC_SERVER" ]; then
-  "$VNC_SERVER" :1 -localhost -SecurityTypes VncAuth -PasswordFile /root/.vnc/passwd -rfbport 5901 -geometry 960x540 -depth 16 -FrameRate 20 > /tmp/forge-xvnc.log 2>&1 &
+if [ -n "${'$'}VNC_SERVER" ]; then
+  "${'$'}VNC_SERVER" :1 -localhost -SecurityTypes VncAuth -PasswordFile /root/.vnc/passwd -rfbport 5901 -geometry 960x540 -depth 16 -FrameRate 20 > /tmp/forge-xvnc.log 2>&1 &
   echo $! > /tmp/forge-xvnc.pid
   sleep 2
   if kill -0 "$(cat /tmp/forge-xvnc.pid)" 2>/dev/null && [ -S /tmp/.X11-unix/X1 ]; then
@@ -602,7 +602,7 @@ fi
         }
         val script = """
 for pidfile in /tmp/forge-xfce4.pid /tmp/forge-xvnc.pid; do
-  if [ -s "$pidfile" ]; then kill -TERM "$(cat "$pidfile")" 2>/dev/null || true; rm -f "$pidfile"; fi
+  if [ -s "${'$'}pidfile" ]; then kill -TERM "$(cat "${'$'}pidfile")" 2>/dev/null || true; rm -f "${'$'}pidfile"; fi
 done
 rm -f /root/.vnc/passwd /tmp/forge-vnc-session.json
 echo "FORGE_VNC_STOP_REQUESTED"
