@@ -128,17 +128,7 @@ internal class ProotPackageMirrorManager(private val runtimeRoot: File) {
         }
         require(host.split('.').any { label -> label.any { !it.isDigit() } }) { "Enter a DNS hostname rather than a raw IP address." }
         val resolved = InetAddress.getAllByName(host)
-        require(resolved.isNotEmpty() && resolved.all { address ->
-            val bytes = address.address.map { it.toInt() and 0xff }
-            !address.isAnyLocalAddress && !address.isLoopbackAddress && !address.isLinkLocalAddress &&
-                !address.isSiteLocalAddress && !address.isMulticastAddress &&
-                (bytes.size != 4 || (bytes[0] != 0 && bytes[0] != 10 && bytes[0] != 127 && bytes[0] < 224 &&
-                    !(bytes[0] == 100 && bytes[1] in 64..127) && !(bytes[0] == 169 && bytes[1] == 254) &&
-                    !(bytes[0] == 172 && bytes[1] in 16..31) && !(bytes[0] == 192 && bytes[1] == 168) &&
-                    !(bytes[0] == 192 && bytes[1] <= 2) && !(bytes[0] == 198 && bytes[1] in 18..19) &&
-                    !(bytes[0] == 198 && bytes[1] == 51) && !(bytes[0] == 203 && bytes[1] == 0)) &&
-                    (bytes.size != 16 || (bytes[0] and 0xfe) != 0xfc && bytes[0] != 0xff)
-        }) { "Mirror host must resolve only to public addresses." }
+        require(resolved.isNotEmpty() && resolved.all(::isPublicAddress)) { "Mirror host must resolve only to public addresses." }
         val requiredSuffix = when (distribution) {
             ProotDistribution.DEBIAN -> "/debian"
             ProotDistribution.UBUNTU -> "/ubuntu-ports"
@@ -155,6 +145,23 @@ internal class ProotPackageMirrorManager(private val runtimeRoot: File) {
         val child = File(parent, relativePath).canonicalFile
         require(child.path.startsWith(parent.canonicalPath + File.separator)) { "Mirror file path escaped its private workspace." }
         return child
+    }
+
+    private fun isPublicAddress(address: InetAddress): Boolean {
+        if (address.isAnyLocalAddress || address.isLoopbackAddress || address.isLinkLocalAddress ||
+            address.isSiteLocalAddress || address.isMulticastAddress) return false
+        val bytes = address.address.map { it.toInt() and 0xff }
+        return if (bytes.size == 4) {
+            val a = bytes[0]
+            val b = bytes[1]
+            a != 0 && a != 10 && a != 127 && a < 224 &&
+                !(a == 100 && b in 64..127) && !(a == 169 && b == 254) &&
+                !(a == 172 && b in 16..31) && !(a == 192 && b == 168) &&
+                !(a == 192 && b <= 2) && !(a == 198 && b in 18..19) &&
+                !(a == 198 && b == 51) && !(a == 203 && b == 0)
+        } else {
+            (bytes[0] and 0xfe) != 0xfc && bytes[0] != 0xff
+        }
     }
 
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
