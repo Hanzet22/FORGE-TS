@@ -1,11 +1,24 @@
 # FORGE-TS WorkStation — Existing Foundation Audit
 
-**Date:** 2026-11-10  
+**Date:** 2026-11-16 (status update)
 **Repository:** Hanzet22/FORGE-TS  
 **Branch:** main  
 **Purpose:** Reconcile the approved WorkStation architecture with code already present before adding new runtime implementations.
 
 ## Existing components
+
+> This audit predates the runtime work already present in `main`. The following status supersedes the implementation claims below; older architectural notes are retained as historical context.
+
+### Current runtime status
+
+| Area | Current behavior | Remaining platform gap |
+|---|---|---|
+| PRoot | ARM64 Debian 12, Ubuntu 24.04 and Alpine rootfs provisioning, pinned archive verification, process adapter, private DNS handling, and XFCE4/TigerVNC server bootstrap are implemented. | Requires device PRoot capability; package mirrors are still distro-configured and there is no country mirror selector. |
+| VNC | TigerVNC server can bind to loopback (`127.0.0.1:5901`) with a temporary password. | FORGE-TS has no bundled VNC client; it launches a separately installed Android viewer. |
+| Embedded X11 | Platform gate and capability reporting exist. | Native X11 library/host bridge is not packaged or implemented. |
+| Linux native / VMStation | Registry workspaces and KVM capability probes exist. | No native Linux desktop or VM execution engine is registered in the Android adapter registry. |
+
+Do not describe the gaps above as active runtimes in UI or release notes.
 
 | Component | Current behavior | Not implemented |
 |---|---|---|

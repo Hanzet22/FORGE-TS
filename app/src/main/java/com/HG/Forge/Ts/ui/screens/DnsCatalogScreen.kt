@@ -30,6 +30,8 @@ private data class DnsProviderEntry(
     val verification: String
 )
 
+private data class DnsCountryEntry(val code: String, val name: String, val sourceUrl: String, val ipv4: List<String>, val ipv6: List<String>, val verification: String)
+
 private fun loadDnsProviders(context: Context): List<DnsProviderEntry> {
     val json = context.assets.open("dns-catalog/providers.json").bufferedReader().use { it.readText() }
     val providers = JSONObject(json).getJSONArray("providers")
@@ -56,12 +58,29 @@ private fun loadDnsProviders(context: Context): List<DnsProviderEntry> {
     }
 }
 
+private fun loadDnsCountries(context: Context): List<DnsCountryEntry> {
+    val json = context.assets.open("dns-catalog/countries.json").bufferedReader().use { it.readText() }
+    val countries = JSONObject(json).getJSONArray("countries")
+    return buildList {
+        for (index in 0 until countries.length()) {
+            val item = countries.getJSONObject(index)
+            fun addresses(key: String): List<String> {
+                val array = item.optJSONArray(key) ?: return emptyList()
+                return buildList { for (addressIndex in 0 until array.length()) add(array.getJSONObject(addressIndex).optString("address")) }
+            }
+            add(DnsCountryEntry(item.optString("code"), item.optString("name"), item.optString("sourceUrl"), addresses("ipv4"), addresses("ipv6"), item.optString("verification")))
+        }
+    }
+}
+
 @Composable
 fun DnsCatalogScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val providers = remember(context) { runCatching { loadDnsProviders(context) }.getOrElse { emptyList() } }
+    val countries = remember(context) { runCatching { loadDnsCountries(context) }.getOrElse { emptyList() } }
     var query by remember { mutableStateOf("") }
     var family by remember { mutableStateOf("All") }
+    var catalog by remember { mutableStateOf("Providers") }
     val filtered = providers.filter { provider ->
         val matchesQuery = query.isBlank() ||
             provider.name.contains(query, ignoreCase = true) ||
@@ -75,21 +94,29 @@ fun DnsCatalogScreen(modifier: Modifier = Modifier) {
         matchesQuery && matchesFamily
     }
 
+    val filteredCountries = countries.filter { country ->
+        (query.isBlank() || country.name.contains(query, true) || country.code.contains(query, true) || (country.ipv4 + country.ipv6).any { it.contains(query.trim(), true) }) &&
+            when (family) { "IPv4" -> country.ipv4.isNotEmpty(); "IPv6" -> country.ipv6.isNotEmpty(); else -> true }
+    }
+
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Public DNS provider catalog", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Text(
+        Text("Public DNS catalog", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("Providers", "Countries").forEach { option -> FilterChip(selected = catalog == option, onClick = { catalog = option }, label = { Text(option) }) }
+        }
+        if (catalog == "Providers") Text(
             providers.size.toString() + " provider profiles bundled for offline reference. Addresses are directory-listed snapshots, not live-tested resolver guarantees.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        ) else Text("${countries.size} countries from PublicDNS.xyz snapshots; directory entries are observations, not live-tested or endorsed resolvers.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Search provider or IP address") },
+            label = { Text(if (catalog == "Providers") "Search provider or IP address" else "Search country or IP address") },
             singleLine = true
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -97,7 +124,22 @@ fun DnsCatalogScreen(modifier: Modifier = Modifier) {
                 FilterChip(selected = family == option, onClick = { family = option }, label = { Text(option) })
             }
         }
-        if (providers.isEmpty()) {
+        if (catalog == "Countries") {
+            if (filteredCountries.isEmpty()) Text("No country has matching directory entries for this filter.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            filteredCountries.forEach { country ->
+                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                        Text("${country.name} (${country.code})", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        Text("${country.ipv4.size} IPv4 • ${country.ipv6.size} IPv6 observations", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                        if (family != "IPv6") country.ipv4.take(5).forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                        if (family != "IPv4") country.ipv6.take(5).forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                        Text("Showing up to five addresses per family.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(country.verification, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(country.sourceUrl, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        } else if (providers.isEmpty()) {
             Text("DNS catalog asset could not be loaded.", color = MaterialTheme.colorScheme.error)
         } else if (filtered.isEmpty()) {
             Text("No provider matches this filter.", color = MaterialTheme.colorScheme.onSurfaceVariant)

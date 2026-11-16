@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -107,6 +108,7 @@ private fun CidrTool(viewModel: CoreNetworkingViewModel) {
 @Composable
 private fun PublicIpTool(viewModel: CoreNetworkingViewModel) {
     val context = LocalContext.current.applicationContext
+    val clipboard = LocalClipboardManager.current
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Public IP address", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Text("Fetches the public address visible to an external service. This is not your device's private LAN address.", color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -116,12 +118,21 @@ private fun PublicIpTool(viewModel: CoreNetworkingViewModel) {
         viewModel.publicIpError?.let { ErrorText(it) }
         viewModel.publicIp?.let { result ->
             ResultCard {
-                Text("Public IP", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                Text(result.address, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Source: ${result.source}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Connection overview", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                result.ipv4?.let { address ->
+                    ResultRow("Public IPv4", address)
+                    TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(address)) }) { Text("Copy IPv4") }
+                } ?: ResultRow("Public IPv4", "Unavailable on this network")
+                result.ipv6?.let { address ->
+                    ResultRow("Public IPv6", address)
+                    TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(address)) }) { Text("Copy IPv6") }
+                } ?: ResultRow("Public IPv6", "Unavailable on this network")
+                ResultRow("Address families", result.addresses.joinToString { if (it.contains(':')) "IPv6" else "IPv4" })
+                ResultRow("Lookup service", result.sources)
+                Text("The result reflects the address visible to each external service. VPNs, proxies, carrier NAT and network routing can change it; it does not identify a precise physical location or your LAN address.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Text("Your public IP is sent to the lookup provider as part of the request. No location history is stored by FORGE-TS.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("The request sends your connection address to ipify over HTTPS. IPv4 and IPv6 are checked independently, so one family can still be shown when the other is unavailable. FORGE-TS does not store location history.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

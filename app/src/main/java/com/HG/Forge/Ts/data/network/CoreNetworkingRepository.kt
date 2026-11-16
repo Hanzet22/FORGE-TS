@@ -2,17 +2,24 @@ package com.HG.Forge.Ts.data.network
 
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import org.json.JSONObject
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-data class PublicIpResult(val address: String, val source: String)
+data class PublicIpResult(
+    val ipv4: String?,
+    val ipv6: String?,
+    val sources: String
+) {
+    val addresses: List<String> get() = listOfNotNull(ipv4, ipv6)
+}
 
 data class HostCheckResult(
     val host: String,
@@ -24,11 +31,23 @@ data class HostCheckResult(
 )
 
 class CoreNetworkingRepository {
-    suspend fun fetchPublicIp(): PublicIpResult = withContext(Dispatchers.IO) {
-        val response = withTimeout(8000) { HttpClientProvider.client.get("https://api.ipify.org?format=json").bodyAsText() }
-        val address = JSONObject(response).optString("ip")
-        require(address.isNotBlank()) { "The IP lookup service returned no address" }
-        PublicIpResult(address, "api.ipify.org")
+    suspend fun fetchPublicIp(): PublicIpResult = coroutineScope {
+        suspend fun query(endpoint: String): String? = runCatching {
+            withTimeout(7000) { HttpClientProvider.client.get(endpoint).bodyAsText().trim() }
+                .takeIf { it.isNotBlank() && InetAddress.getByName(it).hostAddress != null }
+                ?.let { raw ->
+                    val address = InetAddress.getByName(raw)
+                    require((endpoint.contains("api4") && address is java.net.Inet4Address) ||
+                        (endpoint.contains("api6") && address is java.net.Inet6Address))
+                    address.hostAddress
+                }
+        }.getOrNull()
+        val v4 = async { query("https://api4.ipify.org") }
+        val v6 = async { query("https://api6.ipify.org") }
+        val ipv4 = v4.await()
+        val ipv6 = v6.await()
+        require(ipv4 != null || ipv6 != null) { "Could not retrieve a public IPv4 or IPv6 address. Check your connection and try again." }
+        PublicIpResult(ipv4, ipv6, "api4.ipify.org / api6.ipify.org")
     }
 
     suspend fun checkHost(hostInput: String, port: Int, checkTls: Boolean): HostCheckResult =

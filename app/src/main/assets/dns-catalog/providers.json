@@ -14,9 +14,7 @@
       ],
       "ipv6": [
         "2001:4860:4860::8888",
-        "2001:4860:4860::8844",
-        "A",
-        "f"
+        "2001:4860:4860::8844"
       ],
       "source": "PublicDNS.xyz",
       "verification": "directory-listed; not live-tested"
@@ -46,8 +44,7 @@
       ],
       "ipv6": [
         "2606:4700:4700::1111",
-        "2606:4700:4700::1001",
-        "1"
+        "2606:4700:4700::1001"
       ],
       "source": "PublicDNS.xyz",
       "verification": "directory-listed; not live-tested"
@@ -116,8 +113,7 @@
       ],
       "ipv6": [
         "2001:1608:10:25::1c04:b12f",
-        "2001:1608:10:25::9249:d69b",
-        "D"
+        "2001:1608:10:25::9249:d69b"
       ],
       "source": "PublicDNS.xyz",
       "verification": "directory-listed; not live-tested"
@@ -242,8 +238,8 @@
         "77.88.8.1"
       ],
       "ipv6": [
-        "2a02:6b8::feed:0ff",
-        "2a02:6b8:0:1::feed:0ff"
+        "2a02:6b8::feed:ff",
+        "2a02:6b8:0:1::feed:ff"
       ],
       "source": "PublicDNS.xyz",
       "verification": "directory-listed; not live-tested"
@@ -335,8 +331,7 @@
         "180.76.76.76"
       ],
       "ipv6": [
-        "2400:da00::6666",
-        "Ba"
+        "2400:da00::6666"
       ],
       "source": "PublicDNS.xyz",
       "verification": "directory-listed; not live-tested"

@@ -19,6 +19,10 @@ This directory contains raw, checkpointed snapshots collected from PublicDNS.xyz
 - `raw/pagination/discovery-*.json`: pagination discovery snapshots from country first pages.
 - `raw/pagination/pagination-manifest.json`: 619 pagination URLs discovered from 149 country pages.
 - `raw/countries/pagination-batch-*.json`: pagination page snapshots, stored by batch. Some entries record missing extraction results; they are not silently discarded.
+- `app/src/main/assets/dns-catalog/countries.json`: generated offline country catalog. It validates and canonicalizes public IPv4/IPv6 literals without modifying raw snapshots.
+- `scripts/build_dns_country_catalog.py`: repeatable builder for that derived asset.
+
+The derived asset contains the globally routable address observations found in the saved country pages. The UI shows a small sample per country and supports searching/filtering the complete inventory. These country entries are DNS directory observations; they are not package mirror endpoints and are not tested for resolver availability or safety.
 
 ## Current scrape accounting
 

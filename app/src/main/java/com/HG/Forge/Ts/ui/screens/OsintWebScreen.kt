@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -115,6 +117,26 @@ fun OsintWebScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            OutlinedButton(
+                onClick = {
+                    val dnsSummary = viewModel.checks.joinToString("\n") { check ->
+                        "${check.recordType}: ${if (check.result == null) "unavailable" else "${check.result.answers.size} answer(s), DNS status ${check.result.status}"}"
+                    }
+                    val webSummary = viewModel.nativeReport?.findings.orEmpty().joinToString("\n") { "${it.category}: ${it.title} — ${it.status}" }
+                    val summary = buildString {
+                        appendLine("FORGE-TS passive OSINT summary")
+                        appendLine("Target: ${viewModel.target}")
+                        appendLine("DNS checks: ${viewModel.checks.count { it.result != null }}/${viewModel.checks.size} completed")
+                        appendLine(dnsSummary)
+                        viewModel.rdapReport?.let { appendLine("RDAP: registrar=${it.registrar ?: "not disclosed"}; ${it.statuses.size} status(es); ${it.nameServers.size} nameserver(s)") }
+                        if (webSummary.isNotBlank()) appendLine("Web checks:\n$webSummary")
+                        appendLine("Raw DNS values, IP addresses, registrant contacts and local diagnostics are excluded from this summary.")
+                    }
+                    val send = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, summary) }
+                    context.startActivity(Intent.createChooser(send, "Share OSINT summary"))
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Share concise report") }
             viewModel.checks.forEach { check ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(

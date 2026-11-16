@@ -49,8 +49,15 @@ fun SimulationEnvironmentLauncher() {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Hybrid Runtime Manager", style = MaterialTheme.typography.titleLarge)
-            Text("Persistent registry, conservative process recovery, and five isolated workspaces. Recovery never auto-starts an environment.",
+            Text("Persistent registry and five isolated workspaces. Recovery never auto-starts an environment.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)) {
+                Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text("What works on this build", style = MaterialTheme.typography.titleSmall)
+                    Text("PRoot provides Debian, Ubuntu and Alpine ARM64 rootfs instances. XFCE4 can run through the loopback-only TigerVNC server after its packages are installed.", style = MaterialTheme.typography.bodySmall)
+                    Text("A compatible VNC viewer must be installed separately. Embedded X11, Ubuntu/Linux native desktop, and VMStation engines are not available in this Android build. Country-selectable package mirrors are not configured yet; distro package managers use their configured repositories.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
             snapshot.environments.forEach { environment ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
