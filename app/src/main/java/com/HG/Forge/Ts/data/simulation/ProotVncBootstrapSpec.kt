@@ -1,7 +1,7 @@
 package com.HG.Forge.Ts.data.simulation
 
 /**
- * Fixed, distro-specific TigerVNC server packages for the ARM64 guest rootfs.
+ * Fixed, distro-specific TigerVNC and noVNC packages for the ARM64 guest rootfs.
  */
 internal data class ProotVncBootstrapPlan(
     val packageManager: String,
@@ -18,20 +18,20 @@ internal object ProotVncBootstrapSpec {
                 updateArguments = listOf("apt-get", "update"),
                 installArguments = listOf(
                     "/bin/sh", "-c",
-                    "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tigervnc-standalone-server tigervnc-tools"
+                    "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tigervnc-standalone-server tigervnc-tools novnc"
                 ),
                 verifyArguments = listOf(
                     "/bin/sh", "-c",
-                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && (command -v tigervncpasswd || command -v vncpasswd) >/dev/null 2>&1 && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
+                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && (command -v tigervncpasswd || command -v vncpasswd) >/dev/null 2>&1 && command -v websockify >/dev/null 2>&1 && test -s /usr/share/novnc/vnc.html && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
                 )
             )
             ProotDistribution.ALPINE -> ProotVncBootstrapPlan(
                 packageManager = "APK",
                 updateArguments = listOf("apk", "update"),
-                installArguments = listOf("apk", "add", "--no-cache", "tigervnc"),
+                installArguments = listOf("apk", "add", "--no-cache", "tigervnc", "novnc"),
                 verifyArguments = listOf(
                     "/bin/sh", "-c",
-                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && (command -v tigervncpasswd || command -v vncpasswd) >/dev/null 2>&1 && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
+                    "(command -v Xtigervnc || command -v Xvnc) >/dev/null 2>&1 && (command -v tigervncpasswd || command -v vncpasswd) >/dev/null 2>&1 && command -v websockify >/dev/null 2>&1 && test -s /usr/share/novnc/vnc.html && command -v startxfce4 >/dev/null 2>&1 && command -v dbus-launch >/dev/null 2>&1"
                 )
             )
         }

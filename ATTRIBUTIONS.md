@@ -39,6 +39,12 @@ Build-tool licensing does not replace the obligation to identify the licenses of
 
 ## Bundled native runtime
 
+### Runtime-installed VNC client packages
+
+- noVNC is installed into a user-selected PRoot distro from that distro's configured package repository; it is not bundled into the APK. noVNC is licensed under MPL-2.0; see https://github.com/novnc/noVNC.
+- websockify is installed as a package dependency and is licensed under LGPL-3.0-or-later in the Alpine v3.24 package metadata; see https://github.com/novnc/websockify. Package builds may carry distro-specific patches and notices.
+- The viewer and WebSocket bridge bind to loopback only. Distribution-provided copyright and license files remain in the guest rootfs.
+
 ### PRoot (Termux fork)
 
 - Version: 5.1.107.102.

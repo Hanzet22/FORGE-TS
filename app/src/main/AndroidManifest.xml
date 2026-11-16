@@ -9,6 +9,7 @@
         android:icon="@mipmap/forge_ts_logo"
         android:roundIcon="@mipmap/forge_ts_logo"
         android:label="FORGE-TS"
+        android:networkSecurityConfig="@xml/forge_network_security_config"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity

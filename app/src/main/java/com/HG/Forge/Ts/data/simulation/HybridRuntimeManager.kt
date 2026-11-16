@@ -552,21 +552,21 @@ class HybridRuntimeManager(
         if (!update.completed || update.exitCode != 0) {
             return RuntimeOperationResult(false, "VNC package index update failed: ${update.message} ${update.output.takeLast(1200).trim()}")
         }
-        onProgress("Installing TigerVNC server and password utility…")
+        onProgress("Installing TigerVNC server and built-in noVNC viewer…")
         val install = executeProotCommand(distribution, plan.installArguments, 900L)
         if (!install.completed || install.exitCode != 0) {
             return RuntimeOperationResult(false, "TigerVNC installation failed: ${install.message} ${install.output.takeLast(1600).trim()}")
         }
-        onProgress("Verifying Xvnc and VNC password utility…")
+        onProgress("Verifying VNC server, WebSocket bridge and built-in viewer…")
         val verify = executeProotCommand(distribution, plan.verifyArguments, 60L)
         if (!verify.completed || verify.exitCode != 0) {
-            return RuntimeOperationResult(false, "TigerVNC packages installed, but server/password/session commands were not verified. ${verify.output.takeLast(1200).trim()}")
+            return RuntimeOperationResult(false, "VNC server/viewer packages installed, but required commands or noVNC assets were not verified. ${verify.output.takeLast(1200).trim()}")
         }
         File(root, ".forge-vnc.json").writeText(
             """{"distribution":"${distribution.directoryName}","server":"TigerVNC","listener":"127.0.0.1","port":5901,"authentication":"VncAuth","verifiedAt":"${System.currentTimeMillis()}"}"""
         )
-        registry.recordEvent("TigerVNC server package bootstrap completed for ${distribution.name}; listener is configured loopback-only at session start.")
-        return RuntimeOperationResult(true, "TigerVNC server and password utility are installed and command-verified. Start Desktop to create the localhost-only XFCE4 session.")
+        registry.recordEvent("TigerVNC and noVNC package bootstrap completed for ${distribution.name}; web and VNC listeners are configured loopback-only at session start.")
+        return RuntimeOperationResult(true, "TigerVNC server and noVNC viewer are installed and verified. Start Desktop, then open the built-in viewer.")
     }
 
     suspend fun startProotDesktop(
@@ -612,7 +612,14 @@ if [ -n "${'$'}VNC_SERVER" ]; then
   if kill -0 "$(cat /tmp/forge-xvnc.pid)" 2>/dev/null && [ -S /tmp/.X11-unix/X1 ]; then
     DISPLAY=:1 dbus-launch --exit-with-session startxfce4 > /tmp/forge-xfce4.log 2>&1 &
     echo ${'$'}! > /tmp/forge-xfce4.pid
-    echo "FORGE_VNC_START_REQUESTED port=5901 display=:1 geometry=960x540 depth=16 localhost=yes auth=VncAuth"
+    websockify --web /usr/share/novnc localhost:6080 127.0.0.1:5901 > /tmp/forge-novnc.log 2>&1 &
+    echo ${'$'}! > /tmp/forge-websockify.pid
+    sleep 1
+    if kill -0 "$(cat /tmp/forge-websockify.pid)" 2>/dev/null; then
+      echo "FORGE_VNC_START_REQUESTED rfb=127.0.0.1:5901 web=127.0.0.1:6080 display=:1 geometry=960x540 depth=16 auth=VncAuth"
+    else
+      echo "FORGE_VNC_START_FAILED: noVNC WebSocket proxy did not stay running."
+    fi
   else
     echo "FORGE_VNC_START_FAILED; inspect /tmp/forge-xvnc.log"
   fi
@@ -627,23 +634,24 @@ fi
             distribution,
             listOf(
                 "/bin/sh", "-c",
-                "test -s /tmp/forge-xvnc.pid && kill -0 \"$(cat /tmp/forge-xvnc.pid)\" 2>/dev/null && test -s /tmp/forge-xfce4.pid && kill -0 \"$(cat /tmp/forge-xfce4.pid)\" 2>/dev/null && test -S /tmp/.X11-unix/X1"
+                "test -s /tmp/forge-xvnc.pid && kill -0 \"$(cat /tmp/forge-xvnc.pid)\" 2>/dev/null && test -s /tmp/forge-xfce4.pid && kill -0 \"$(cat /tmp/forge-xfce4.pid)\" 2>/dev/null && test -s /tmp/forge-websockify.pid && kill -0 \"$(cat /tmp/forge-websockify.pid)\" 2>/dev/null && test -S /tmp/.X11-unix/X1"
             ),
             15L
         )
         if (!verify.completed || verify.exitCode != 0) {
             val logs = executeProotCommand(
                 distribution,
-                listOf("/bin/sh", "-c", "cat /tmp/forge-xvnc.log /tmp/forge-xfce4.log 2>/dev/null | tail -n 35"),
+                listOf("/bin/sh", "-c", "cat /tmp/forge-xvnc.log /tmp/forge-xfce4.log /tmp/forge-novnc.log 2>/dev/null | tail -n 35"),
                 10L
             )
+            stopProotDesktop(distribution)
             return RuntimeOperationResult(false, "Desktop launch was requested but the VNC/XFCE processes were not confirmed. ${logs.output.takeLast(1800).trim()}")
         }
         File(root, ".forge-vnc-session.json").writeText(
-            """{"display":":1","host":"127.0.0.1","port":5901,"geometry":"960x540","depth":16,"authentication":"VncAuth","startedAt":"${System.currentTimeMillis()}"}"""
+            """{"display":":1","host":"127.0.0.1","port":5901,"webHost":"localhost","webPort":6080,"geometry":"960x540","depth":16,"authentication":"VncAuth","startedAt":"${System.currentTimeMillis()}"}"""
         )
-        registry.recordEvent("XFCE4 VNC desktop session confirmed on loopback port 5901 for ${distribution.name}.")
-        return RuntimeOperationResult(true, "XFCE4 desktop session confirmed. Connect the Android VNC viewer to 127.0.0.1:5901 and enter the temporary password shown in FORGE-TS.")
+        registry.recordEvent("XFCE4 desktop and noVNC viewer confirmed on loopback ports 5901 and 6080 for ${distribution.name}.")
+        return RuntimeOperationResult(true, "XFCE4 desktop and built-in viewer are ready on this device.")
     }
 
     suspend fun stopProotDesktop(distribution: ProotDistribution): RuntimeOperationResult {
@@ -652,7 +660,7 @@ fi
             return RuntimeOperationResult(false, "The selected PRoot instance must remain RUNNING to stop its desktop session cleanly.")
         }
         val script = """
-for pidfile in /tmp/forge-xfce4.pid /tmp/forge-xvnc.pid; do
+for pidfile in /tmp/forge-xfce4.pid /tmp/forge-websockify.pid /tmp/forge-xvnc.pid; do
   if [ -s "${'$'}pidfile" ]; then kill -TERM "$(cat "${'$'}pidfile")" 2>/dev/null || true; rm -f "${'$'}pidfile"; fi
 done
 rm -f /root/.vnc/passwd /tmp/forge-vnc-session.json

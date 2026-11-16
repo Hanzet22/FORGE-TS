@@ -48,6 +48,7 @@ fun ProotTerminalPanel() {
     var busy by remember { mutableStateOf(false) }
     var vncPassword by remember { mutableStateOf("") }
     var vncReady by remember { mutableStateOf(false) }
+    var showBuiltInVnc by remember { mutableStateOf(false) }
     var mirrorUrl by remember(distribution) { mutableStateOf("") }
 
     val terminalEmulator = remember(manager, distribution) {
@@ -244,7 +245,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
-                ) { Text("Install / Repair VNC Server") }
+                ) { Text("Install / Repair VNC Viewer") }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
@@ -286,7 +287,7 @@ fun ProotTerminalPanel() {
                 ) { Text("Stop Desktop") }
             }
             if (vncReady) {
-                Text("VNC endpoint: 127.0.0.1:5901", style = MaterialTheme.typography.labelMedium)
+                Text("VNC server: loopback:5901 · built-in viewer: localhost:6080", style = MaterialTheme.typography.labelMedium)
                 Text("Temporary VNC password: $vncPassword", style = MaterialTheme.typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
@@ -296,7 +297,8 @@ fun ProotTerminalPanel() {
                             status = "Temporary VNC password copied to clipboard."
                         }
                     ) { Text("Copy Password") }
-                    Button(
+                    Button(onClick = { showBuiltInVnc = true }) { Text("Open built-in viewer") }
+                    OutlinedButton(
                         onClick = {
                             runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("vnc://127.0.0.1:5901")))
@@ -304,7 +306,7 @@ fun ProotTerminalPanel() {
                                 status = "No VNC viewer is registered. Install a compatible viewer such as AVNC, then open the endpoint again."
                             }
                         }
-                    ) { Text("Open VNC Viewer") }
+                    ) { Text("External viewer") }
                 }
             }
 
@@ -369,4 +371,6 @@ fun ProotTerminalPanel() {
             )
         }
     }
+
+    if (showBuiltInVnc) ProotVncViewerDialog(onDismiss = { showBuiltInVnc = false })
 }
