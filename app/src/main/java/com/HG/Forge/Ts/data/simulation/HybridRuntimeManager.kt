@@ -126,6 +126,7 @@ class HybridRuntimeManager(
     private val registry = RuntimeRegistryStore(appContext)
     private val foundationSupervisor = RuntimeFoundationSupervisor(appContext)
     private val rootfsProvisioner = ProotRootfsProvisioner(runtimeRoot)
+    private val packageMirrorManager = ProotPackageMirrorManager(runtimeRoot)
     private val roots = mapOf(
         RuntimeEnvironmentId.XFCE_NATIVE to File(runtimeRoot, "native-xfce"),
         RuntimeEnvironmentId.XFCE_PROOT to File(runtimeRoot, "proot"),
@@ -315,6 +316,18 @@ class HybridRuntimeManager(
         registry.writeProotInstance(distribution, next, true)
         registry.recordEvent("Rootfs ${distribution.name}: ${result.message}")
         RuntimeOperationResult(result.installed, result.message)
+    }
+
+    suspend fun configureProotPackageMirror(distribution: ProotDistribution, httpsMirror: String?): RuntimeOperationResult = withContext(Dispatchers.IO) {
+        if (prootInstanceStates.getValue(distribution) == RuntimeLifecycleState.RUNNING ||
+            prootInstanceStates.getValue(distribution) == RuntimeLifecycleState.STARTING) {
+            return@withContext RuntimeOperationResult(false, "Stop this PRoot instance before changing its package sources.")
+        }
+        val result = packageMirrorManager.apply(distribution, httpsMirror)
+        val traceId = ForgeDiagnostics.newTraceId()
+        ForgeDiagnostics.log(appContext, if (result.applied) "INFO" else "WARNING", "Runtime", if (result.applied) "runtime.proot.mirror.configured" else "runtime.proot.mirror.failed", traceId = traceId)
+        if (result.applied) registry.recordEvent("HTTPS package mirror configuration updated for ${distribution.name}.")
+        RuntimeOperationResult(result.applied, result.message)
     }
 
     suspend fun requestStart(

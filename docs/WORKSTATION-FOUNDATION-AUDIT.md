@@ -13,7 +13,7 @@
 
 | Area | Current behavior | Remaining platform gap |
 |---|---|---|
-| PRoot | ARM64 Debian 12, Ubuntu 24.04 and Alpine rootfs provisioning, pinned archive verification, process adapter, private DNS handling, and XFCE4/TigerVNC server bootstrap are implemented. | Requires device PRoot capability; package mirrors are still distro-configured and there is no country mirror selector. |
+| PRoot | ARM64 Debian 12, Ubuntu 24.04 and Alpine rootfs provisioning, pinned archive verification, process adapter, private DNS handling, XFCE4/TigerVNC bootstrap, and user-supplied HTTPS package mirror configuration are implemented. | Requires device PRoot capability. There is no built-in country mirror directory; users must supply a compatible mirror URL. |
 | VNC | TigerVNC server can bind to loopback (`127.0.0.1:5901`) with a temporary password. | FORGE-TS has no bundled VNC client; it launches a separately installed Android viewer. |
 | Embedded X11 | Platform gate and capability reporting exist. | Native X11 library/host bridge is not packaged or implemented. |
 | Linux native / VMStation | Registry workspaces and KVM capability probes exist. | No native Linux desktop or VM execution engine is registered in the Android adapter registry. |

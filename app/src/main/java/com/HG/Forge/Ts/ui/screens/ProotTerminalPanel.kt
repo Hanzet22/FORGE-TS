@@ -16,6 +16,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,6 +48,7 @@ fun ProotTerminalPanel() {
     var busy by remember { mutableStateOf(false) }
     var vncPassword by remember { mutableStateOf("") }
     var vncReady by remember { mutableStateOf(false) }
+    var mirrorUrl by remember(distribution) { mutableStateOf("") }
 
     val terminalEmulator = remember(manager, distribution) {
         TerminalEmulatorFactory.create(
@@ -126,6 +128,60 @@ fun ProotTerminalPanel() {
                         enabled = !busy
                     )
                 }
+            }
+            OutlinedTextField(
+                value = mirrorUrl,
+                onValueChange = { mirrorUrl = it.take(300) },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("HTTPS package mirror") },
+                placeholder = { Text(when (distribution) {
+                    ProotDistribution.DEBIAN -> "https://mirror.example/debian"
+                    ProotDistribution.UBUNTU -> "https://mirror.example/ubuntu-ports"
+                    ProotDistribution.ALPINE -> "https://mirror.example/alpine"
+                }) },
+                supportingText = { Text("Any reachable HTTPS mirror with the matching repository path works across countries. Package signatures stay enabled.") },
+                singleLine = true
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        val officialMirror = when (distribution) {
+                            ProotDistribution.DEBIAN -> "https://deb.debian.org/debian"
+                            ProotDistribution.UBUNTU -> "https://ports.ubuntu.com/ubuntu-ports"
+                            ProotDistribution.ALPINE -> "https://dl-cdn.alpinelinux.org/alpine"
+                        }
+                        mirrorUrl = officialMirror
+                        scope.launch {
+                            busy = true
+                            try { status = manager.configureProotPackageMirror(distribution, officialMirror).message }
+                            finally { busy = false }
+                        }
+                    },
+                    enabled = !busy && lifecycle != "RUNNING"
+                ) { Text("Use official HTTPS mirror") }
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            try {
+                                status = manager.configureProotPackageMirror(distribution, mirrorUrl).message
+                            } finally { busy = false }
+                        }
+                    },
+                    enabled = !busy && lifecycle != "RUNNING" && mirrorUrl.isNotBlank()
+                ) { Text("Apply mirror") }
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            busy = true
+                            try {
+                                status = manager.configureProotPackageMirror(distribution, null).message
+                                mirrorUrl = ""
+                            } finally { busy = false }
+                        }
+                    },
+                    enabled = !busy && lifecycle != "RUNNING"
+                ) { Text("Restore default") }
             }
             Text("Lifecycle: $lifecycle", style = MaterialTheme.typography.labelMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
