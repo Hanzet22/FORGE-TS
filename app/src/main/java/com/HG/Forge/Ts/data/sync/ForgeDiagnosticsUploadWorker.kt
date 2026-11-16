@@ -56,13 +56,23 @@ class ForgeDiagnosticsUploadWorker(context: Context, params: WorkerParameters) :
                 }
                 currentCoroutineContext().ensureActive()
                 when {
-                    code in 200..299 -> ForgeDiagnostics.acknowledge(applicationContext, uploadedIds)
-                    code == 429 || code >= 500 -> return@withContext Result.retry()
-                    else -> return@withContext Result.failure()
+                    code in 200..299 -> {
+                        ForgeDiagnostics.acknowledge(applicationContext, uploadedIds)
+                        android.util.Log.i("FORGE/DiagnosticsUpload", "event=diagnostic_upload.acknowledged")
+                    }
+                    code == 429 || code >= 500 -> {
+                        ForgeDiagnostics.log(applicationContext, "WARNING", "DiagnosticsUpload", "diagnostic_upload.retry_http_$code")
+                        return@withContext Result.retry()
+                    }
+                    else -> {
+                        ForgeDiagnostics.log(applicationContext, "ERROR", "DiagnosticsUpload", "diagnostic_upload.rejected_http_$code")
+                        return@withContext Result.failure()
+                    }
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
-            } catch (_: Exception) {
+            } catch (error: Exception) {
+                ForgeDiagnostics.log(applicationContext, "WARNING", "DiagnosticsUpload", "diagnostic_upload.network_or_storage_failure", error)
                 return@withContext Result.retry()
             }
         }

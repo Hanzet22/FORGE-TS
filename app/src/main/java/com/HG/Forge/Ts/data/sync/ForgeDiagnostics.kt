@@ -138,6 +138,13 @@ object ForgeDiagnostics {
                     safeEvent == "application.on_create" || safeEvent == "activity.on_create.enter")) {
                 ForgeDiagnosticsUploadScheduler.enqueue(context)
             }
+        }.onFailure { storageError ->
+            // The Android log is the last-resort sink if private storage is full,
+            // unavailable, or damaged. Never include the event payload here.
+            Log.e(
+                "FORGE/Diagnostics",
+                "event=diagnostic_journal_write_failed exception=${storageError.javaClass.name}"
+            )
         }
     }
 
@@ -211,11 +218,23 @@ object ForgeDiagnostics {
     }
 
     @Synchronized
-    fun read(context: Context): JSONArray = runCatching {
+    fun read(context: Context): JSONArray {
         val file = File(context.filesDir, FILE_NAME)
-        if (!file.isFile || file.length() > MAX_FILE_BYTES) JSONArray()
-        else JSONArray(file.readText(Charsets.UTF_8))
-    }.getOrDefault(JSONArray())
+        if (!file.isFile) return JSONArray()
+        if (file.length() > MAX_FILE_BYTES) {
+            Log.e("FORGE/Diagnostics", "event=diagnostic_journal_oversize bytes=${file.length()}")
+            return JSONArray()
+        }
+        return try {
+            JSONArray(file.readText(Charsets.UTF_8))
+        } catch (error: Exception) {
+            Log.e(
+                "FORGE/Diagnostics",
+                "event=diagnostic_journal_read_failed exception=${error.javaClass.name}"
+            )
+            JSONArray()
+        }
+    }
 
     @Synchronized
     fun clearPendingUploadJournal(context: Context) {

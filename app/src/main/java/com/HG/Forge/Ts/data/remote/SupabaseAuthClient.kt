@@ -1,10 +1,8 @@
 package com.HG.Forge.Ts.data.remote
 
 import android.net.Uri
-import android.util.Base64
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import io.ktor.client.request.delete
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -24,31 +22,6 @@ data class SupabaseAuthSession(
     val email: String?,
     val expiresAtEpochSeconds: Long,
     val emailConfirmedAt: String? = null
-) {
-    /** Read from the signed Supabase JWT; never accept a client-supplied AAL value. */
-    val assuranceLevel: String
-        get() = runCatching {
-            val payload = accessToken.split('.')[1]
-            val decoded = Base64.decode(
-                payload,
-                Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
-            )
-            JSONObject(String(decoded, Charsets.UTF_8)).optString("aal").ifBlank { "aal1" }
-        }.getOrDefault("aal1")
-}
-
-data class SupabaseMfaFactor(
-    val id: String,
-    val factorType: String,
-    val status: String,
-    val friendlyName: String?
-)
-
-data class SupabaseTotpEnrollment(
-    val factorId: String,
-    val qrCodeSvg: String,
-    val secret: String,
-    val uri: String
 )
 
 data class SupabaseAuthUserProfile(
@@ -61,8 +34,17 @@ data class SupabaseAuthUserProfile(
     val isEmailVerified: Boolean get() = !emailConfirmedAt.isNullOrBlank()
 }
 
-class SupabaseAuthException(val statusCode: Int, val errorCode: String) :
-    Exception("$errorCode (HTTP $statusCode)")
+class SupabaseAuthException(
+    val statusCode: Int,
+    val errorCode: String,
+    val operation: String
+) : Exception(
+    if (statusCode == 405) {
+        "Supabase Auth rejected the HTTP method for $operation (405). Check the project API URL and Auth endpoint routing."
+    } else {
+        "$errorCode (HTTP $statusCode)"
+    }
+)
 
 /** Password-auth client. Session persistence is handled by ForgeAuthSessionStore using Android Keystore encryption. */
 class SupabaseAuthClient(
@@ -79,7 +61,7 @@ class SupabaseAuthClient(
             setBody(JSONObject().put("email", email.trim()).put("password", password).toString())
         }
         val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, body, "POST /auth/v1/signup")
         val json = JSONObject(body)
         return json.takeIf { it.has("access_token") }?.toSession()
     }
@@ -92,7 +74,7 @@ class SupabaseAuthClient(
             contentType(ContentType.Application.Json)
             setBody(JSONObject().put("email", email.trim()).toString())
         }
-        ensureSuccess(response.status.value, response.bodyAsText())
+        ensureSuccess(response.status.value, response.bodyAsText(), "POST /auth/v1/recover")
     }
 
     suspend fun updatePassword(session: SupabaseAuthSession, newPassword: String) {
@@ -103,7 +85,7 @@ class SupabaseAuthClient(
             contentType(ContentType.Application.Json)
             setBody(JSONObject().put("password", newPassword).toString())
         }
-        ensureSuccess(response.status.value, response.bodyAsText())
+        ensureSuccess(response.status.value, response.bodyAsText(), "PUT /auth/v1/user")
     }
 
     fun isPasswordRecoveryCallback(callbackUrl: String): Boolean {
@@ -139,7 +121,7 @@ class SupabaseAuthClient(
             header("Authorization", "Bearer $accessToken")
         }
         val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, body, "GET /auth/v1/user")
         val user = JSONObject(body)
         return SupabaseAuthSession(
             accessToken = accessToken,
@@ -159,7 +141,7 @@ class SupabaseAuthClient(
             setBody(JSONObject().put("email", email.trim()).put("password", password).toString())
         }
         val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, body, "POST /auth/v1/token?grant_type=password")
         return JSONObject(body).toSession()
     }
 
@@ -169,7 +151,7 @@ class SupabaseAuthClient(
             header("Authorization", "Bearer ${session.accessToken}")
         }
         val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, body, "GET /auth/v1/user")
         val user = JSONObject(body)
         val emailConfirmedAt = user.optString("email_confirmed_at")
         val confirmedAt = user.optString("confirmed_at")
@@ -183,7 +165,7 @@ class SupabaseAuthClient(
             header("Authorization", "Bearer ${session.accessToken}")
         }
         val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, body, "GET /auth/v1/user")
         val user = JSONObject(body)
         return SupabaseAuthUserProfile(
             userId = user.optString("id"),
@@ -194,119 +176,12 @@ class SupabaseAuthClient(
         )
     }
 
-    suspend fun listMfaFactors(session: SupabaseAuthSession): List<SupabaseMfaFactor> {
-        val response = httpClient.get("${supabaseUrl.trimEnd('/')}/auth/v1/factors") {
-            header("apikey", publishableKey)
-            header("Authorization", "Bearer ${session.accessToken}")
-        }
-        val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
-        val json = JSONObject(body)
-        val all = json.optJSONArray("all") ?: org.json.JSONArray().apply {
-            listOf("totp", "phone").forEach { key ->
-                val values = json.optJSONArray(key) ?: return@forEach
-                for (index in 0 until values.length()) put(values.optJSONObject(index))
-            }
-        }
-        return buildList {
-            for (index in 0 until all.length()) {
-                val factor = all.optJSONObject(index) ?: continue
-                val id = factor.optString("id")
-                if (id.isBlank()) continue
-                add(
-                    SupabaseMfaFactor(
-                        id = id,
-                        factorType = factor.optString("factor_type", factor.optString("type")),
-                        status = factor.optString("status"),
-                        friendlyName = factor.optString("friendly_name")
-                            .takeIf { it.isNotBlank() && it != "null" }
-                    )
-                )
-            }
-        }
-    }
-
-    suspend fun enrollTotp(
-        session: SupabaseAuthSession,
-        friendlyName: String = "FORGE-TS Android"
-    ): SupabaseTotpEnrollment {
-        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/factors") {
-            header("apikey", publishableKey)
-            header("Authorization", "Bearer ${session.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(JSONObject().put("factor_type", "totp").put("friendly_name", friendlyName).toString())
-        }
-        val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
-        val json = JSONObject(body)
-        val totp = json.optJSONObject("totp") ?: throw IllegalStateException("Supabase did not return TOTP setup data.")
-        return SupabaseTotpEnrollment(
-            factorId = json.optString("id").takeIf { it.isNotBlank() }
-                ?: throw IllegalStateException("Supabase did not return a factor ID."),
-            qrCodeSvg = totp.optString("qr_code"),
-            secret = totp.optString("secret"),
-            uri = totp.optString("uri")
-        ).also {
-            require(it.secret.isNotBlank() && it.uri.startsWith("otpauth://")) {
-                "Supabase returned incomplete TOTP setup data."
-            }
-        }
-    }
-
-    suspend fun createMfaChallenge(session: SupabaseAuthSession, factorId: String): String {
-        require(factorId.isNotBlank() && factorId.length <= 64)
-        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/factors/${Uri.encode(factorId)}/challenge") {
-            header("apikey", publishableKey)
-            header("Authorization", "Bearer ${session.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(JSONObject().toString())
-        }
-        val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
-        return JSONObject(body).optString("id").takeIf { it.isNotBlank() }
-            ?: throw IllegalStateException("Supabase did not return a challenge ID.")
-    }
-
-    suspend fun verifyMfaChallenge(
-        session: SupabaseAuthSession,
-        factorId: String,
-        challengeId: String,
-        code: String
-    ): SupabaseAuthSession {
-        require(factorId.isNotBlank() && factorId.length <= 64)
-        require(challengeId.isNotBlank() && challengeId.length <= 64)
-        require(code.matches(Regex("[0-9]{6,10}"))) { "Enter the current authenticator code." }
-        val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/factors/${Uri.encode(factorId)}/verify") {
-            header("apikey", publishableKey)
-            header("Authorization", "Bearer ${session.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(
-                JSONObject()
-                    .put("challenge_id", challengeId)
-                    .put("code", code)
-                    .toString()
-            )
-        }
-        val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
-        return JSONObject(body).toSession()
-    }
-
-    suspend fun unenrollMfaFactor(session: SupabaseAuthSession, factorId: String) {
-        require(factorId.isNotBlank() && factorId.length <= 64)
-        val response = httpClient.delete("${supabaseUrl.trimEnd('/')}/auth/v1/factors/${Uri.encode(factorId)}") {
-            header("apikey", publishableKey)
-            header("Authorization", "Bearer ${session.accessToken}")
-        }
-        ensureSuccess(response.status.value, response.bodyAsText())
-    }
-
     suspend fun signOut(session: SupabaseAuthSession) {
         val response = httpClient.post("${supabaseUrl.trimEnd('/')}/auth/v1/logout") {
             header("apikey", publishableKey)
             header("Authorization", "Bearer ${session.accessToken}")
         }
-        ensureSuccess(response.status.value, response.bodyAsText())
+        ensureSuccess(response.status.value, response.bodyAsText(), "POST /auth/v1/logout")
     }
 
     suspend fun refresh(session: SupabaseAuthSession): SupabaseAuthSession {
@@ -316,7 +191,7 @@ class SupabaseAuthClient(
             setBody(JSONObject().put("refresh_token", session.refreshToken).toString())
         }
         val body = response.bodyAsText()
-        ensureSuccess(response.status.value, body)
+        ensureSuccess(response.status.value, body, "POST /auth/v1/token?grant_type=refresh_token")
         return JSONObject(body).toSession()
     }
 
@@ -332,7 +207,10 @@ class SupabaseAuthClient(
     }
 
     private fun requireValidEmail(email: String) {
-        require(supabaseUrl.startsWith("https://")) { "Supabase URL must use HTTPS." }
+        val base = Uri.parse(supabaseUrl)
+        require(base.scheme == "https" && !base.host.isNullOrBlank() &&
+            base.path.orEmpty().trimEnd('/').isEmpty() && base.query == null && base.fragment == null
+        ) { "Supabase URL must be the HTTPS project API origin without an API path." }
         require(publishableKey.isNotBlank()) { "Supabase publishable key is missing." }
         require(email.contains("@") && email.length <= 254) { "Enter a valid email address." }
     }
@@ -345,7 +223,7 @@ class SupabaseAuthClient(
         }
     }
 
-    private fun ensureSuccess(statusCode: Int, body: String) {
+    private fun ensureSuccess(statusCode: Int, body: String, operation: String) {
         if (statusCode !in 200..299) {
             val json = runCatching { JSONObject(body) }.getOrNull()
             val code = json?.optString("msg")?.takeIf { it.isNotBlank() }
@@ -353,7 +231,7 @@ class SupabaseAuthClient(
                 ?: json?.optString("error_description")?.takeIf { it.isNotBlank() }
                 ?: json?.optString("error")?.takeIf { it.isNotBlank() }
                 ?: "supabase_auth_failed"
-            throw SupabaseAuthException(statusCode, code.take(160))
+            throw SupabaseAuthException(statusCode, code.take(160), operation)
         }
     }
 

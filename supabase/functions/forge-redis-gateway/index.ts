@@ -29,46 +29,6 @@ export default {
       return json({ ok: false, error: "authenticated_user_required" }, 401);
     }
 
-    // Optional MFA: users with a verified factor must present an AAL2 JWT.
-    // Accounts without a verified factor retain the normal AAL1 password flow.
-    const verifiedTokenAal = (ctx.userClaims as unknown as { aal?: string } | undefined)?.aal;
-    if (verifiedTokenAal !== "aal2") {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL");
-      const publishableKey = Deno.env.get("SUPABASE_ANON_KEY") ??
-        Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
-      const authorization = req.headers.get("authorization");
-      if (!supabaseUrl || !publishableKey || !authorization) {
-        return json({ ok: false, error: "mfa_status_unavailable" }, 503);
-      }
-      try {
-        const supabaseBase = supabaseUrl.endsWith("/")
-          ? supabaseUrl.slice(0, -1)
-          : supabaseUrl;
-        const factorUrl = new URL(`${supabaseBase}/rest/v1/auth/factors`);
-        factorUrl.searchParams.set("select", "id,status");
-        factorUrl.searchParams.set("user_id", `eq.${userId}`);
-        const factorResponse = await fetch(factorUrl, {
-          headers: {
-            "apikey": publishableKey,
-            "Authorization": authorization,
-          },
-          signal: AbortSignal.timeout(4000),
-        });
-        if (!factorResponse.ok) {
-          return json({ ok: false, error: "mfa_status_unavailable" }, 503);
-        }
-        const factors = await factorResponse.json();
-        if (!Array.isArray(factors)) {
-          return json({ ok: false, error: "mfa_status_unavailable" }, 503);
-        }
-        if (factors.some((factor: { status?: string }) => factor?.status === "verified")) {
-          return json({ ok: false, error: "mfa_required" }, 403);
-        }
-      } catch {
-        return json({ ok: false, error: "mfa_status_unavailable" }, 503);
-      }
-    }
-
     const redisUrl = Deno.env.get("UPSTASH_REDIS_REST_URL");
     const redisToken = Deno.env.get("UPSTASH_REDIS_REST_TOKEN");
     if (!redisUrl || !redisToken) {

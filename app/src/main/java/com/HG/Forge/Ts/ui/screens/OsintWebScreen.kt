@@ -22,8 +22,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 
 @Composable
 fun OsintWebScreen(
@@ -31,6 +33,26 @@ fun OsintWebScreen(
     viewModel: OsintWebViewModel = viewModel()
 ) {
     var domain by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    var inspectionTraceId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(viewModel.isLoading) {
+        if (viewModel.isLoading) {
+            val traceId = inspectionTraceId ?: return@LaunchedEffect
+            ForgeDiagnostics.log(context, "INFO", "Osint", "osint.inspect.started", traceId = traceId)
+        } else {
+            val traceId = inspectionTraceId ?: return@LaunchedEffect
+            val succeeded = viewModel.checks.count { it.result != null }
+            val failed = viewModel.checks.count { it.result == null }
+            ForgeDiagnostics.log(
+                context,
+                if (succeeded == 0) "ERROR" else "INFO",
+                "Osint",
+                if (succeeded == 0) "osint.inspect.failed" else "osint.inspect.completed.dns_${succeeded}_failed_${failed}",
+                traceId = traceId
+            )
+            inspectionTraceId = null
+        }
+    }
 
     Column(
         modifier = modifier
@@ -53,7 +75,10 @@ fun OsintWebScreen(
             singleLine = true
         )
         Button(
-            onClick = { viewModel.inspect(domain) },
+            onClick = {
+                inspectionTraceId = ForgeDiagnostics.newTraceId()
+                viewModel.inspect(domain)
+            },
             enabled = domain.isNotBlank() && !viewModel.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 
 private data class KnowledgeEntry(
     val id: String,
@@ -38,6 +39,32 @@ private data class KnowledgeEntry(
     val summary: String,
     val explanation: String,
     val example: String
+)
+
+private data class GuidedCourse(
+    val id: String,
+    val title: String,
+    val summary: String,
+    val lessonIds: List<String>
+)
+
+private val guidedCourses = listOf(
+    GuidedCourse(
+        "network-foundations", "Network Foundations", "Build confidence with addressing, routing and core protocols.",
+        listOf("proto-osi", "proto-tcpip", "ip-v4", "ip-cidr", "ip-vlsm", "mt-route", "proto-dhcp", "proto-tcp", "proto-udp")
+    ),
+    GuidedCourse(
+        "dns-web-troubleshooting", "DNS & Web Troubleshooting", "Follow a request from a name lookup to a verified HTTPS connection.",
+        listOf("dns-fundamentals", "os-dns", "http-basics", "tls-basics", "tls-certificates", "os-ping", "os-trace")
+    ),
+    GuidedCourse(
+        "secure-access", "Secure Remote Access", "Understand endpoint identity, encrypted transport and safe access choices.",
+        listOf("security-basics", "ssh-basics", "ssh-keys", "tls-basics", "tls-certificates", "proto-wireguard", "proto-openvpn")
+    ),
+    GuidedCourse(
+        "network-design", "Network Design Basics", "Plan segments and address ranges before configuring a network.",
+        listOf("net-pan", "net-lan", "net-wlan", "net-vlan", "net-ipplan", "ip-v4", "ip-v6", "ip-cidr", "ip-vlsm")
+    )
 )
 
 private val knowledgeEntries = listOf(
@@ -434,12 +461,22 @@ private fun SimulationPanel(entryId: String) {
 
 @Composable
 fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val progressPrefs = remember(context) {
+        context.getSharedPreferences("forge_course_progress", android.content.Context.MODE_PRIVATE)
+    }
     var query by remember { mutableStateOf("") }
     var selectedSection by remember { mutableStateOf("All") }
+    var selectedCourseId by remember { mutableStateOf<String?>(null) }
     var expandedId by remember { mutableStateOf<String?>(null) }
+    var completedLessonIds by remember {
+        mutableStateOf(progressPrefs.getStringSet("completed_lessons", emptySet()).orEmpty().toSet())
+    }
+    val selectedCourse = guidedCourses.firstOrNull { it.id == selectedCourseId }
     val sections = listOf("All", "MikroTik", "OS Commands", "DNS", "Web Technology", "Security & Privacy", "SSH & TLS", "Addressing", "Network Types", "Core Protocols", "Remote Access", "Transport & Tunneling", "VPN & Tunneling", "Proxy Protocols")
     val filtered = knowledgeEntries.filter { entry ->
         (selectedSection == "All" || entry.section == selectedSection) &&
+            (selectedCourse == null || entry.id in selectedCourse.lessonIds) &&
             (query.isBlank() || listOf(entry.title, entry.summary, entry.explanation, entry.example, entry.section)
                 .any { it.contains(query, ignoreCase = true) })
     }
@@ -476,6 +513,40 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                 label = { Text("Search lessons and commands") },
                 singleLine = true
             )
+        }
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("GUIDED COURSES", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    selectedCourse?.let { course ->
+                        val completed = course.lessonIds.count { it in completedLessonIds }
+                        "${course.title} · $completed of ${course.lessonIds.size} lessons completed"
+                    } ?: "Choose a learning path or browse all lessons.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = selectedCourse == null,
+                        onClick = { selectedCourseId = null },
+                        label = { Text("All lessons") }
+                    )
+                    guidedCourses.forEach { course ->
+                        val completed = course.lessonIds.count { it in completedLessonIds }
+                        FilterChip(
+                            selected = selectedCourseId == course.id,
+                            onClick = { selectedCourseId = course.id; selectedSection = "All"; expandedId = null },
+                            label = { Text("${course.title} · $completed/${course.lessonIds.size}") }
+                        )
+                    }
+                }
+                selectedCourse?.let { course ->
+                    Text(course.summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
         item {
             Row(
@@ -537,6 +608,20 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                             )
                         }
                         SimulationPanel(entry.id)
+                        Button(
+                            onClick = {
+                                val updatedLessonIds = if (entry.id in completedLessonIds) {
+                                    completedLessonIds - entry.id
+                                } else {
+                                    completedLessonIds + entry.id
+                                }
+                                completedLessonIds = updatedLessonIds
+                                progressPrefs.edit().putStringSet("completed_lessons", updatedLessonIds).apply()
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (entry.id in completedLessonIds) "Mark as not complete" else "Mark lesson complete")
+                        }
                         LessonSection("8 · BUGS & TROUBLESHOOTING", guidance.troubleshooting)
                         LessonSection("STANDARDS & FURTHER READING", guidance.standards)
                         Text(

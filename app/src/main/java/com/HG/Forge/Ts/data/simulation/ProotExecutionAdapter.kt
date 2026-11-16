@@ -36,6 +36,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
     private val appContext = context.applicationContext
     private val connectivityManager = appContext.getSystemService(ConnectivityManager::class.java)
     private val dnsLock = Any()
+    @Volatile private var lastDnsDiagnosticState: String? = null
     @Volatile private var defaultDnsNetwork: Network? = null
     private val dnsCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -141,21 +142,17 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
 
             val session = PtySession(handle, ByteArrayOutputStream(), Any(), Mutex(), 0L, Channel(Channel.CONFLATED))
             sessions[key] = session
-            val logFile = File(logs, "session.log")
             session.reader = Thread({
                 val bytes = ByteArray(8192)
                 try {
                     var consecutiveEofSignals = 0
                     var consecutivePostExitIdlePolls = 0
-                    logFile.outputStream().buffered().use { log ->
-                        while (true) {
+                    while (true) {
                             val count = NativePtyEngine.nativeRead(handle, bytes, 250)
                             when {
                                 count > 0 -> {
                                     consecutiveEofSignals = 0
                                     consecutivePostExitIdlePolls = 0
-                                    log.write(bytes, 0, count)
-                                    log.flush()
                                     synchronized(session.output) {
                                         session.output.write(bytes, 0, count)
                                         if (session.output.size() > 262144) {
@@ -199,7 +196,6 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                                 }
                                 count < 0 -> break
                             }
-                        }
                     }
                 } catch (_: Exception) {
                     // Session shutdown closes the PTY master and ends this reader.
@@ -220,7 +216,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 runCatching { session.reader?.join(750) }
                 ForgeDiagnostics.log(appContext, "ERROR", "Pty", "runtime.pty.start.verification_failed", traceId = traceId)
                 return@withContext RuntimeAdapterStartResult(false, false,
-                    "Could not verify PRoot shell startup status (errno=" + (-status) + "); inspect session.log.")
+                    "Could not verify PRoot shell startup status (errno=" + (-status) + "); review the terminal output and runtime diagnostics.")
             }
             if (status > 0) {
                 NativePtyEngine.nativeClose(handle, true)
@@ -228,7 +224,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
                 runCatching { session.reader?.join(750) }
                 ForgeDiagnostics.log(appContext, "WARNING", "Pty", "runtime.pty.start.exited_early", traceId = traceId)
                 return@withContext RuntimeAdapterStartResult(false, false,
-                    "PRoot shell exited during PTY startup (status=" + status + "); inspect session.log.")
+                    "PRoot shell exited during PTY startup (status=" + status + "); review the terminal output and runtime diagnostics.")
             }
             ForgeDiagnostics.log(appContext, "INFO", "Pty", "runtime.pty.start.confirmed", traceId = traceId)
             val durationMs = (SystemClock.elapsedRealtime() - startedAt).coerceAtMost(60000L)
@@ -463,6 +459,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
      * Linux guests need /etc/resolv.conf, but Android Private DNS must not be
      * bypassed by sending plaintext DNS directly to LinkProperties DNS servers.
      * In that mode (or while offline), expose an empty resolver file instead.
+     * Record the state without logging resolver addresses or guest traffic.
      */
     private fun refreshResolverFile(workspace: File): File? {
         val network = runCatching { connectivityManager.activeNetwork }.getOrNull()
@@ -514,7 +511,7 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             else "nameserver $host"
         }.distinct().joinToString(separator = "\n", postfix = if (dnsServers.isEmpty()) "" else "\n")
 
-        return runCatching {
+        val written = runCatching {
             synchronized(dnsLock) {
                 FileOutputStream(safeResolverFile, false).use { output ->
                     output.write(contents.toByteArray(Charsets.US_ASCII))
@@ -523,6 +520,18 @@ class ProotExecutionAdapter(context: Context) : RuntimeExecutionAdapter {
             }
             safeResolverFile
         }.getOrNull()
+        val (state, level) = when {
+            written == null -> "resolver_write_failed" to "ERROR"
+            linkProperties == null -> "no_active_network" to "WARNING"
+            linkProperties.isPrivateDnsActive -> "private_dns_preserved" to "INFO"
+            linkProperties.dnsServers.isEmpty() -> "no_system_resolvers" to "WARNING"
+            else -> "system_resolvers_configured" to "INFO"
+        }
+        if (lastDnsDiagnosticState != state) {
+            lastDnsDiagnosticState = state
+            ForgeDiagnostics.log(appContext, level, "ProotDns", "runtime.proot.dns.$state")
+        }
+        return written
     }
 
     private fun environment(loader: File, tmp: File): Map<String, String> = mapOf(

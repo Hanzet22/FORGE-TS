@@ -30,11 +30,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.HG.Forge.Ts.data.network.HttpClientProvider
 import com.HG.Forge.Ts.data.remote.ForgeAuthSessionState
+import com.HG.Forge.Ts.data.remote.SupabaseAuthException
 import com.HG.Forge.Ts.data.remote.SupabaseAuthClient
 import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
+import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private fun authFailureEvent(operation: String, error: Throwable): String {
+    val authError = generateSequence(error) { it.cause }
+        .filterIsInstance<SupabaseAuthException>()
+        .firstOrNull()
+    return if (authError != null) "$operation.failed_http_${authError.statusCode}"
+    else "$operation.failed_network_or_client"
+}
 
 @Composable
 fun AuthGateScreen(
@@ -139,6 +149,7 @@ fun AuthGateScreen(
                                 message = "Password updated. Your account is ready."
                                 onAuthenticated()
                             }.onFailure {
+                                ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.password_update", it), it)
                                 message = it.message ?: "Password update failed."
                             }
                             busy = false
@@ -187,14 +198,17 @@ fun AuthGateScreen(
                                 scope.launch {
                                     busy = true
                                     message = "Signing in..."
+                                    val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.signIn(email, password) }
                                     }
                                     result.onSuccess { signedIn ->
                                         ForgeAuthSessionState.setSession(context, signedIn)
+                                        ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.sign_in.succeeded", traceId = traceId)
                                         message = "Email and password verified. Simulate and Tools are unlocked."
                                         onAuthenticated()
                                     }.onFailure {
+                                        ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.sign_in", it), it, traceId)
                                         message = it.message ?: "Sign-in failed."
                                     }
                                     busy = false
@@ -220,10 +234,12 @@ fun AuthGateScreen(
                                 scope.launch {
                                     busy = true
                                     message = "Creating account..."
+                                    val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.signUp(email, password) }
                                     }
                                     result.onSuccess { created ->
+                                        ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.sign_up.succeeded", traceId = traceId)
                                         if (created != null) {
                                             ForgeAuthSessionState.setSession(context, created)
                                             message = "Account created and authenticated."
@@ -232,6 +248,7 @@ fun AuthGateScreen(
                                             message = "Registration submitted. Check your email and open the verification link to return to FORGE-TS."
                                         }
                                     }.onFailure {
+                                        ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.sign_up", it), it, traceId)
                                         message = it.message ?: "Account creation failed."
                                     }
                                     busy = false
@@ -252,12 +269,15 @@ fun AuthGateScreen(
                                 scope.launch {
                                     busy = true
                                     message = "Sending password reset email..."
+                                    val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.requestPasswordReset(email) }
                                     }
                                     result.onSuccess {
+                                        ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.password_reset.requested", traceId = traceId)
                                         message = "If the account exists, a recovery link has been sent. Open it on this device to set a new password."
                                     }.onFailure {
+                                        ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.password_reset", it), it, traceId)
                                         message = it.message ?: "Password reset request failed."
                                     }
                                     busy = false
