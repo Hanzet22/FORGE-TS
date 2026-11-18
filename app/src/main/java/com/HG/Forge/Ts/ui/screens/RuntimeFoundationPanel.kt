@@ -67,24 +67,24 @@ fun RuntimeFoundationPanel() {
             }
             error?.let { Text(forgeText("Inspection error: $it"), color = MaterialTheme.colorScheme.error) }
             report?.let { current ->
-                Text(forgeText("Foundation status: ${current.status}"), style = MaterialTheme.typography.titleSmall)
-                Text(forgeText("Android API: ${current.apiLevel} • ABI: ${current.supportedAbis.joinToString()}"))
-                Text(forgeText("CPU cores: ${current.availableProcessors}"))
-                Text(forgeText("RAM available / total: ${current.availableMemoryBytes / 1_048_576} / ${current.totalMemoryBytes / 1_048_576} MiB"))
-                Text(forgeText("Storage available / total: ${current.availableStorageBytes / 1_073_741_824} / ${current.totalStorageBytes / 1_073_741_824} GiB"))
-                Text(forgeText("/dev/kvm visible: ${current.kvmNodeVisible} • readable flag: ${current.kvmNodeReadable} • writable flag: ${current.kvmNodeWritable}"))
-                Text(forgeText("Process architecture: ${current.capabilities.processArchitecture}"))
-                Text(forgeText("KVM node: ${current.capabilities.kvmNode.status} — ${current.capabilities.kvmNode.detail}"), style = MaterialTheme.typography.bodySmall)
-                Text(forgeText("KVM read: ${current.capabilities.kvmReadPermission.status} • write: ${current.capabilities.kvmWritePermission.status}"), style = MaterialTheme.typography.bodySmall)
-                Text(forgeText("KVM API probe: ${current.capabilities.kvmApiProbe.status} — ${current.capabilities.kvmApiProbe.detail}"), style = MaterialTheme.typography.bodySmall)
-                Text(forgeText("KVM VM creation: ${current.capabilities.kvmVmCreationProbe.status} — ${current.capabilities.kvmVmCreationProbe.detail}"), style = MaterialTheme.typography.bodySmall)
-                Text(forgeText("PRoot ptrace: ${current.capabilities.prootPtraceProbe.status} — ${current.capabilities.prootPtraceProbe.detail}"), style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("Foundation status:") + " ${current.status}", style = MaterialTheme.typography.titleSmall)
+                Text(forgeText("Android API:") + " ${current.apiLevel} • " + forgeText("ABI:") + " ${current.supportedAbis.joinToString()}")
+                Text(forgeText("CPU cores:") + " ${current.availableProcessors}")
+                Text(forgeText("RAM available / total:") + " ${current.availableMemoryBytes / 1_048_576} / ${current.totalMemoryBytes / 1_048_576} MiB")
+                Text(forgeText("Storage available / total:") + " ${current.availableStorageBytes / 1_073_741_824} / ${current.totalStorageBytes / 1_073_741_824} GiB")
+                Text(forgeText("/dev/kvm visible:") + " ${current.kvmNodeVisible} • " + forgeText("readable flag:") + " ${current.kvmNodeReadable} • " + forgeText("writable flag:") + " ${current.kvmNodeWritable}")
+                Text(forgeText("Process architecture:") + " ${current.capabilities.processArchitecture}")
+                Text(forgeText("KVM node:") + " ${current.capabilities.kvmNode.status} — ${current.capabilities.kvmNode.detail}", style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("KVM read:") + " ${current.capabilities.kvmReadPermission.status} • " + forgeText("write:") + " ${current.capabilities.kvmWritePermission.status}", style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("KVM API probe:") + " ${current.capabilities.kvmApiProbe.status} — ${current.capabilities.kvmApiProbe.detail}", style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("KVM VM creation:") + " ${current.capabilities.kvmVmCreationProbe.status} — ${current.capabilities.kvmVmCreationProbe.detail}", style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("PRoot ptrace:") + " ${current.capabilities.prootPtraceProbe.status} — ${current.capabilities.prootPtraceProbe.detail}", style = MaterialTheme.typography.bodySmall)
                 Text(forgeText("Execution adapters:"), style = MaterialTheme.typography.labelMedium)
                 current.capabilities.executionAdapters.forEach { (environment, observation) ->
                     Text(forgeText("• $environment: ${observation.status} — ${observation.detail}"), style = MaterialTheme.typography.bodySmall)
                 }
-                Text(forgeText("Private runtime root: ${current.runtimeRoot}"))
-                Text(forgeText("Directories: images=${current.imageDirectoryReady}, instances=${current.instanceDirectoryReady}, logs=${current.logDirectoryReady}"))
+                Text(forgeText("Private runtime root:") + " ${current.runtimeRoot}")
+                Text(forgeText("Directories:") + " images=${current.imageDirectoryReady}, instances=${current.instanceDirectoryReady}, logs=${current.logDirectoryReady}")
                 current.notes.forEach { note ->
                     Text(forgeText("• $note"), style = MaterialTheme.typography.bodySmall)
                 }
