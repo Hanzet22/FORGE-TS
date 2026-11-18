@@ -104,7 +104,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
         ProotTerminalPanel()
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(if (internetValidated) "INTERNET AVAILABLE" else "INTERNET UNAVAILABLE", fontWeight = FontWeight.Bold)
+                Text(forgeText(if (internetValidated) "INTERNET AVAILABLE" else "INTERNET UNAVAILABLE"), fontWeight = FontWeight.Bold)
                 Text(
                     if (internetValidated) "Internet is validated. Simulation Center labs remain local; this screen does not start cloud requests."
                     else "Internet is unavailable. Local simulation remains available; no cloud request is made.",
