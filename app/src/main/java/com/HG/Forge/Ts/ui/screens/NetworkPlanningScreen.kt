@@ -150,7 +150,7 @@ fun NetworkIpAllocationScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun PlannerRow(label: String, value: String) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText(label), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
     }
 }
