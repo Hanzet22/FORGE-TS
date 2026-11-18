@@ -104,7 +104,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                             5 -> "REFUSED · Resolver refused the query."
                             else -> "DNS status: ${result.status}"
                         })
-                        Text(if(result.dnssecAuthenticated) "DNSSEC: resolver reports AD (Authenticated Data)." else "DNSSEC: resolver did not assert AD; this does not prove the domain is unsigned.", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText(if(result.dnssecAuthenticated) "DNSSEC: resolver reports AD (Authenticated Data)." else "DNSSEC: resolver did not assert AD; this does not prove the domain is unsigned."), style = MaterialTheme.typography.bodySmall)
                         if(result.checkingDisabled) Text(forgeText("CD flag: checking disabled by query."), style = MaterialTheme.typography.bodySmall)
                         DnsAnswerSection("Answer", result.answers)
                         DnsAnswerSection("Authority", result.authority)
