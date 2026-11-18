@@ -29,6 +29,16 @@ class ForgeLanguageState(context: Context) {
 val LocalForgeLanguage = compositionLocalOf<ForgeLanguageState> { error("ForgeLanguageState was not provided") }
 
 private val indonesianUiText = mapOf(
+    "observations" to "hasil pengamatan",
+    "countries from PublicDNS.xyz snapshots; directory entries are observations, not live-tested or endorsed resolvers." to "negara dari snapshot PublicDNS.xyz; entri direktori ini merupakan hasil pengamatan, bukan resolver yang telah diuji secara langsung atau direkomendasikan.",
+    "over HTTPS…" to "melalui HTTPS…",
+    "Querying" to "Sedang mengirim kueri ke",
+    "Tap to open details" to "Ketuk untuk membuka detail",
+    "REFERENCES" to "REFERENSI",
+    "AUTHENTICATED" to "TERAUTENTIKASI",
+    "Sign in to your existing account." to "Masuk ke akun Anda yang sudah ada.",
+    "Requested area:" to "Area yang diminta:",
+    "A shared FORGE-TS account session is required to access this area." to "Untuk mengakses area ini, diperlukan sesi akun FORGE-TS bersama.",
     "Diagnostics & privacy" to "Diagnostik & privasi",
     "FORGE-TS always keeps a limited technical log on this device. " to "FORGE-TS selalu menyimpan catatan teknis terbatas pada perangkat ini. ",
     "Allow automatic diagnostics" to "Izinkan diagnostik otomatis",
@@ -106,7 +116,7 @@ private val indonesianUiText = mapOf(
     "example.com" to "contoh.com",
     "Record type" to "Jenis catatan",
     "DNS-over-HTTPS resolver" to "Resolver DNS-over-HTTPS",
-    "Resolve DNS" to "Menyelesaikan DNS",
+    "Resolve DNS" to "Lakukan resolusi DNS",
     "CD flag: checking disabled by query." to "Bendera CD: pemeriksaan dinonaktifkan berdasarkan kueri.",
     "Privacy: the selected resolver receives the domain and record type. DoH encrypts transport to that resolver but does not make queries anonymous. DNSSEC validation is separate. FORGE-TS does not save lookup history." to "Privasi: resolver yang dipilih menerima nama domain dan jenis catatan. DoH mengenkripsi lalu lintas ke resolver tersebut, tetapi tidak membuat permintaan menjadi anonim. Validasi DNSSEC dilakukan secara terpisah. FORGE-TS tidak menyimpan riwayat pencarian.",
     "Select a protocol to read its purpose, usage, pros, cons, risks and references. This is educational guidance; the app does not establish tunnels or run protocol clients." to "Pilih sebuah protokol untuk mengetahui tujuan, cara penggunaan, kelebihan, kekurangan, risiko, dan referensinya. Ini adalah panduan edukatif; aplikasi ini tidak membuat terowongan atau menjalankan klien protokol.",
