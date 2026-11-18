@@ -226,20 +226,20 @@ fun OsintWebScreen(
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(report.domain, style = MaterialTheme.typography.titleMedium)
-                    Text(forgeText("Registrar: ${report.registrar ?: "Not disclosed"}"))
-                    report.handle?.let { Text(forgeText("RDAP handle: $it"), style = MaterialTheme.typography.bodySmall) }
-                    Text(forgeText("Domain statuses: ${report.statuses.joinToString().ifBlank { "Not returned" }}"), style = MaterialTheme.typography.bodySmall)
+                    Text("${forgeText("Registrar:")} ${report.registrar ?: forgeText("Not disclosed")}")
+                    report.handle?.let { Text("${forgeText("RDAP handle:")} $it", style = MaterialTheme.typography.bodySmall) }
+                    Text("${forgeText("Domain statuses:")} ${report.statuses.joinToString().ifBlank { forgeText("Not returned") }}", style = MaterialTheme.typography.bodySmall)
                     Text(forgeText("Registration events:"), style = MaterialTheme.typography.labelLarge)
                     report.events.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
-                    Text(forgeText("Nameservers: ${report.nameServers.joinToString().ifBlank { "Not returned" }}"), style = MaterialTheme.typography.bodySmall)
-                    Text(forgeText("Source: ${report.source} · Public RDAP metadata only; registrant contact/vCard data is not collected."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("${forgeText("Nameservers:")} ${report.nameServers.joinToString().ifBlank { forgeText("Not returned") }}", style = MaterialTheme.typography.bodySmall)
+                    Text("${forgeText("Source:")} ${report.source} · ${forgeText("Public RDAP metadata only; registrant contact/vCard data is not collected.")}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
 
         Text(forgeText("IP & Network Registry Intelligence"), style = MaterialTheme.typography.headlineSmall)
         viewModel.ipNetworkError?.let { message ->
-            Text(forgeText("Network attribution unavailable: $message"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("${forgeText("Network attribution unavailable:")} $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         viewModel.ipNetworkReport?.let { report ->
             Card(modifier = Modifier.fillMaxWidth()) {
@@ -261,7 +261,7 @@ fun OsintWebScreen(
 
         viewModel.nativeError?.let { message ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
-                Text(forgeText("Website inspection: $message"), modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
+                Text("${forgeText("Website inspection:")} $message", modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
             }
         }
 
