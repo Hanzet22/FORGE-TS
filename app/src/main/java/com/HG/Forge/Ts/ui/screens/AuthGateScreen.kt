@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -86,15 +87,14 @@ fun AuthGateScreen(
             Modifier.fillMaxWidth().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("FORGE-TS ACCOUNT", style = MaterialTheme.typography.titleLarge)
+            Text(forgeText("FORGE-TS ACCOUNT"), style = MaterialTheme.typography.titleLarge)
             Text(
                 if (recoveryMode) "Reset password" else "Account authentication",
                 style = MaterialTheme.typography.headlineSmall
             )
 
             if (recoveryMode) {
-                Text(
-                    "Recovery link verified. Set a new password to finish account recovery.",
+                Text(forgeText("Recovery link verified. Set a new password to finish account recovery."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -102,7 +102,7 @@ fun AuthGateScreen(
                     value = password,
                     onValueChange = { password = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("New password") },
+                    label = { Text(forgeText("New password")) },
                     singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -116,7 +116,7 @@ fun AuthGateScreen(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Confirm new password") },
+                    label = { Text(forgeText("Confirm new password")) },
                     singleLine = true,
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -160,8 +160,7 @@ fun AuthGateScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) { Text(if (busy) "Please wait..." else "Update password") }
             } else {
-                Text(
-                    "The $requestedArea area requires a shared FORGE-TS account session.",
+                Text(forgeText("The $requestedArea area requires a shared FORGE-TS account session."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -169,7 +168,7 @@ fun AuthGateScreen(
                     value = email,
                     onValueChange = { email = it.trimStart() },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Email") },
+                    label = { Text(forgeText("Email")) },
                     singleLine = true,
                     enabled = !busy
                 )
@@ -179,7 +178,7 @@ fun AuthGateScreen(
                         value = password,
                         onValueChange = { password = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Password") },
+                        label = { Text(forgeText("Password")) },
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -221,12 +220,12 @@ fun AuthGateScreen(
                             onClick = { mode = "create"; message = "Create your FORGE-TS account." },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Create account") }
+                        ) { Text(forgeText("Create account")) }
                         OutlinedButton(
                             onClick = { mode = "reset"; message = "Enter your account email to receive a password reset link." },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Reset password") }
+                        ) { Text(forgeText("Reset password")) }
                     }
                     "create" -> {
                         Button(
@@ -261,7 +260,7 @@ fun AuthGateScreen(
                             onClick = { mode = "sign_in"; message = "Sign in to your existing account." },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Back to sign in") }
+                        ) { Text(forgeText("Back to sign in")) }
                     }
                     else -> {
                         Button(
@@ -290,19 +289,17 @@ fun AuthGateScreen(
                             onClick = { mode = "sign_in"; message = "Sign in to your existing account." },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Back to sign in") }
+                        ) { Text(forgeText("Back to sign in")) }
                     }
                 }
-                Text(
-                    "Password policy: at least 20 characters, including uppercase, lowercase, a number, and a symbol.",
+                Text(forgeText("Password policy: at least 20 characters, including uppercase, lowercase, a number, and a symbol."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Text(message, style = MaterialTheme.typography.bodySmall)
-            Text(
-                "Account credentials are verified by Supabase Auth. Session tokens are encrypted with Android Keystore on this device.",
+            Text(forgeText("Account credentials are verified by Supabase Auth. Session tokens are encrypted with Android Keystore on this device."),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

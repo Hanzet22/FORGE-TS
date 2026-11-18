@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,10 +22,9 @@ fun DiagnosticConsentGate() {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { },
-            title = { Text("Diagnostics & privacy") },
+            title = { Text(forgeText("Diagnostics & privacy")) },
             text = {
-                Text(
-                    "FORGE-TS always keeps a limited technical log on this device. " +
+                Text(forgeText("FORGE-TS always keeps a limited technical log on this device. " +
                         "If you allow remote diagnostics, the app automatically uploads one bounded report when it " +
                         "moves to the background, and retries later if the network is unavailable. Reports can include " +
                         "Info, Warning, Error, Crash and Critical Error events; app and Android versions; device " +
@@ -39,7 +39,7 @@ fun DiagnosticConsentGate() {
                     ForgeDiagnosticsConsent.setEnabled(context, true)
                     showDialog = false
                 }) {
-                    Text("Allow automatic diagnostics")
+                    Text(forgeText("Allow automatic diagnostics"))
                 }
             },
             dismissButton = {
@@ -47,7 +47,7 @@ fun DiagnosticConsentGate() {
                     ForgeDiagnosticsConsent.setEnabled(context, false)
                     showDialog = false
                 }) {
-                    Text("Keep on-device only")
+                    Text(forgeText("Keep on-device only"))
                 }
             }
         )

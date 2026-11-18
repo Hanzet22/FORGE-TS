@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -64,17 +65,16 @@ fun OsintWebScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("OSINT Web", style = MaterialTheme.typography.headlineMedium)
-        Text(
-            "Inspect passive DNS, DNSSEC resolver signals, CAA policy, RDAP domain metadata, HTTP/TLS, HSTS, cookies, robots.txt, sitemaps, page metadata and technology indicators using native Android networking.",
+        Text(forgeText("OSINT Web"), style = MaterialTheme.typography.headlineMedium)
+        Text(forgeText("Inspect passive DNS, DNSSEC resolver signals, CAA policy, RDAP domain metadata, HTTP/TLS, HSTS, cookies, robots.txt, sitemaps, page metadata and technology indicators using native Android networking."),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         OutlinedTextField(
             value = domain,
             onValueChange = { domain = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Target domain") },
-            placeholder = { Text("example.com") },
+            label = { Text(forgeText("Target domain")) },
+            placeholder = { Text(forgeText("example.com")) },
             singleLine = true
         )
         Button(
@@ -85,14 +85,14 @@ fun OsintWebScreen(
             enabled = domain.isNotBlank() && !viewModel.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Run native inspection")
+            Text(forgeText("Run native inspection"))
         }
 
 
         if (viewModel.isLoading) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CircularProgressIndicator()
-                Text("Collecting public DNS records…")
+                Text(forgeText("Collecting public DNS records…"))
             }
         }
 
@@ -111,9 +111,8 @@ fun OsintWebScreen(
         }
 
         if (viewModel.checks.isNotEmpty()) {
-            Text("Domain report: ${viewModel.target}", style = MaterialTheme.typography.titleLarge)
-            Text(
-                "${viewModel.checks.count { it.result != null }} of ${viewModel.checks.size} DNS checks completed",
+            Text(forgeText("Domain report: ${viewModel.target}"), style = MaterialTheme.typography.titleLarge)
+            Text(forgeText("${viewModel.checks.count { it.result != null }} of ${viewModel.checks.size} DNS checks completed"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -136,7 +135,7 @@ fun OsintWebScreen(
                     context.startActivity(Intent.createChooser(send, "Share OSINT summary"))
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Share concise report") }
+            ) { Text(forgeText("Share concise report")) }
             viewModel.checks.forEach { check ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(
@@ -157,18 +156,16 @@ fun OsintWebScreen(
                                 },
                                 style = MaterialTheme.typography.bodyMedium
                             )
-                            Text(
-                                "Google Public DNS · ${result.elapsedMs} ms · DNSSEC AD: ${result.dnssecAuthenticated}",
+                            Text(forgeText("Google Public DNS · ${result.elapsedMs} ms · DNSSEC AD: ${result.dnssecAuthenticated}"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             if (result.answers.isEmpty()) {
-                                Text("No answer records returned.", style = MaterialTheme.typography.bodySmall)
+                                Text(forgeText("No answer records returned."), style = MaterialTheme.typography.bodySmall)
                             } else {
                                 result.answers.forEach { answer ->
                                     Text(answer.data, style = MaterialTheme.typography.bodyMedium)
-                                    Text(
-                                        "TTL ${answer.ttl}s",
+                                    Text(forgeText("TTL ${answer.ttl}s"),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -187,8 +184,8 @@ fun OsintWebScreen(
         }
 
         if (viewModel.dnsSecurityFindings.isNotEmpty()) {
-            Text("DNS Security Intelligence", style = MaterialTheme.typography.headlineSmall)
-            Text("Resolver-reported DNSSEC authentication and passive CAA policy interpretation. These are evidence signals, not a full independent DNSSEC chain validator.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("DNS Security Intelligence"), style = MaterialTheme.typography.headlineSmall)
+            Text(forgeText("Resolver-reported DNSSEC authentication and passive CAA policy interpretation. These are evidence signals, not a full independent DNSSEC chain validator."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             viewModel.dnsSecurityFindings.forEach { finding ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -200,9 +197,8 @@ fun OsintWebScreen(
             }
         }
         if (viewModel.mailSecurityFindings.isNotEmpty()) {
-            Text("Mail Security Intelligence", style = MaterialTheme.typography.headlineSmall)
-            Text(
-                "Passive DNS checks for mail-routing and domain-level email security. DKIM checks use common selector guesses only.",
+            Text(forgeText("Mail Security Intelligence"), style = MaterialTheme.typography.headlineSmall)
+            Text(forgeText("Passive DNS checks for mail-routing and domain-level email security. DKIM checks use common selector guesses only."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -222,57 +218,57 @@ fun OsintWebScreen(
             }
         }
 
-        Text("RDAP Domain Intelligence", style = MaterialTheme.typography.headlineSmall)
+        Text(forgeText("RDAP Domain Intelligence"), style = MaterialTheme.typography.headlineSmall)
         viewModel.rdapError?.let { message ->
-            Text("RDAP unavailable: $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("RDAP unavailable: $message"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         viewModel.rdapReport?.let { report ->
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(report.domain, style = MaterialTheme.typography.titleMedium)
-                    Text("Registrar: ${report.registrar ?: "Not disclosed"}")
-                    report.handle?.let { Text("RDAP handle: $it", style = MaterialTheme.typography.bodySmall) }
-                    Text("Domain statuses: ${report.statuses.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
-                    Text("Registration events:", style = MaterialTheme.typography.labelLarge)
+                    Text(forgeText("Registrar: ${report.registrar ?: "Not disclosed"}")
+                    report.handle?.let { Text(forgeText("RDAP handle: $it"), style = MaterialTheme.typography.bodySmall) }
+                    Text(forgeText("Domain statuses: ${report.statuses.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Registration events:"), style = MaterialTheme.typography.labelLarge)
                     report.events.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
-                    Text("Nameservers: ${report.nameServers.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
-                    Text("Source: ${report.source} · Public RDAP metadata only; registrant contact/vCard data is not collected.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(forgeText("Nameservers: ${report.nameServers.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Source: ${report.source} · Public RDAP metadata only; registrant contact/vCard data is not collected."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
 
-        Text("IP & Network Registry Intelligence", style = MaterialTheme.typography.headlineSmall)
+        Text(forgeText("IP & Network Registry Intelligence"), style = MaterialTheme.typography.headlineSmall)
         viewModel.ipNetworkError?.let { message ->
-            Text("Network attribution unavailable: $message", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Network attribution unavailable: $message"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         viewModel.ipNetworkReport?.let { report ->
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(report.address, style = MaterialTheme.typography.titleMedium)
-                    Text("IP version: ${report.ipVersion ?: "Not reported"}")
-                    Text("Network: ${report.networkName ?: "Not reported"}")
-                    Text("Handle: ${report.handle ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
-                    Text("Range: ${report.startAddress ?: "?"} – ${report.endAddress ?: "?"}", style = MaterialTheme.typography.bodySmall)
-                    Text("Country/region code: ${report.country ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
-                    Text("Origin ASN: ${report.asn?.let { "AS$it" } ?: "Not returned"}")
-                    report.asnHolder?.let { Text("Network holder: $it", style = MaterialTheme.typography.bodySmall) }
-                    report.announcedPrefix?.let { Text("Announced prefix: $it", style = MaterialTheme.typography.bodySmall) }
-                    Text("Registry source: ${report.source}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("ASN enrichment uses RIPEstat and is best-effort. Registry metadata is not proof of physical server location or operational ownership.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(forgeText("IP version: ${report.ipVersion ?: "Not reported"}")
+                    Text(forgeText("Network: ${report.networkName ?: "Not reported"}")
+                    Text(forgeText("Handle: ${report.handle ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Range: ${report.startAddress ?: "?"} – ${report.endAddress ?: "?"}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Country/region code: ${report.country ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Origin ASN: ${report.asn?.let { "AS$it" } ?: "Not returned"}")
+                    report.asnHolder?.let { Text(forgeText("Network holder: $it"), style = MaterialTheme.typography.bodySmall) }
+                    report.announcedPrefix?.let { Text(forgeText("Announced prefix: $it"), style = MaterialTheme.typography.bodySmall) }
+                    Text(forgeText("Registry source: ${report.source}"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(forgeText("ASN enrichment uses RIPEstat and is best-effort. Registry metadata is not proof of physical server location or operational ownership."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
 
         viewModel.nativeError?.let { message ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
-                Text("Website inspection: $message", modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
+                Text(forgeText("Website inspection: $message"), modifier = Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer)
             }
         }
 
 
         viewModel.nativeReport?.let { report ->
-            Text("Native Web-Check report", style = MaterialTheme.typography.headlineSmall)
-            Text("Final URL: ${report.finalUrl}\nChecked: ${report.checkedAt}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Native Web-Check report"), style = MaterialTheme.typography.headlineSmall)
+            Text(forgeText("Final URL: ${report.finalUrl}\nChecked: ${report.checkedAt}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             report.findings.forEach { finding ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -280,19 +276,17 @@ fun OsintWebScreen(
                         Text(finding.title, style = MaterialTheme.typography.titleMedium)
                         Text(finding.status, style = MaterialTheme.typography.bodyMedium)
                         finding.details.forEach { detail -> Text(detail, style = MaterialTheme.typography.bodySmall) }
-                        Text("Source: ${finding.source}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(forgeText("Source: ${finding.source}"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
         }
 
-        Text(
-            "Scope: passive public metadata only. DNS queries are sent to Google Public DNS; website requests go directly to the selected public domain. Local/private/link-local destinations are blocked, redirects are manually limited, response bodies are capped, and HTTPS downgrade redirects are rejected. FORGE-TS does not persist reports. Inspect only domains you own or are authorized to assess.",
+        Text(forgeText("Scope: passive public metadata only. DNS queries are sent to Google Public DNS; website requests go directly to the selected public domain. Local/private/link-local destinations are blocked, redirects are manually limited, response bodies are capped, and HTTPS downgrade redirects are rejected. FORGE-TS does not persist reports. Inspect only domains you own or are authorized to assess."),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Text(
-            "Reference project: Web-Check by Alicia Sykes (MIT). This is an independently implemented native Kotlin/Compose adaptation; it does not bundle the upstream web application or copy its runtime.",
+        Text(forgeText("Reference project: Web-Check by Alicia Sykes (MIT). This is an independently implemented native Kotlin/Compose adaptation; it does not bundle the upstream web application or copy its runtime."),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

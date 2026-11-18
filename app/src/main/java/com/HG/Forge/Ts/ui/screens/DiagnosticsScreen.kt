@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -52,15 +53,14 @@ fun DiagnosticsScreen(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Network Diagnostics", style = MaterialTheme.typography.headlineMedium)
-        Text(
-            "A local snapshot of Android's active network capabilities. This screen does not send diagnostic probes.",
+        Text(forgeText("Network Diagnostics"), style = MaterialTheme.typography.headlineMedium)
+        Text(forgeText("A local snapshot of Android's active network capabilities. This screen does not send diagnostic probes."),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Transport", style = MaterialTheme.typography.labelMedium)
+                Text(forgeText("Transport"), style = MaterialTheme.typography.labelMedium)
                 Text(snapshot.value.transports, style = MaterialTheme.typography.titleLarge)
                 Text(
                     if (snapshot.value.connected) "Internet capability: available" else "Internet capability: unavailable",
@@ -74,10 +74,9 @@ fun DiagnosticsScreen(modifier: Modifier = Modifier) {
             }
         }
         Button(onClick = { snapshot.value = readNetworkSnapshot(context) }) {
-            Text("Refresh network status")
+            Text(forgeText("Refresh network status"))
         }
-        Text(
-            "For a specific authorized endpoint, use Network → Host Checker. It performs one DNS lookup and one selected TCP/TLS check; it is not a scanner.",
+        Text(forgeText("For a specific authorized endpoint, use Network → Host Checker. It performs one DNS lookup and one selected TCP/TLS check; it is not a scanner."),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

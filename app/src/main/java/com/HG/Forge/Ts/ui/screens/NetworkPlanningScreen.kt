@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,13 +40,13 @@ fun VlsmPlannerScreen(modifier: Modifier = Modifier) {
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("VLSM subnet planner", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Text("Allocate different subnet sizes from one IPv4 network. The planner sorts requests from largest to smallest and aligns each subnet on its boundary.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        OutlinedTextField(base, { base = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Base IPv4 network / prefix") }, singleLine = true)
+        Text(forgeText("VLSM subnet planner"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(forgeText("Allocate different subnet sizes from one IPv4 network. The planner sorts requests from largest to smallest and aligns each subnet on its boundary."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        OutlinedTextField(base, { base = it }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("Base IPv4 network / prefix")) }, singleLine = true)
         OutlinedTextField(
             requirements, { requirements = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Subnet name, required hosts (one per line)") },
+            label = { Text(forgeText("Subnet name, required hosts (one per line)")) },
             minLines = 4
         )
         Button(
@@ -65,7 +66,7 @@ fun VlsmPlannerScreen(modifier: Modifier = Modifier) {
                 }
             },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Allocate VLSM subnets") }
+        ) { Text(forgeText("Allocate VLSM subnets")) }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         allocations.forEach { item ->
             Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
@@ -80,7 +81,7 @@ fun VlsmPlannerScreen(modifier: Modifier = Modifier) {
                 }
             }
         }
-        Text("IPv4 VLSM reserves network and broadcast addresses for ordinary subnets. /31 point-to-point links are not allocated by this classroom planner. All calculations stay on-device.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("IPv4 VLSM reserves network and broadcast addresses for ordinary subnets. /31 point-to-point links are not allocated by this classroom planner. All calculations stay on-device."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -111,22 +112,22 @@ fun NetworkIpAllocationScreen(modifier: Modifier = Modifier) {
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Network IP allocation", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Text("PAN, LAN, WLAN and VLAN do not have fixed IP quotas. Estimate each segment from its actual device count, reserved addresses and growth.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Network IP allocation"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(forgeText("PAN, LAN, WLAN and VLAN do not have fixed IP quotas. Estimate each segment from its actual device count, reserved addresses and growth."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             types.forEach { type ->
                 FilterChip(selected = selected == type, onClick = { selected = type }, label = { Text(type) })
             }
         }
         Text(networkTypeDescription(selected), style = MaterialTheme.typography.bodyMedium)
-        OutlinedTextField(devices, { devices = it.filter(Char::isDigit).take(7) }, modifier = Modifier.fillMaxWidth(), label = { Text("Expected client devices") }, singleLine = true)
-        OutlinedTextField(reserve, { reserve = it.filter(Char::isDigit).take(7) }, modifier = Modifier.fillMaxWidth(), label = { Text("Reserved IPs (gateway, printer, AP, etc.)") }, singleLine = true)
-        OutlinedTextField(growth, { growth = it.filter(Char::isDigit).take(3) }, modifier = Modifier.fillMaxWidth(), label = { Text("Growth allowance (%)") }, singleLine = true)
+        OutlinedTextField(devices, { devices = it.filter(Char::isDigit).take(7) }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("Expected client devices")) }, singleLine = true)
+        OutlinedTextField(reserve, { reserve = it.filter(Char::isDigit).take(7) }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("Reserved IPs (gateway, printer, AP, etc.)")) }, singleLine = true)
+        OutlinedTextField(growth, { growth = it.filter(Char::isDigit).take(3) }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("Growth allowance (%)")) }, singleLine = true)
         if (required != null && prefix != null && addressCount != null && usable != null) {
             Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("$selected IPv4 estimate", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Text("/$prefix", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text(forgeText("$selected IPv4 estimate"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("/$prefix"), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     PlannerRow("Capacity target", "$required addresses")
                     PlannerRow("Total block", "$addressCount addresses")
                     PlannerRow("Usable hosts", "$usable")
@@ -135,14 +136,14 @@ fun NetworkIpAllocationScreen(modifier: Modifier = Modifier) {
             }
             Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("IPv6 planning note", fontWeight = FontWeight.SemiBold)
-                    Text("For a typical IPv6 LAN or VLAN segment, /64 is the conventional subnet size and supports SLAAC. Do not size an IPv6 subnet by subtracting network and broadcast addresses; IPv6 has no broadcast address.", style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("IPv6 planning note"), fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("For a typical IPv6 LAN or VLAN segment, /64 is the conventional subnet size and supports SLAAC. Do not size an IPv6 subnet by subtracting network and broadcast addresses; IPv6 has no broadcast address."), style = MaterialTheme.typography.bodyMedium)
                 }
             }
         } else {
-            Text("Enter valid non-negative numbers to calculate an estimate.", color = MaterialTheme.colorScheme.error)
+            Text(forgeText("Enter valid non-negative numbers to calculate an estimate."), color = MaterialTheme.colorScheme.error)
         }
-        Text("Planning estimate only. A PAN may use link-local or non-IP personal-area technologies; a VLAN is a logical Layer 2 segment and typically receives its own Layer 3 subnet when routed. Actual allocation must follow the network design and existing address plan.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Planning estimate only. A PAN may use link-local or non-IP personal-area technologies; a VLAN is a logical Layer 2 segment and typically receives its own Layer 3 subnet when routed. Actual allocation must follow the network design and existing address plan."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

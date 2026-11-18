@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,21 +49,21 @@ fun SimulationEnvironmentLauncher() {
 
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Hybrid Runtime Manager", style = MaterialTheme.typography.titleLarge)
-            Text("Persistent registry and five isolated workspaces. Recovery never auto-starts an environment.",
+            Text(forgeText("Hybrid Runtime Manager"), style = MaterialTheme.typography.titleLarge)
+            Text(forgeText("Persistent registry and five isolated workspaces. Recovery never auto-starts an environment."),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Text("What works on this build", style = MaterialTheme.typography.titleSmall)
-                    Text("PRoot provides Debian, Ubuntu and Alpine ARM64 rootfs instances. XFCE4 can run through the loopback-only TigerVNC server and the in-app noVNC viewer after their packages are installed.", style = MaterialTheme.typography.bodySmall)
-                    Text("PRoot Terminal can store custom HTTPS mirror profiles for 132 country labels. You provide each URL; this build does not include a curated 90-country endpoint directory. Embedded X11, Ubuntu/Linux native desktop, and VMStation engines are not available in this Android build.", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("What works on this build"), style = MaterialTheme.typography.titleSmall)
+                    Text(forgeText("PRoot provides Debian, Ubuntu and Alpine ARM64 rootfs instances. XFCE4 can run through the loopback-only TigerVNC server and the in-app noVNC viewer after their packages are installed."), style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("PRoot Terminal can store custom HTTPS mirror profiles for 132 country labels. You provide each URL; this build does not include a curated 90-country endpoint directory. Embedded X11, Ubuntu/Linux native desktop, and VMStation engines are not available in this Android build."), style = MaterialTheme.typography.bodySmall)
                 }
             }
             snapshot.environments.forEach { environment ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(environment.title, style = MaterialTheme.typography.titleMedium)
-                        Text("Lifecycle: ${environment.lifecycle}", style = MaterialTheme.typography.labelMedium)
+                        Text(forgeText("Lifecycle: ${environment.lifecycle}"), style = MaterialTheme.typography.labelMedium)
                         Text(if (environment.workspaceReady) "Workspace: prepared and verified" else "Workspace: not prepared / not verified", style = MaterialTheme.typography.bodySmall)
                         Text(environment.notes.joinToString(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -79,20 +80,20 @@ fun SimulationEnvironmentLauncher() {
                                 }
                             }, enabled = environment.id != RuntimeEnvironmentId.XFCE_PROOT &&
                                 environment.lifecycle != RuntimeLifecycleState.UNAVAILABLE &&
-                                environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED) { Text("Start") }
+                                environment.lifecycle != RuntimeLifecycleState.RECOVERY_REQUIRED) { Text(forgeText("Start")) }
                         }
                     }
                 }
             }
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("PRoot distro instances", style = MaterialTheme.typography.titleMedium)
-                    Text("Pinned ARM64 rootfs archives for Debian, Ubuntu, and Alpine are installed into each distro's existing private workspace. Runtime availability still depends on the device PRoot probe.",
+                    Text(forgeText("PRoot distro instances"), style = MaterialTheme.typography.titleMedium)
+                    Text(forgeText("Pinned ARM64 rootfs archives for Debian, Ubuntu, and Alpine are installed into each distro's existing private workspace. Runtime availability still depends on the device PRoot probe."),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     snapshot.prootInstances.forEach { instance ->
                         Column(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(instance.distribution.name, style = MaterialTheme.typography.titleSmall)
-                            Text("Lifecycle: ${instance.lifecycle}", style = MaterialTheme.typography.bodySmall)
+                            Text(forgeText("Lifecycle: ${instance.lifecycle}"), style = MaterialTheme.typography.bodySmall)
                             Text(if (instance.workspaceReady) "Workspace prepared" else "Workspace not prepared", style = MaterialTheme.typography.bodySmall)
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 OutlinedButton(onClick = {
@@ -130,7 +131,7 @@ fun SimulationEnvironmentLauncher() {
                                             message = result.message; snapshot = manager.inspect()
                                         }
                                     }
-                                ) { Text("Start") }
+                                ) { Text(forgeText("Start")) }
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 OutlinedButton(
@@ -142,7 +143,7 @@ fun SimulationEnvironmentLauncher() {
                                             managerEvent = manager.lastManagerEvent()
                                         }
                                     }
-                                ) { Text("Stop") }
+                                ) { Text(forgeText("Stop")) }
                                 OutlinedButton(
                                     enabled = instance.lifecycle == RuntimeLifecycleState.RUNNING,
                                     onClick = {
@@ -156,12 +157,12 @@ fun SimulationEnvironmentLauncher() {
                                             snapshot = manager.inspect()
                                         }
                                     }
-                                ) { Text("Diagnostics") }
+                                ) { Text(forgeText("Diagnostics")) }
                             }
                         }
                     }
                     if (commandOutput.isNotBlank()) {
-                        Text("Guest command output", style = MaterialTheme.typography.titleSmall)
+                        Text(forgeText("Guest command output"), style = MaterialTheme.typography.titleSmall)
                         Text(commandOutput, style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -170,19 +171,19 @@ fun SimulationEnvironmentLauncher() {
             snapshot.foundation?.let { foundation ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Runtime capability gate", style = MaterialTheme.typography.titleSmall)
-                        Text("PRoot ptrace: ${foundation.capabilities.prootPtraceProbe.status}", style = MaterialTheme.typography.bodySmall)
-                        Text("KVM API: ${foundation.capabilities.kvmApiProbe.status} • VM creation: ${foundation.capabilities.kvmVmCreationProbe.status}", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("Runtime capability gate"), style = MaterialTheme.typography.titleSmall)
+                        Text(forgeText("PRoot ptrace: ${foundation.capabilities.prootPtraceProbe.status}"), style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("KVM API: ${foundation.capabilities.kvmApiProbe.status} • VM creation: ${foundation.capabilities.kvmVmCreationProbe.status}"), style = MaterialTheme.typography.bodySmall)
                         foundation.capabilities.executionAdapters.forEach { (environment, observation) ->
-                            Text("$environment adapter: ${observation.status}", style = MaterialTheme.typography.bodySmall)
+                            Text(forgeText("$environment adapter: ${observation.status}"), style = MaterialTheme.typography.bodySmall)
                         }
-                        Text("Unknown means not probed; it is not treated as available.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(forgeText("Unknown means not probed; it is not treated as available."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Manager event", style = MaterialTheme.typography.titleSmall)
+                    Text(forgeText("Manager event"), style = MaterialTheme.typography.titleSmall)
                     Text(message, style = MaterialTheme.typography.bodySmall)
                     Text(managerEvent, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -192,7 +193,7 @@ fun SimulationEnvironmentLauncher() {
                     snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
                     message = "Device resources and persistent registry refreshed."
                 }
-            }, modifier = Modifier.fillMaxWidth()) { Text("Refresh manager status") }
+            }, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Refresh manager status")) }
         }
     }
 }
@@ -202,11 +203,11 @@ private fun ResourceSummary(snapshot: HybridRuntimeSnapshot) {
     val resources = snapshot.resources
     Card {
         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Device resource monitor", style = MaterialTheme.typography.titleMedium)
-            Text("Available RAM: ${formatBytes(resources.availableMemoryBytes)} / ${formatBytes(resources.totalMemoryBytes)}")
-            Text("Available storage: ${formatBytes(resources.availableStorageBytes)} / ${formatBytes(resources.totalStorageBytes)}")
-            Text("Available processors: ${resources.availableProcessors}")
-            Text("Device-wide readings; not resources reserved for FORGE-TS.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Device resource monitor"), style = MaterialTheme.typography.titleMedium)
+            Text(forgeText("Available RAM: ${formatBytes(resources.availableMemoryBytes)} / ${formatBytes(resources.totalMemoryBytes)}"))
+            Text(forgeText("Available storage: ${formatBytes(resources.availableStorageBytes)} / ${formatBytes(resources.totalStorageBytes)}"))
+            Text(forgeText("Available processors: ${resources.availableProcessors}"))
+            Text(forgeText("Device-wide readings; not resources reserved for FORGE-TS."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

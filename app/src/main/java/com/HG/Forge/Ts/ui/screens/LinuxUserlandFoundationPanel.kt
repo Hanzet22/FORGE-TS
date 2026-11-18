@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,9 +40,8 @@ fun LinuxUserlandFoundationPanel() {
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Linux Userland • Phase 8 Foundation", style = MaterialTheme.typography.titleMedium)
-            Text(
-                "Prepares private workspace folders for a future XFCE4 environment. This step does not install or launch Linux.",
+            Text(forgeText("Linux Userland • Phase 8 Foundation"), style = MaterialTheme.typography.titleMedium)
+            Text(forgeText("Prepares private workspace folders for a future XFCE4 environment. This step does not install or launch Linux."),
                 style = MaterialTheme.typography.bodySmall
             )
             Button(
@@ -61,20 +61,18 @@ fun LinuxUserlandFoundationPanel() {
             ) {
                 Text(if (preparing) "Preparing…" else "Prepare Linux workspace")
             }
-            error?.let { Text("Preparation error: $it", color = MaterialTheme.colorScheme.error) }
+            error?.let { Text(forgeText("Preparation error: $it"), color = MaterialTheme.colorScheme.error) }
             report?.let { current ->
-                Text("Workspace status: ${current.status}", style = MaterialTheme.typography.titleSmall)
-                Text("Private root: ${current.rootPath}", style = MaterialTheme.typography.bodySmall)
-                Text(
-                    "Directories: rootfs=${current.rootfsDirectoryReady}, home=${current.homeDirectoryReady}, tmp=${current.temporaryDirectoryReady}, logs=${current.logDirectoryReady}",
+                Text(forgeText("Workspace status: ${current.status}"), style = MaterialTheme.typography.titleSmall)
+                Text(forgeText("Private root: ${current.rootPath}"), style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("Directories: rootfs=${current.rootfsDirectoryReady}, home=${current.homeDirectoryReady}, tmp=${current.temporaryDirectoryReady}, logs=${current.logDirectoryReady}"),
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(
-                    "Available app storage: ${current.availableStorageBytes / 1_073_741_824} GiB",
+                Text(forgeText("Available app storage: ${current.availableStorageBytes / 1_073_741_824} GiB"),
                     style = MaterialTheme.typography.bodySmall
                 )
                 current.notes.forEach { note ->
-                    Text("• $note", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("• $note"), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

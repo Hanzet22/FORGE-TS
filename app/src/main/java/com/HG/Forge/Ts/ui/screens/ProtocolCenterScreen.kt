@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -133,10 +134,10 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
         val deep = protocolDeepDocs[current.name]
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(onClick = { selectedProtocol = null }) {
-                Text("← Back to Protocol Center")
+                Text(forgeText("← Back to Protocol Center"))
             }
             Text(current.name, style = MaterialTheme.typography.headlineSmall)
-            Text("${current.category} · ${current.layer}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("${current.category} · ${current.layer}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(current.overview, style = MaterialTheme.typography.bodyLarge)
             ProtocolDetail("1. Penjelasan", current.overview)
             ProtocolDetail("2. Detail teknis", current.technical)
@@ -148,9 +149,8 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
             ProtocolDetail("8. Standar / Draft / Registry", current.standard)
             ProtocolDetail("9. Cocok / tidak cocok digunakan", current.fit)
             ProtocolDetail("10. Environment yang sesuai", current.environment)
-            Text("Full technical documentation", style = MaterialTheme.typography.titleLarge)
-            Text(
-                "The following chapters are protocol-specific. Shared concepts are explained only where they apply; implementation details can differ by version and vendor.",
+            Text(forgeText("Full technical documentation"), style = MaterialTheme.typography.titleLarge)
+            Text(forgeText("The following chapters are protocol-specific. Shared concepts are explained only where they apply; implementation details can differ by version and vendor."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -171,24 +171,23 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
                 "An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols"
             )
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                Text(
-                    "Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan.",
+                Text(forgeText("Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan."),
                     Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             OutlinedButton(onClick = { selectedProtocol = null }, modifier = Modifier.fillMaxWidth()) {
-                Text("Kembali ke daftar protokol")
+                Text(forgeText("Kembali ke daftar protokol"))
             }
         }
     } else {
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Protocol Center", style = MaterialTheme.typography.headlineSmall)
-            Text("${protocolProfiles.size} protocol and protocol-family references · offline learning guide", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Protocol Center"), style = MaterialTheme.typography.headlineSmall)
+            Text(forgeText("${protocolProfiles.size} protocol and protocol-family references · offline learning guide"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             OutlinedTextField(
                 value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
-                label = { Text("Search protocol") }, placeholder = { Text("e.g. BGP, DNS, VLAN, MQTT") }, singleLine = true
+                label = { Text(forgeText("Search protocol")) }, placeholder = { Text(forgeText("e.g. BGP, DNS, VLAN, MQTT")) }, singleLine = true
             )
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -198,7 +197,7 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
                     FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
                 }
             }
-            Text("${visible.size} result(s)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("${visible.size} result(s)"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             visible.forEach { item ->
                 Card(onClick = { selectedProtocol = item }, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -206,12 +205,12 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
                         Text(item.name, style = MaterialTheme.typography.titleMedium)
                         Text(item.layer, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(item.overview, style = MaterialTheme.typography.bodyMedium)
-                        Text("Tap to open dedicated protocol page →", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        Text(forgeText("Tap to open dedicated protocol page →"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
-            if (visible.isEmpty()) Text("No matching protocol found.", style = MaterialTheme.typography.bodyMedium)
-            Text("Standards note: an RFC is not automatically an Internet Standard. Entries identify the relevant RFC, IEEE/ISO/ITU-T standard, project specification or implementation documentation where applicable. Internet-Drafts may expire or change; verify status before production use.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (visible.isEmpty()) Text(forgeText("No matching protocol found."), style = MaterialTheme.typography.bodyMedium)
+            Text(forgeText("Standards note: an RFC is not automatically an Internet Standard. Entries identify the relevant RFC, IEEE/ISO/ITU-T standard, project specification or implementation documentation where applicable. Internet-Drafts may expire or change; verify status before production use."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

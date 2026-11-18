@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -43,8 +44,8 @@ fun CoreNetworkingScreen(modifier: Modifier = Modifier, viewModel: CoreNetworkin
     var selectedTool by remember { mutableIntStateOf(0) }
     Column(modifier.fillMaxSize()) {
         Column(Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-            Text("Core Networking", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text("Practical network utilities for everyday diagnostics.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Core Networking"), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(forgeText("Practical network utilities for everyday diagnostics."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         ScrollableTabRow(selectedTabIndex = selectedTool) {
             listOf("CIDR", "VLSM", "IP Plan", "My IP", "Host").forEachIndexed { index, label ->
@@ -67,8 +68,8 @@ private fun CidrTool(viewModel: CoreNetworkingViewModel) {
     var binary by remember { mutableStateOf<String?>(null) }
     var binaryError by remember { mutableStateOf<String?>(null) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("IPv4 & IPv6 subnet calculator", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        OutlinedTextField(value = input, onValueChange = { input = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Address / prefix") }, placeholder = { Text("2001:db8::1/64") }, singleLine = true)
+        Text(forgeText("IPv4 & IPv6 subnet calculator"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        OutlinedTextField(value = input, onValueChange = { input = it }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("Address / prefix")) }, placeholder = { Text(forgeText("2001:db8::1/64")) }, singleLine = true)
         Button(onClick = {
             viewModel.calculateCidr(input)
             try {
@@ -78,7 +79,7 @@ private fun CidrTool(viewModel: CoreNetworkingViewModel) {
                 binary = null
                 binaryError = error.message ?: "Invalid address"
             }
-        }, modifier = Modifier.fillMaxWidth()) { Text("Calculate network") }
+        }, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Calculate network")) }
         viewModel.cidrError?.let { ErrorText(it) }
         binaryError?.let { ErrorText(it) }
         viewModel.cidrResult?.let { result ->
@@ -95,13 +96,13 @@ private fun CidrTool(viewModel: CoreNetworkingViewModel) {
                 result.usableHostCount?.let { ResultRow("Usable host count", it) }
                 ResultRow("Total addresses", result.addressCount)
                 if (result.addressFamily == "IPv6") {
-                    Text("IPv6 has no broadcast address. Usable host counts are not calculated using IPv4 network/broadcast subtraction.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(forgeText("IPv6 has no broadcast address. Usable host counts are not calculated using IPv4 network/broadcast subtraction."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 binary?.let { ResultRow("Binary address", it) }
             }
         }
-        Text("IPv4 /31 is treated as a two-address point-to-point subnet (RFC 3021); /32 is one host route. IPv6 does not use broadcast addressing.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text("Calculations and binary conversion run locally on this device. No address is uploaded.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("IPv4 /31 is treated as a two-address point-to-point subnet (RFC 3021); /32 is one host route. IPv6 does not use broadcast addressing."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Calculations and binary conversion run locally on this device. No address is uploaded."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -110,29 +111,29 @@ private fun PublicIpTool(viewModel: CoreNetworkingViewModel) {
     val context = LocalContext.current.applicationContext
     val clipboard = LocalClipboardManager.current
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Public IP address", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        Text("Fetches the public address visible to an external service. This is not your device's private LAN address.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Public IP address"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(forgeText("Fetches the public address visible to an external service. This is not your device's private LAN address."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         Button(onClick = { viewModel.loadPublicIp(context) }, enabled = !viewModel.isLoadingIp, modifier = Modifier.fillMaxWidth()) {
-            if (viewModel.isLoadingIp) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Check public IP")
+            if (viewModel.isLoadingIp) CircularProgressIndicator(strokeWidth = 2.dp) else Text(forgeText("Check public IP"))
         }
         viewModel.publicIpError?.let { ErrorText(it) }
         viewModel.publicIp?.let { result ->
             ResultCard {
-                Text("Connection overview", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(forgeText("Connection overview"), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 result.ipv4?.let { address ->
                     ResultRow("Public IPv4", address)
-                    TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(address)) }) { Text("Copy IPv4") }
+                    TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(address)) }) { Text(forgeText("Copy IPv4")) }
                 } ?: ResultRow("Public IPv4", "Unavailable on this network")
                 result.ipv6?.let { address ->
                     ResultRow("Public IPv6", address)
-                    TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(address)) }) { Text("Copy IPv6") }
+                    TextButton(onClick = { clipboard.setText(androidx.compose.ui.text.AnnotatedString(address)) }) { Text(forgeText("Copy IPv6")) }
                 } ?: ResultRow("Public IPv6", "Unavailable on this network")
                 ResultRow("Address families", result.addresses.joinToString { if (it.contains(':')) "IPv6" else "IPv4" })
                 ResultRow("Lookup service", result.sources)
-                Text("The result reflects the address visible to each external service. VPNs, proxies, carrier NAT and network routing can change it; it does not identify a precise physical location or your LAN address.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(forgeText("The result reflects the address visible to each external service. VPNs, proxies, carrier NAT and network routing can change it; it does not identify a precise physical location or your LAN address."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Text("The request sends your connection address to ipify over HTTPS. IPv4 and IPv6 are checked independently, so one family can still be shown when the other is unavailable. FORGE-TS does not store location history.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("The request sends your connection address to ipify over HTTPS. IPv4 and IPv6 are checked independently, so one family can still be shown when the other is unavailable. FORGE-TS does not store location history."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -143,15 +144,15 @@ private fun HostTool(viewModel: CoreNetworkingViewModel) {
     var port by remember { mutableStateOf("443") }
     var checkTls by remember { mutableStateOf(true) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Authorized host check", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        OutlinedTextField(value = host, onValueChange = { host = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Hostname or IP address") }, singleLine = true)
-        OutlinedTextField(value = port, onValueChange = { port = it.filter(Char::isDigit).take(5) }, modifier = Modifier.fillMaxWidth(), label = { Text("TCP port") }, singleLine = true)
+        Text(forgeText("Authorized host check"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        OutlinedTextField(value = host, onValueChange = { host = it }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("Hostname or IP address")) }, singleLine = true)
+        OutlinedTextField(value = port, onValueChange = { port = it.filter(Char::isDigit).take(5) }, modifier = Modifier.fillMaxWidth(), label = { Text(forgeText("TCP port")) }, singleLine = true)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = checkTls, onCheckedChange = { checkTls = it })
-            Text("Verify TLS certificate and hostname")
+            Text(forgeText("Verify TLS certificate and hostname"))
         }
         Button(onClick = { viewModel.checkHost(context, host, port, checkTls) }, enabled = !viewModel.isCheckingHost, modifier = Modifier.fillMaxWidth()) {
-            if (viewModel.isCheckingHost) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Check host")
+            if (viewModel.isCheckingHost) CircularProgressIndicator(strokeWidth = 2.dp) else Text(forgeText("Check host"))
         }
         viewModel.hostError?.let { ErrorText(it) }
         viewModel.hostResult?.let { result ->
@@ -163,7 +164,7 @@ private fun HostTool(viewModel: CoreNetworkingViewModel) {
                 Text(result.details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Text("Only check systems you own or have permission to inspect. This tool performs one DNS lookup and one TCP/TLS check; it does not scan ports or exploit services.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Only check systems you own or have permission to inspect. This tool performs one DNS lookup and one TCP/TLS check; it does not scan ports or exploit services."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

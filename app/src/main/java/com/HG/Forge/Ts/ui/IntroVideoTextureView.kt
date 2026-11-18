@@ -5,6 +5,8 @@ import android.graphics.Matrix
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.os.SystemClock
+import android.os.Handler
+import android.os.Looper
 import android.view.Surface
 import android.view.TextureView
 import androidx.annotation.RawRes
@@ -31,6 +33,9 @@ internal class IntroVideoTextureView(
     private var firstFrameLogged = false
     private var playbackTraceId: String? = null
     private var playbackStartedAtMs: Long? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var prepareTimeout: Runnable? = null
+    private var firstFrameTimeout: Runnable? = null
     private var lastLayoutWidth = 0
     private var lastLayoutHeight = 0
 
@@ -64,6 +69,10 @@ internal class IntroVideoTextureView(
 
         val player = MediaPlayer()
         mediaPlayer = player
+        prepareTimeout = Runnable {
+            ForgeDiagnostics.log(context, "WARNING", "IntroVideo", "intro.prepare.timeout", traceId = traceId)
+            finishOnce("prepare_timeout")
+        }.also { mainHandler.postDelayed(it, PREPARE_TIMEOUT_MS) }
 
         try {
             resources.openRawResourceFd(videoResource).use { descriptor ->
@@ -80,6 +89,8 @@ internal class IntroVideoTextureView(
                 applyCenterCrop()
             }
             player.setOnPreparedListener {
+                prepareTimeout?.let(mainHandler::removeCallbacks)
+                prepareTimeout = null
                 ForgeDiagnostics.log(
                     context, "INFO", "IntroVideo", "intro.player.prepared", traceId = traceId
                 )
@@ -88,6 +99,12 @@ internal class IntroVideoTextureView(
                     it.isLooping = false
                     it.start()
                     playbackStartedAtMs = SystemClock.elapsedRealtime()
+                    firstFrameTimeout = Runnable {
+                        if (!firstFrameLogged && !finished) {
+                            ForgeDiagnostics.log(context, "WARNING", "IntroVideo", "intro.first_frame.timeout", traceId = traceId)
+                            finishOnce("first_frame_timeout")
+                        }
+                    }.also { mainHandler.postDelayed(it, FIRST_FRAME_TIMEOUT_MS) }
                     ForgeDiagnostics.log(
                         context, "INFO", "IntroVideo", "intro.playback.started", traceId = traceId
                     )
@@ -184,6 +201,8 @@ internal class IntroVideoTextureView(
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
         if (!firstFrameLogged && playbackStartedAtMs != null && !terminalEventLogged) {
             firstFrameLogged = true
+            firstFrameTimeout?.let(mainHandler::removeCallbacks)
+            firstFrameTimeout = null
             ForgeDiagnostics.log(
                 context, "INFO", "IntroVideo", "intro.playback.first_frame",
                 traceId = playbackTraceId
@@ -221,6 +240,10 @@ internal class IntroVideoTextureView(
     }
 
     private fun releasePlayer(reason: String) {
+        prepareTimeout?.let(mainHandler::removeCallbacks)
+        prepareTimeout = null
+        firstFrameTimeout?.let(mainHandler::removeCallbacks)
+        firstFrameTimeout = null
         val player = mediaPlayer ?: return
         mediaPlayer = null
 
@@ -247,7 +270,7 @@ internal class IntroVideoTextureView(
         }
 
         ForgeDiagnostics.log(
-            context, "DEBUG", "IntroVideo", "intro.player.released_\${reason}",
+            context, "DEBUG", "IntroVideo", "intro.player.released_${reason}",
             traceId = playbackTraceId
         )
         runCatching { player.stop() }
@@ -264,5 +287,7 @@ internal class IntroVideoTextureView(
 
     private companion object {
         const val MAX_PLAYBACK_DURATION_MS = 600_000L
+        const val PREPARE_TIMEOUT_MS = 12_000L
+        const val FIRST_FRAME_TIMEOUT_MS = 8_000L
     }
 }

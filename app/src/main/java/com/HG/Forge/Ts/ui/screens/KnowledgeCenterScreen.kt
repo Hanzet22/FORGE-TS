@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -72,6 +73,30 @@ private val guidedCourses = listOf(
     GuidedCourse(
         "linux-proot-workstation", "Linux Userland & PRoot", "Understand root filesystems, package networking and the app's local desktop path.",
         listOf("proot-mental-model", "proot-rootfs", "linux-dns-config", "os-dns", "proot-desktop-vnc")
+    ),
+    GuidedCourse(
+        "dns-operations", "DNS Operations", "Resolve names, inspect records and troubleshoot resolver paths.",
+        listOf("dns-fundamentals", "os-dns", "proto-dhcp", "proto-nat", "proto-cgnat")
+    ),
+    GuidedCourse(
+        "ipv6-subnet-planning", "IPv6 & Subnet Planning", "Plan IPv4 and IPv6 prefixes, address ranges and network segments.",
+        listOf("ip-binary", "ip-v4", "ip-v6", "ip-cidr", "ip-vlsm", "net-ipplan")
+    ),
+    GuidedCourse(
+        "web-protocols-tls", "Web Protocols & TLS", "Understand HTTP, modern transports, certificates and secure web connections.",
+        listOf("http-basics", "tls-basics", "tls-certificates", "dns-fundamentals", "proto-quic")
+    ),
+    GuidedCourse(
+        "linux-network-troubleshooting", "Linux Network Troubleshooting", "Diagnose interfaces, routes, name resolution and the local PRoot desktop.",
+        listOf("os-ipaddr", "os-route", "os-dns", "os-ping", "os-trace", "linux-dns-config", "proot-desktop-vnc")
+    ),
+    GuidedCourse(
+        "transport-tunneling", "Transport & Tunneling", "Compare TCP and UDP, then learn how common encrypted tunnels work.",
+        listOf("proto-tcp", "proto-udp", "proto-wireguard", "proto-openvpn", "proto-ipsec", "proto-hysteria")
+    ),
+    GuidedCourse(
+        "osint-verification", "Practical OSINT Verification", "Evaluate public sources, document evidence and keep investigations in scope.",
+        listOf("osint-scope", "osint-passive-workflow", "osint-source-evaluation", "osint-evidence")
     )
 )
 
@@ -329,7 +354,7 @@ private fun LessonSection(title: String, lines: List<String>) {
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
         lines.forEach { line ->
-            Text("• " + line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("• " + line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -361,70 +386,70 @@ private fun SimulationPanel(entryId: String) {
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(9.dp)
         ) {
-            Text("LOCAL LEARNING LAB", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-            Text("SIMULATED · No packets sent · No network inspected", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Text(forgeText("LOCAL LEARNING LAB"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text(forgeText("SIMULATED · No packets sent · No network inspected"), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
             when (entryId) {
                 "os-dns", "dns-fundamentals" -> {
-                    Text("DNS resolution walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("DNS resolution walkthrough"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Text(dnsStages[stage], style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { stage = 0 }) { Text("Reset") }
-                        Button(onClick = { stage = (stage + 1) % dnsStages.size }) { Text("Next step") }
+                        Button(onClick = { stage = 0 }) { Text(forgeText("Reset")) }
+                        Button(onClick = { stage = (stage + 1) % dnsStages.size }) { Text(forgeText("Next step")) }
                     }
-                    Text("Fixture: portal.example.com → 192.0.2.25", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Fixture: portal.example.com → 192.0.2.25"), style = MaterialTheme.typography.bodySmall)
                 }
                 "ip-cidr", "ip-vlsm" -> {
                     val p = prefix.toInt()
                     val total = 1 shl (32 - p)
-                    Text("IPv4 prefix calculator", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                    Text("Example network: 192.0.2.0/" + p, style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("IPv4 prefix calculator"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("Example network: 192.0.2.0/" + p, style = MaterialTheme.typography.bodyMedium)
                     Slider(value = prefix, onValueChange = { prefix = it }, valueRange = 24f..30f, steps = 5)
-                    Text("Prefix /" + p + " · " + total + " total addresses · " + (total - 2) + " conventional usable host addresses", style = MaterialTheme.typography.bodyMedium)
-                    Text("Educational fixture only. /31 and /32 have different use cases and are not included in this simple host-count exercise.", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Prefix /" + p + " · " + total + " total addresses · " + (total - 2) + " conventional usable host addresses", style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("Educational fixture only. /31 and /32 have different use cases and are not included in this simple host-count exercise."), style = MaterialTheme.typography.bodySmall)
                 }
                 "http-basics" -> {
                     val stages = listOf("1 · Client prepares GET /status for example.com.", "2 · Request fields describe the method, target and host.", "3 · Fictional server returns status 200 OK.", "4 · Client interprets the response body and status.")
-                    Text("HTTP request/response walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("HTTP request/response walkthrough"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Text(stages[httpStage], style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { httpStage = 0 }) { Text("Reset") }
-                        Button(onClick = { httpStage = (httpStage + 1) % stages.size }) { Text("Next step") }
+                        Button(onClick = { httpStage = 0 }) { Text(forgeText("Reset")) }
+                        Button(onClick = { httpStage = (httpStage + 1) % stages.size }) { Text(forgeText("Next step")) }
                     }
-                    Text("Fixture only: no HTTP request is sent.", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Fixture only: no HTTP request is sent."), style = MaterialTheme.typography.bodySmall)
                 }
                 "proto-dhcp" -> {
                     val stages = listOf("DISCOVER · fictional client asks for configuration.", "OFFER · fictional server proposes 192.0.2.40/24.", "REQUEST · client indicates the offered configuration.", "ACKNOWLEDGE · server confirms the example lease.")
-                    Text("DHCPv4 DORA walkthrough", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("DHCPv4 DORA walkthrough"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Text(stages[dhcpStage], style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { dhcpStage = 0 }) { Text("Reset") }
-                        Button(onClick = { dhcpStage = (dhcpStage + 1) % stages.size }) { Text("Next step") }
+                        Button(onClick = { dhcpStage = 0 }) { Text(forgeText("Reset")) }
+                        Button(onClick = { dhcpStage = (dhcpStage + 1) % stages.size }) { Text(forgeText("Next step")) }
                     }
                 }
                 "proto-tcp", "proto-udp" -> {
-                    Text("Transport behavior comparison", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("Transport behavior comparison"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { transport = "TCP" }) { Text("TCP") }
-                        Button(onClick = { transport = "UDP" }) { Text("UDP") }
+                        Button(onClick = { transport = "TCP" }) { Text(forgeText("TCP")) }
+                        Button(onClick = { transport = "UDP" }) { Text(forgeText("UDP")) }
                     }
                     if (transport == "TCP") {
-                        Text("SYN → SYN-ACK → ACK → application bytes → acknowledgements/retransmission as needed.", style = MaterialTheme.typography.bodyMedium)
-                        Text("TCP provides an ordered reliable byte stream.", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("SYN → SYN-ACK → ACK → application bytes → acknowledgements/retransmission as needed."), style = MaterialTheme.typography.bodyMedium)
+                        Text(forgeText("TCP provides an ordered reliable byte stream."), style = MaterialTheme.typography.bodySmall)
                     } else {
-                        Text("Datagram A → Datagram B → Datagram C. A missing datagram is not retransmitted by UDP itself.", style = MaterialTheme.typography.bodyMedium)
-                        Text("UDP provides datagrams without delivery or ordering guarantees.", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("Datagram A → Datagram B → Datagram C. A missing datagram is not retransmitted by UDP itself."), style = MaterialTheme.typography.bodyMedium)
+                        Text(forgeText("UDP provides datagrams without delivery or ordering guarantees."), style = MaterialTheme.typography.bodySmall)
                     }
                 }
                 "mt-route" -> {
-                    Text("Longest-prefix route selection", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Text(forgeText("Longest-prefix route selection"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { destination = "192.0.2.77" }) { Text("Host A") }
-                        Button(onClick = { destination = "198.51.100.9" }) { Text("Host B") }
+                        Button(onClick = { destination = "192.0.2.77" }) { Text(forgeText("Host A")) }
+                        Button(onClick = { destination = "198.51.100.9" }) { Text(forgeText("Host B")) }
                     }
-                    Text("Destination: " + destination, style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("Destination: " + destination, style = MaterialTheme.typography.bodyMedium)
                     val route = if (destination == "192.0.2.77") "192.0.2.0/24 → Lab gateway (most specific match)" else "198.51.100.0/24 → Office gateway (most specific match)"
-                    Text("Selected route: " + route, style = MaterialTheme.typography.bodyMedium)
-                    Text("The simulator uses fixed documentation-only routes.", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Selected route: " + route, style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("The simulator uses fixed documentation-only routes."), style = MaterialTheme.typography.bodySmall)
                 }
             }
             val question = when (entryId) {
@@ -455,7 +480,7 @@ private fun SimulationPanel(entryId: String) {
                 else -> ""
             }
             if (question.isNotBlank()) {
-                Text("QUICK CHECK", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(forgeText("QUICK CHECK"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 Text(question, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                 options.forEach { option ->
                     Button(onClick = { selectedAnswer = option }, enabled = selectedAnswer == null, modifier = Modifier.fillMaxWidth()) {
@@ -468,7 +493,7 @@ private fun SimulationPanel(entryId: String) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Button(onClick = { selectedAnswer = null }) { Text("Try again") }
+                    Button(onClick = { selectedAnswer = null }) { Text(forgeText("Try again")) }
                 }
             }
         }
@@ -504,18 +529,15 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(
-                    "KNOWLEDGE CENTER",
+                Text(forgeText("KNOWLEDGE CENTER"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    "Learn. Inspect. Understand.",
+                Text(forgeText("Learn. Inspect. Understand."),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    "Offline references for IP addressing, network design, transport, VPN and proxy protocols.",
+                Text(forgeText("Offline references for IP addressing, network design, transport, VPN and proxy protocols."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -526,18 +548,18 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                 value = query,
                 onValueChange = { query = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Search lessons and commands") },
+                label = { Text(forgeText("Search lessons and commands")) },
                 singleLine = true
             )
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("GUIDED COURSES", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(forgeText("GUIDED COURSES"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 Text(
                     selectedCourse?.let { course ->
                         val completed = course.lessonIds.count { it in completedLessonIds }
-                        "${course.title} · $completed of ${course.lessonIds.size} lessons completed"
-                    } ?: "Choose a learning path or browse all lessons.",
+                        "${forgeText(course.title)} · $completed/${course.lessonIds.size} ${forgeText("lessons completed")}"
+                    } ?: forgeText("Choose a learning path or browse all lessons."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -548,19 +570,19 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                     FilterChip(
                         selected = selectedCourse == null,
                         onClick = { selectedCourseId = null },
-                        label = { Text("All lessons") }
+                        label = { Text(forgeText("All lessons")) }
                     )
                     guidedCourses.forEach { course ->
                         val completed = course.lessonIds.count { it in completedLessonIds }
                         FilterChip(
                             selected = selectedCourseId == course.id,
                             onClick = { selectedCourseId = course.id; selectedSection = "All"; expandedId = null },
-                            label = { Text("${course.title} · $completed/${course.lessonIds.size}") }
+                            label = { Text(forgeText("${forgeText(course.title)} · $completed/${course.lessonIds.size}")) }
                         )
                     }
                 }
                 selectedCourse?.let { course ->
-                    Text(course.summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(forgeText(course.summary), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -579,8 +601,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
             }
         }
         item {
-            Text(
-                "${filtered.size} REFERENCES",
+            Text(forgeText("${filtered.size} REFERENCES"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -640,14 +661,12 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                         }
                         LessonSection("8 · BUGS & TROUBLESHOOTING", guidance.troubleshooting)
                         LessonSection("STANDARDS & FURTHER READING", guidance.standards)
-                        Text(
-                            "Reference examples are read-only. The learning lab uses synthetic local data only; no commands or network requests are executed.",
+                        Text(forgeText("Reference examples are read-only. The learning lab uses synthetic local data only; no commands or network requests are executed."),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
-                        Text(
-                            "Tap to read",
+                        Text(forgeText("Tap to read"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -657,8 +676,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
         }
         if (filtered.isEmpty()) {
             item {
-                Text(
-                    "No matching references. Try another keyword or category.",
+                Text(forgeText("No matching references. Try another keyword or category."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

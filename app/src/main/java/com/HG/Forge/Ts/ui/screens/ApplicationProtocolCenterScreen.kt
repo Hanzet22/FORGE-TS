@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -201,7 +202,7 @@ fun ApplicationProtocolCenterScreen(modifier: Modifier = Modifier) {
     val current = selectedProfile
     if (current != null) {
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { selectedProfile = null }) { Text("← Back to Application Protocols") }
+            OutlinedButton(onClick = { selectedProfile = null }) { Text(forgeText("← Back to Application Protocols")) }
             Text(current.name, style = MaterialTheme.typography.headlineSmall)
             Text(current.category + " · " + current.layer, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             AssistChip(onClick = {}, label = { Text(current.classification) })
@@ -217,17 +218,17 @@ fun ApplicationProtocolCenterScreen(modifier: Modifier = Modifier) {
             ApplicationProtocolSection("9. Limitations & operational hurdles", current.limitations)
             ApplicationProtocolSection("10. Primary specifications & references", current.references)
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                Text("Classification matters: HTTP and WebSocket are protocols; HTTPS is HTTP protected by TLS; REST is an architectural style; GraphQL is a query language and execution specification; Protocol Buffers is a serialization format. They are related, but they are not interchangeable protocol layers.",
+                Text(forgeText("Classification matters: HTTP and WebSocket are protocols; HTTPS is HTTP protected by TLS; REST is an architectural style; GraphQL is a query language and execution specification; Protocol Buffers is a serialization format. They are related, but they are not interchangeable protocol layers."),
                     Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     } else {
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Application Protocol Center", style = MaterialTheme.typography.headlineSmall)
-            Text("A dedicated reference for web transfer, real-time web, API architecture, RPC, enterprise messaging and serialization. Select an entry for its technical chapter.",
+            Text(forgeText("Application Protocol Center"), style = MaterialTheme.typography.headlineSmall)
+            Text(forgeText("A dedicated reference for web transfer, real-time web, API architecture, RPC, enterprise messaging and serialization. Select an entry for its technical chapter."),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
-                label = { Text("Search application protocols") }, placeholder = { Text("HTTP/3, GraphQL, WebSocket…") }, singleLine = true)
+                label = { Text(forgeText("Search application protocols")) }, placeholder = { Text(forgeText("HTTP/3, GraphQL, WebSocket…")) }, singleLine = true)
             Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 categories.forEach { category ->
                     FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
@@ -244,7 +245,7 @@ fun ApplicationProtocolCenterScreen(modifier: Modifier = Modifier) {
                     }
                 }
             }
-            Text("Educational reference only. This tab does not send API requests, open WebSocket sessions, execute RPC calls or configure external services.",
+            Text(forgeText("Educational reference only. This tab does not send API requests, open WebSocket sessions, execute RPC calls or configure external services."),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

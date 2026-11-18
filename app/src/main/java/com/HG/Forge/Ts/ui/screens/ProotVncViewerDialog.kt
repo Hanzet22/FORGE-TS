@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import android.graphics.Bitmap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -67,13 +68,13 @@ fun ProotVncViewerDialog(onDismiss: () -> Unit) {
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Column(Modifier.weight(1f)) {
-                        Text("XFCE desktop", style = MaterialTheme.typography.titleMedium)
-                        Text("Built-in VNC · enter the temporary password if prompted", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("XFCE desktop"), style = MaterialTheme.typography.titleMedium)
+                        Text(forgeText("Built-in VNC · enter the temporary password if prompted"), style = MaterialTheme.typography.bodySmall)
                     }
-                    TextButton(onClick = onDismiss) { Text("Close") }
+                    TextButton(onClick = onDismiss) { Text(forgeText("Close")) }
                 }
                 if (pageError.value) {
-                    Text("The built-in viewer could not reach the local noVNC service. Stop and restart the desktop, then try again.", modifier = Modifier.padding(16.dp))
+                    Text(forgeText("The built-in viewer could not reach the local noVNC service. Stop and restart the desktop, then try again."), modifier = Modifier.padding(16.dp))
                 } else {
                     AndroidView(factory = { viewer }, modifier = Modifier.weight(1f).fillMaxWidth())
                 }

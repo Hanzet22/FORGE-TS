@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,9 +38,8 @@ fun RouterOsImageImportPanel() {
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text("MikroTik RouterOS CHR", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(
-                "Version catalog • CHR runtime and image integration are not released yet.",
+            Text(forgeText("MikroTik RouterOS CHR"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(forgeText("Version catalog • CHR runtime and image integration are not released yet."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -56,16 +56,15 @@ fun RouterOsImageImportPanel() {
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(3.dp)
                         ) {
-                            Text("RouterOS ${entry.version}", fontWeight = FontWeight.SemiBold)
-                            Text("${entry.channel} • ${entry.releaseDate}", style = MaterialTheme.typography.labelSmall)
+                            Text(forgeText("RouterOS ${entry.version}"), fontWeight = FontWeight.SemiBold)
+                            Text(forgeText("${entry.channel} • ${entry.releaseDate}"), style = MaterialTheme.typography.labelSmall)
                             Text(entry.description, style = MaterialTheme.typography.bodySmall)
                         }
-                        AssistChip(onClick = {}, enabled = false, label = { Text("Coming Soon") })
+                        AssistChip(onClick = {}, enabled = false, label = { Text(forgeText("Coming Soon")) })
                     }
                 }
             }
-            Text(
-                "Version references follow MikroTik's published changelog. Every entry is informational only; download, import, installation and runtime controls are not available.",
+            Text(forgeText("Version references follow MikroTik's published changelog. Every entry is informational only; download, import, installation and runtime controls are not available."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

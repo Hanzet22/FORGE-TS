@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,9 +38,8 @@ fun RepositoryExplorerScreen(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Repository Explorer", style = MaterialTheme.typography.headlineMedium)
-        Text(
-            "Search public GitHub repositories and inspect basic metadata.",
+        Text(forgeText("Repository Explorer"), style = MaterialTheme.typography.headlineMedium)
+        Text(forgeText("Search public GitHub repositories and inspect basic metadata."),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -47,20 +47,20 @@ fun RepositoryExplorerScreen(
             value = query,
             onValueChange = { query = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Repository search") },
-            placeholder = { Text("Kotlin Android networking") },
+            label = { Text(forgeText("Repository search")) },
+            placeholder = { Text(forgeText("Kotlin Android networking")) },
             singleLine = true
         )
         Button(
             onClick = { viewModel.search(query) },
             enabled = query.trim().length >= 2 && !viewModel.isLoading,
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Search GitHub") }
+        ) { Text(forgeText("Search GitHub")) }
 
         if (viewModel.isLoading) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CircularProgressIndicator()
-                Text("Searching public repositories…")
+                Text(forgeText("Searching public repositories…"))
             }
         }
         viewModel.error?.let {
@@ -69,8 +69,7 @@ fun RepositoryExplorerScreen(
             }
         }
         viewModel.result?.let { result ->
-            Text(
-                "${result.totalCount} matching public repositories (showing ${result.repositories.size})",
+            Text(forgeText("${result.totalCount} matching public repositories (showing ${result.repositories.size})"),
                 style = MaterialTheme.typography.titleSmall
             )
             result.repositories.forEach { repository ->
@@ -83,21 +82,19 @@ fun RepositoryExplorerScreen(
                         if (repository.description.isNotBlank()) {
                             Text(repository.description, style = MaterialTheme.typography.bodyMedium)
                         }
-                        Text(
-                            "★ ${repository.stars}  ·  ${repository.language.ifBlank { "Language not specified" }}",
+                        Text(forgeText("★ ${repository.stars}  ·  ${repository.language.ifBlank { "Language not specified" }}",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        Text("License: ${repository.license}", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("License: ${repository.license}"), style = MaterialTheme.typography.bodySmall)
                         OutlinedButton(onClick = { uriHandler.openUri(repository.htmlUrl) }) {
-                            Text("Open on GitHub")
+                            Text(forgeText("Open on GitHub"))
                         }
                     }
                 }
             }
         }
-        Text(
-            "Read-only access. Search terms are sent to GitHub. FORGE-TS does not request a GitHub token, access private repositories or modify repository data. GitHub applies unauthenticated API rate limits.",
+        Text(forgeText("Read-only access. Search terms are sent to GitHub. FORGE-TS does not request a GitHub token, access private repositories or modify repository data. GitHub applies unauthenticated API rate limits."),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

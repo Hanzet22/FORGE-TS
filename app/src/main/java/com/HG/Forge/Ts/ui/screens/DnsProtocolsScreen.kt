@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -63,37 +64,37 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
     LaunchedEffect(defaultType) { if (dnsTypes.contains(defaultType)) selectedType = defaultType }
 
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("DNS & Protocols", style = MaterialTheme.typography.headlineMedium)
-        Text("Live DNS record inspection and practical protocol guidance.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("DNS & Protocols"), style = MaterialTheme.typography.headlineMedium)
+        Text(forgeText("Live DNS record inspection and practical protocol guidance."), color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FilterChip(section == 0, { section = 0 }, label = { Text("DNS Lookup") })
-            FilterChip(section == 1, { section = 1 }, label = { Text("Protocol Library") })
-            FilterChip(section == 2, { section = 2 }, label = { Text("Protocol Center") })
-            FilterChip(section == 3, { section = 3 }, label = { Text("Application Protocols") })
+            FilterChip(section == 0, { section = 0 }, label = { Text(forgeText("DNS Lookup")) })
+            FilterChip(section == 1, { section = 1 }, label = { Text(forgeText("Protocol Library")) })
+            FilterChip(section == 2, { section = 2 }, label = { Text(forgeText("Protocol Center")) })
+            FilterChip(section == 3, { section = 3 }, label = { Text(forgeText("Application Protocols")) })
         }
         if (section == 0) {
-            OutlinedTextField(domain, { domain = it }, Modifier.fillMaxWidth(), label = { Text("Domain name") }, placeholder = { Text("example.com") }, singleLine = true)
-            Text("Record type", style = MaterialTheme.typography.titleSmall)
+            OutlinedTextField(domain, { domain = it }, Modifier.fillMaxWidth(), label = { Text(forgeText("Domain name")) }, placeholder = { Text(forgeText("example.com")) }, singleLine = true)
+            Text(forgeText("Record type"), style = MaterialTheme.typography.titleSmall)
             dnsTypes.chunked(3).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     row.forEach { type -> FilterChip(selectedType == type, { selectedType = type }, label = { Text(type) }) }
                 }
             }
-            Text("DNS-over-HTTPS resolver", style = MaterialTheme.typography.titleSmall)
+            Text(forgeText("DNS-over-HTTPS resolver"), style = MaterialTheme.typography.titleSmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DnsResolver.values().forEach { item -> FilterChip(resolver == item, { resolver = item }, label = { Text(item.label) }) }
             }
-            Button(onClick = { viewModel.lookup(context.applicationContext, domain, selectedType, resolver) }, enabled = domain.isNotBlank() && !viewModel.isLoading, modifier = Modifier.fillMaxWidth()) { Text("Resolve DNS") }
-            if (viewModel.isLoading) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(); Text("Querying ${resolver.label} over HTTPS…") }
+            Button(onClick = { viewModel.lookup(context.applicationContext, domain, selectedType, resolver) }, enabled = domain.isNotBlank() && !viewModel.isLoading, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Resolve DNS")) }
+            if (viewModel.isLoading) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(); Text(forgeText("Querying ${resolver.label} over HTTPS…")) }
             viewModel.error?.let { Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) { Text(it, Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer) } }
             viewModel.result?.let { result ->
                 Card {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("${result.domain} · ${result.recordType}", style = MaterialTheme.typography.titleMedium)
-                        Text("Resolver: ${result.provider} · ${result.elapsedMs} ms", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("${result.domain} · ${result.recordType}"), style = MaterialTheme.typography.titleMedium)
+                        Text(forgeText("Resolver: ${result.provider} · ${result.elapsedMs} ms"), style = MaterialTheme.typography.bodySmall)
                         Text(when(result.status) {
                             0 -> if(result.answers.isEmpty()) "NOERROR · No answer records." else "NOERROR · ${result.answers.size} answer(s)."
                             1 -> "FORMERR · Malformed query."
@@ -104,16 +105,16 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                             else -> "DNS status: ${result.status}"
                         })
                         Text(if(result.dnssecAuthenticated) "DNSSEC: resolver reports AD (Authenticated Data)." else "DNSSEC: resolver did not assert AD; this does not prove the domain is unsigned.", style = MaterialTheme.typography.bodySmall)
-                        if(result.checkingDisabled) Text("CD flag: checking disabled by query.", style = MaterialTheme.typography.bodySmall)
+                        if(result.checkingDisabled) Text(forgeText("CD flag: checking disabled by query."), style = MaterialTheme.typography.bodySmall)
                         DnsAnswerSection("Answer", result.answers)
                         DnsAnswerSection("Authority", result.authority)
                         DnsAnswerSection("Additional", result.additional)
                     }
                 }
             }
-            Text("Privacy: the selected resolver receives the domain and record type. DoH encrypts transport to that resolver but does not make queries anonymous. DNSSEC validation is separate. FORGE-TS does not save lookup history.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Privacy: the selected resolver receives the domain and record type. DoH encrypts transport to that resolver but does not make queries anonymous. DNSSEC validation is separate. FORGE-TS does not save lookup history."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else if (section == 1) {
-            Text("Select a protocol to read its purpose, usage, pros, cons, risks and references. This is educational guidance; the app does not establish tunnels or run protocol clients.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("Select a protocol to read its purpose, usage, pros, cons, risks and references. This is educational guidance; the app does not establish tunnels or run protocol clients."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             guides.forEach { guide ->
                 val open = expanded == guide.name
                 Card(onClick = { expanded = if(open) null else guide.name }, modifier = Modifier.fillMaxWidth()) {
@@ -127,7 +128,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                             Detail("Kekurangan", guide.cons)
                             Detail("Risiko", guide.risks)
                             Detail("Referensi", guide.refs)
-                        } else Text("Tap untuk membuka detail", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        } else Text(forgeText("Tap untuk membuka detail"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -147,7 +148,7 @@ private fun DnsAnswerSection(title:String, answers:List<DnsAnswer>) {
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
             Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(answer.data, style = MaterialTheme.typography.bodyLarge)
-                Text("${answer.type} · TTL ${answer.ttl}s · ${answer.name}", style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("${answer.type} · TTL ${answer.ttl}s · ${answer.name}"), style = MaterialTheme.typography.bodySmall)
             }
         }
     }

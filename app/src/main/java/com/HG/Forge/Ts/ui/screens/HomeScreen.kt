@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,31 +48,30 @@ fun HomeScreen(
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(
-                    "FORGE-TS",
+                Text(forgeText("FORGE-TS"),
                     style = MaterialTheme.typography.headlineSmall,
                     fontFamily = ForgeScript,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text("NETWORK & SYSTEMS TOOLKIT", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(forgeText("NETWORK & SYSTEMS TOOLKIT"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         item {
             Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), color = MaterialTheme.colorScheme.primaryContainer) {
                 Column(Modifier.padding(20.dp)) {
-                    Text("YOUR SYSTEMS WORKSPACE", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(forgeText("YOUR SYSTEMS WORKSPACE"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     Spacer(Modifier.height(8.dp))
-                    Text("Tools for your network workflow.", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(forgeText("Tools for your network workflow."), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     Spacer(Modifier.height(6.dp))
-                    Text("Utilities, system references and diagnostics in one place.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(forgeText("Utilities, system references and diagnostics in one place."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("CORE TOOLS", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("8 MODULES", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(forgeText("CORE TOOLS"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(forgeText("8 MODULES"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         item {

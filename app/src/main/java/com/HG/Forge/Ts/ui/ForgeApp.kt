@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import android.app.Activity
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
@@ -27,6 +28,9 @@ import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import com.HG.Forge.Ts.ui.localization.ForgeLanguageState
+import com.HG.Forge.Ts.ui.localization.LocalForgeLanguage
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -62,6 +66,8 @@ fun ForgeApp() {
     var navigationTraceId by remember { mutableStateOf<String?>(null) }
     var selectedToolsSubtab by remember { mutableIntStateOf(0) }
     val context = LocalContext.current
+    val languageState = remember(context) { ForgeLanguageState(context) }
+    val tabStateHolder = rememberSaveableStateHolder()
     val authClient = remember(context) {
         SupabaseAuthClient(
             ForgeCrashBackendConfig.SUPABASE_URL,
@@ -170,16 +176,17 @@ fun ForgeApp() {
         }
     }
 
+    CompositionLocalProvider(LocalForgeLanguage provides languageState) {
     Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
         Scaffold(
             bottomBar = {
                 NavigationBar {
-                    NavigationBarItem(selected = selectedTab == 0, onClick = { navigateToTab(0) }, icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") }, label = { Text("Home") })
-                    NavigationBarItem(selected = selectedTab == 1, onClick = { navigateToTab(1) }, icon = { Icon(Icons.Outlined.MenuBook, contentDescription = "Learn") }, label = { Text("Learn") })
-                    NavigationBarItem(selected = selectedTab == 2, onClick = { navigateToTab(2) }, icon = { Icon(Icons.Outlined.Calculate, contentDescription = "Network") }, label = { Text("Network") })
-                    NavigationBarItem(selected = selectedTab == 3, onClick = { navigateToTab(3) }, icon = { Icon(Icons.Outlined.Science, contentDescription = "Simulate") }, label = { Text("Simulate") })
-                    NavigationBarItem(selected = selectedTab == 4, onClick = { navigateToTab(4) }, icon = { Icon(Icons.Outlined.Build, contentDescription = "Tools") }, label = { Text("Tools") })
-                    NavigationBarItem(selected = selectedTab == 5, onClick = { navigateToTab(5) }, icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") }, label = { Text("Settings") })
+                    NavigationBarItem(selected = selectedTab == 0, onClick = { navigateToTab(0) }, icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") }, label = { Text(forgeText("Home")) })
+                    NavigationBarItem(selected = selectedTab == 1, onClick = { navigateToTab(1) }, icon = { Icon(Icons.Outlined.MenuBook, contentDescription = "Learn") }, label = { Text(forgeText("Learn")) })
+                    NavigationBarItem(selected = selectedTab == 2, onClick = { navigateToTab(2) }, icon = { Icon(Icons.Outlined.Calculate, contentDescription = "Network") }, label = { Text(forgeText("Network")) })
+                    NavigationBarItem(selected = selectedTab == 3, onClick = { navigateToTab(3) }, icon = { Icon(Icons.Outlined.Science, contentDescription = "Simulate") }, label = { Text(forgeText("Simulate")) })
+                    NavigationBarItem(selected = selectedTab == 4, onClick = { navigateToTab(4) }, icon = { Icon(Icons.Outlined.Build, contentDescription = "Tools") }, label = { Text(forgeText("Tools")) })
+                    NavigationBarItem(selected = selectedTab == 5, onClick = { navigateToTab(5) }, icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") }, label = { Text(forgeText("Settings")) })
                 }
             }
         ) { padding ->
@@ -195,6 +202,7 @@ fun ForgeApp() {
                 },
                 label = "forge_tab_transition"
             ) { destination ->
+                tabStateHolder.SaveableStateProvider(destination) {
                 when (destination) {
                 0 -> HomeScreen(
                     modifier = Modifier.padding(padding),
@@ -223,6 +231,7 @@ fun ForgeApp() {
                 }
                     else -> SettingsScreen(Modifier.padding(padding))
                 }
+                }
             }
         }
 
@@ -235,7 +244,7 @@ fun ForgeApp() {
                 onClick = { showIntro = false },
                 modifier = Modifier.align(Alignment.TopEnd).padding(12.dp)
             ) {
-                Text("Skip intro")
+                Text(forgeText("Skip intro"))
             }
         }
 
@@ -247,6 +256,7 @@ fun ForgeApp() {
                 recoveryMode = true
             )
         }
+    }
     }
 }
 
@@ -282,8 +292,8 @@ private fun AuthenticatedAccessBanner() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
-            Text("AUTHENTICATED • ${session.email ?: session.userId}", style = MaterialTheme.typography.labelMedium)
-            Text("Simulate & Tools access enabled", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("AUTHENTICATED • ${session.email ?: session.userId}"), style = MaterialTheme.typography.labelMedium)
+            Text(forgeText("Simulate & Tools access enabled"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         TextButton(onClick = {
             scope.launch {
@@ -293,6 +303,6 @@ private fun AuthenticatedAccessBanner() {
                     ForgeAuthSessionState.clearSession(context)
                 }
             }
-        }) { Text("Sign out") }
+        }) { Text(forgeText("Sign out")) }
     }
 }

@@ -1,5 +1,6 @@
 package com.HG.Forge.Ts.ui.screens
 
+import com.HG.Forge.Ts.ui.localization.forgeText
 import android.net.Uri
 import android.os.Build
 import android.widget.VideoView
@@ -48,6 +49,8 @@ import com.HG.Forge.Ts.data.remote.SupabaseAuthUserProfile
 import com.HG.Forge.Ts.data.sync.ForgeCrashBackendConfig
 import com.HG.Forge.Ts.data.sync.ForgeDiagnosticsConsent
 import com.HG.Forge.Ts.ui.components.PasswordVisibilityField
+import com.HG.Forge.Ts.ui.localization.ForgeLanguage
+import com.HG.Forge.Ts.ui.localization.LocalForgeLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,6 +59,7 @@ import java.util.Date
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val languageState = LocalForgeLanguage.current
     val repository = remember(context) { AppPreferencesRepository(context) }
     val scope = rememberCoroutineScope()
     val defaultType by repository.defaultDnsRecordType.collectAsState(initial = "A")
@@ -89,10 +93,20 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Settings", style = MaterialTheme.typography.headlineMedium)
-        Text("Local preferences are stored on this device.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Settings"), style = MaterialTheme.typography.headlineMedium)
+        Text(forgeText("Local preferences are stored on this device."), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Language"), style = MaterialTheme.typography.titleMedium)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ForgeLanguage.entries.forEach { language ->
+                FilterChip(
+                    selected = languageState.language == language,
+                    onClick = { languageState.select(language) },
+                    label = { Text(language.name) }
+                )
+            }
+        }
         AccountLifecycleSection()
-        Text("Default DNS record type", style = MaterialTheme.typography.titleMedium)
+        Text(forgeText("Default DNS record type"), style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("A", "AAAA", "MX", "TXT").forEach { type ->
                 FilterChip(
@@ -102,8 +116,8 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-        Text("The selected record type is saved locally using Android DataStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text("Appearance", style = MaterialTheme.typography.titleMedium)
+        Text(forgeText("The selected record type is saved locally using Android DataStore."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(forgeText("Appearance"), style = MaterialTheme.typography.titleMedium)
         ForgeThemeMode.entries.forEach { mode ->
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(modifier = Modifier.weight(1f)) {
@@ -123,9 +137,8 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-        Text("Crash recovery & diagnostics", style = MaterialTheme.typography.titleMedium)
-        Text(
-            "Local technical logging is always on. After you allow remote diagnostics, FORGE-TS automatically sends one bounded report when the app moves to the background and retries when connectivity returns. Reports can include Info, Warning, Error, Crash and Critical Error events; app and Android versions; device brand/model, RAM and display resolution; CPU chipset and architecture; event labels; and a pseudonymous installation ID. Technical exception traces are bounded. No IMEI/serial number, location, passwords, terminal input/output, message contents, files or network payloads are collected. Remote upload can be disabled here at any time.",
+        Text(forgeText("Crash recovery & diagnostics"), style = MaterialTheme.typography.titleMedium)
+        Text(forgeText("Local technical logging is always on. After you allow remote diagnostics, FORGE-TS automatically sends one bounded report when the app moves to the background and retries when connectivity returns. Reports can include Info, Warning, Error, Crash and Critical Error events; app and Android versions; device brand/model, RAM and display resolution; CPU chipset and architecture; event labels; and a pseudonymous installation ID. Technical exception traces are bounded. No IMEI/serial number, location, passwords, terminal input/output, message contents, files or network payloads are collected. Remote upload can be disabled here at any time."),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -134,7 +147,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Automatic remote diagnostics", style = MaterialTheme.typography.titleSmall)
+                Text(forgeText("Automatic remote diagnostics"), style = MaterialTheme.typography.titleSmall)
                 Text(
                     if (diagnosticsUploadsEnabled) "Uploads enabled when connected"
                     else "On-device logging only",
@@ -150,21 +163,20 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 }
             )
         }
-        Text(
-            "Remote reports are stored in the FORGE-TS Supabase diagnostics service. The backend can send a privacy-filtered session summary to the configured administrator email; raw stack traces and installation IDs are not included in email.",
+        Text(forgeText("Remote reports are stored in the FORGE-TS Supabase diagnostics service. The backend can send a privacy-filtered session summary to the configured administrator email; raw stack traces and installation IDs are not included in email."),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        OutlinedButton(onClick = { showAboutApps = true }) { Text("About Apps") }
-        OutlinedButton(onClick = { showOpenSourceLicenses = true }) { Text("Open-source licenses") }
-        Text("FORGE-TS 0.1.0", style = MaterialTheme.typography.labelMedium)
+        OutlinedButton(onClick = { showAboutApps = true }) { Text(forgeText("About Apps")) }
+        OutlinedButton(onClick = { showOpenSourceLicenses = true }) { Text(forgeText("Open-source licenses")) }
+        Text(forgeText("FORGE-TS 0.1.0"), style = MaterialTheme.typography.labelMedium)
     }
 
 
     if (showOpenSourceLicenses) {
         AlertDialog(
             onDismissRequest = { showOpenSourceLicenses = false },
-            title = { Text("Open-source licenses") },
+            title = { Text(forgeText("Open-source licenses")) },
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth()
@@ -175,7 +187,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 }
             },
             confirmButton = {
-                Button(onClick = { showOpenSourceLicenses = false }) { Text("Close") }
+                Button(onClick = { showOpenSourceLicenses = false }) { Text(forgeText("Close")) }
             }
         )
     }
@@ -190,12 +202,12 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         contentDescription = "FORGE-TS app logo",
                         modifier = Modifier.size(44.dp)
                     )
-                    Text("About FORGE-TS", style = MaterialTheme.typography.titleLarge)
+                    Text(forgeText("About FORGE-TS"), style = MaterialTheme.typography.titleLarge)
                 }
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("FORGE-TS • Version 0.1.0")
+                    Text(forgeText("FORGE-TS • Version 0.1.0"))
                     AndroidView(
                         factory = { viewContext ->
                             VideoView(viewContext).apply {
@@ -210,7 +222,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     )
                 }
             },
-            confirmButton = { Button(onClick = { showAboutApps = false }) { Text("Close") } }
+            confirmButton = { Button(onClick = { showAboutApps = false }) { Text(forgeText("Close")) } }
         )
     }
 }
@@ -259,17 +271,17 @@ private fun AccountLifecycleSection() {
 
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Account & Session", style = MaterialTheme.typography.titleLarge)
+            Text(forgeText("Account & Session"), style = MaterialTheme.typography.titleLarge)
             if (session == null) {
-                Text("Not signed in", style = MaterialTheme.typography.titleMedium)
-                Text("Open Simulate or Tools to create an account or sign in.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(forgeText("Not signed in"), style = MaterialTheme.typography.titleMedium)
+                Text(forgeText("Open Simulate or Tools to create an account or sign in."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
-                Text("Email: ${profile?.email ?: session.email ?: "Unavailable"}", style = MaterialTheme.typography.bodyMedium)
-                Text("User ID: ${session.userId}", style = MaterialTheme.typography.bodySmall)
-                Text("Email status: ${profile?.let { if (it.isEmailVerified) "Verified" else "Not verified" } ?: "Checking…"}", style = MaterialTheme.typography.bodyMedium)
-                Text("Session expires: ${Date(session.expiresAtEpochSeconds * 1000L)}", style = MaterialTheme.typography.bodySmall)
-                profile?.createdAt?.let { Text("Account created: $it", style = MaterialTheme.typography.bodySmall) }
-                profile?.lastSignInAt?.let { Text("Last sign-in: $it", style = MaterialTheme.typography.bodySmall) }
+                Text(forgeText("Email: ${profile?.email ?: session.email ?: "Unavailable"}", style = MaterialTheme.typography.bodyMedium)
+                Text(forgeText("User ID: ${session.userId}"), style = MaterialTheme.typography.bodySmall)
+                Text(forgeText("Email status: ${profile?.let { if (it.isEmailVerified) "Verified" else "Not verified" } ?: "Checking…"}", style = MaterialTheme.typography.bodyMedium)
+                Text(forgeText("Session expires: ${Date(session.expiresAtEpochSeconds * 1000L)}"), style = MaterialTheme.typography.bodySmall)
+                profile?.createdAt?.let { Text(forgeText("Account created: $it"), style = MaterialTheme.typography.bodySmall) }
+                profile?.lastSignInAt?.let { Text(forgeText("Last sign-in: $it"), style = MaterialTheme.typography.bodySmall) }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(enabled = !busy, onClick = {
@@ -291,7 +303,7 @@ private fun AccountLifecycleSection() {
                             }
                             busy = false
                         }
-                    }) { Text("Refresh session") }
+                    }) { Text(forgeText("Refresh session")) }
 
                     OutlinedButton(enabled = !busy, onClick = {
                         scope.launch {
@@ -310,13 +322,13 @@ private fun AccountLifecycleSection() {
                             }
                             busy = false
                         }
-                    }) { Text("Sign out") }
+                    }) { Text(forgeText("Sign out")) }
                 }
 
-                Text("Change password", style = MaterialTheme.typography.titleMedium)
+                Text(forgeText("Change password"), style = MaterialTheme.typography.titleMedium)
                 PasswordVisibilityField(value = newPassword, onValueChange = { newPassword = it }, label = "New password", enabled = !busy)
                 PasswordVisibilityField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = "Confirm new password", enabled = !busy)
-                Text("At least 20 characters with uppercase, lowercase, a number, and a symbol.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(forgeText("At least 20 characters with uppercase, lowercase, a number, and a symbol."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(
                     enabled = !busy && validPassword && newPassword == confirmPassword,
                     onClick = {
