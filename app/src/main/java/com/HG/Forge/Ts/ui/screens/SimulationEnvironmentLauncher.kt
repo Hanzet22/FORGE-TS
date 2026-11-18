@@ -55,7 +55,7 @@ fun SimulationEnvironmentLauncher() {
                 Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Text("What works on this build", style = MaterialTheme.typography.titleSmall)
                     Text("PRoot provides Debian, Ubuntu and Alpine ARM64 rootfs instances. XFCE4 can run through the loopback-only TigerVNC server and the in-app noVNC viewer after their packages are installed.", style = MaterialTheme.typography.bodySmall)
-                    Text("Package sources can use an official HTTPS endpoint or a compatible custom HTTPS mirror from the PRoot Terminal. There is no built-in 90-country mirror directory. Embedded X11, Ubuntu/Linux native desktop, and VMStation engines are not available in this Android build.", style = MaterialTheme.typography.bodySmall)
+                    Text("PRoot Terminal can store custom HTTPS mirror profiles for 132 country labels. You provide each URL; this build does not include a curated 90-country endpoint directory. Embedded X11, Ubuntu/Linux native desktop, and VMStation engines are not available in this Android build.", style = MaterialTheme.typography.bodySmall)
                 }
             }
             snapshot.environments.forEach { environment ->
