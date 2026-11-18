@@ -106,7 +106,7 @@ fun DnsCatalogScreen(modifier: Modifier = Modifier) {
     ) {
         Text(forgeText("Public DNS catalog"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("Providers", "Countries").forEach { option -> FilterChip(selected = catalog == option, onClick = { catalog = option }, label = { Text(option) }) }
+            listOf("Providers", "Countries").forEach { option -> FilterChip(selected = catalog == option, onClick = { catalog = option }, label = { Text(forgeText(option)) }) }
         }
         if (catalog == "Providers") Text(
             providers.size.toString() + " provider profiles bundled for offline reference. Addresses are directory-listed snapshots, not live-tested resolver guarantees.",
@@ -117,12 +117,12 @@ fun DnsCatalogScreen(modifier: Modifier = Modifier) {
             value = query,
             onValueChange = { query = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text(if (catalog == "Providers") "Search provider or IP address" else "Search country or IP address") },
+            label = { Text(forgeText(if (catalog == "Providers") "Search provider or IP address" else "Search country or IP address")) },
             singleLine = true
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("All", "IPv4", "IPv6").forEach { option ->
-                FilterChip(selected = family == option, onClick = { family = option }, label = { Text(option) })
+                FilterChip(selected = family == option, onClick = { family = option }, label = { Text(forgeText(option)) })
             }
         }
         if (catalog == "Countries") {
