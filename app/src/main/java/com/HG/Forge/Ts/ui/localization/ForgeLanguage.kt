@@ -2166,3 +2166,7 @@ private val indonesianUiText = mapOf(
 @Composable
 fun forgeText(english: String): String =
     if (LocalForgeLanguage.current.language == ForgeLanguage.ID) indonesianUiText[english] ?: english else english
+
+
+fun forgeTextFor(english: String, language: ForgeLanguage): String =
+    if (language == ForgeLanguage.ID) indonesianUiText[english] ?: english else english
