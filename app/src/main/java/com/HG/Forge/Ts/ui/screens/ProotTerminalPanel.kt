@@ -93,8 +93,8 @@ fun ProotTerminalPanel() {
     val officialAlpineMirrors = officialAlpineCatalog.mirrors
     val scope = rememberCoroutineScope()
     var distribution by remember { mutableStateOf(ProotDistribution.DEBIAN) }
-    var lifecycle by remember { mutableStateOf("Loading runtime registry…") }
-    var status by remember { mutableStateOf("Native PTY terminal is ready.") }
+    var lifecycle by remember { mutableStateOf(forgeText("Loading runtime registry…")) }
+    var status by remember { mutableStateOf(forgeText("Native PTY terminal is ready.")) }
     var busy by remember { mutableStateOf(false) }
     var vncPassword by remember { mutableStateOf("") }
     var vncReady by remember { mutableStateOf(false) }
@@ -134,7 +134,7 @@ fun ProotTerminalPanel() {
 
     LaunchedEffect(manager) {
         val result = manager.initialize()
-        lifecycle = if (result.accepted) "Registry ready" else result.message
+        lifecycle = if (result.accepted) forgeText("Registry ready") else forgeText(result.message)
         refreshState()
     }
 
@@ -192,7 +192,7 @@ fun ProotTerminalPanel() {
                 selectedMirrorCountry?.let { country ->
                     TextButton(onClick = {
                         mirrorUrl = mirrorProfiles.get(distribution, country.code).orEmpty()
-                        status = if (mirrorUrl.isBlank()) "No saved ${distribution.name} URL for ${country.name}. Enter an official HTTPS mirror URL." else "Loaded ${country.name} HTTPS mirror profile."
+                        status = if (mirrorUrl.isBlank()) "${forgeText("No saved mirror URL for")} ${distribution.name} / ${country.name}. ${forgeText("Enter an official HTTPS mirror URL.")}" else "${forgeText("Loaded")} ${country.name} HTTPS ${forgeText("mirror profile")}."
                     }, enabled = !busy) { Text(forgeText("Load saved")) }
                 }
             }
@@ -222,8 +222,8 @@ fun ProotTerminalPanel() {
                 OutlinedButton(
                     onClick = {
                         runCatching { mirrorProfiles.save(distribution, country.code, mirrorUrl) }
-                            .onSuccess { status = "Saved HTTPS mirror profile for ${country.name} (${distribution.name})." }
-                            .onFailure { status = it.message ?: "Could not save this mirror profile." }
+                            .onSuccess { status = "${forgeText("Saved HTTPS mirror profile for")} ${country.name} (${distribution.name})." }
+                            .onFailure { status = it.message ?: forgeText("Could not save this mirror profile.") }
                     },
                     enabled = !busy && mirrorUrl.isNotBlank()
                 ) { Text(forgeText("Save ${country.name} profile")) }
@@ -282,7 +282,7 @@ fun ProotTerminalPanel() {
                     onClick = {
                         scope.launch {
                             busy = true
-                            status = "Preparing ${distribution.name} rootfs: downloading, verifying SHA-256 and extracting…"
+                            status = "${forgeText("Preparing rootfs for")} ${distribution.name}: ${forgeText("downloading, verifying SHA-256 and extracting…")}"
                             try {
                                 val result = manager.installProotRootfs(distribution)
                                 status = result.message
@@ -305,7 +305,7 @@ fun ProotTerminalPanel() {
                     onClick = {
                         scope.launch {
                             busy = true
-                            status = "Preparing XFCE4 bootstrap…"
+                            status = forgeText("Preparing XFCE4 bootstrap…")
                             try {
                                 val result = manager.prepareProotDesktop(distribution) { stage ->
                                     status = stage
@@ -326,7 +326,7 @@ fun ProotTerminalPanel() {
                     onClick = {
                         scope.launch {
                             busy = true
-                            status = "Preparing TigerVNC server…"
+                            status = forgeText("Preparing TigerVNC server…")
                             try {
                                 val result = manager.prepareProotVncServer(distribution) { stage -> status = stage }
                                 status = result.message
@@ -347,7 +347,7 @@ fun ProotTerminalPanel() {
                         val password = buildString { repeat(8) { append(alphabet[random.nextInt(alphabet.length)]) } }
                         scope.launch {
                             busy = true
-                            status = "Starting localhost-only TigerVNC and XFCE4…"
+                            status = forgeText("Starting localhost-only TigerVNC and XFCE4…")
                             try {
                                 val result = manager.startProotDesktop(distribution, password)
                                 status = result.message
@@ -386,7 +386,7 @@ fun ProotTerminalPanel() {
                         onClick = {
                             val clipboard = context.getSystemService(ClipboardManager::class.java)
                             clipboard?.setPrimaryClip(ClipData.newPlainText("FORGE-TS VNC password", vncPassword))
-                            status = "Temporary VNC password copied to clipboard."
+                            status = forgeText("Temporary VNC password copied to clipboard.")
                         }
                     ) { Text(forgeText("Copy Password")) }
                     Button(onClick = { showBuiltInVnc = true }) { Text(forgeText("Open built-in viewer")) }
@@ -395,7 +395,7 @@ fun ProotTerminalPanel() {
                             runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("vnc://127.0.0.1:5901")))
                             }.onFailure {
-                                status = "No VNC viewer is registered. Install a compatible viewer such as AVNC, then open the endpoint again."
+                                status = forgeText("No VNC viewer is registered. Install a compatible viewer such as AVNC, then open the endpoint again.")
                             }
                         }
                     ) { Text(forgeText("External viewer")) }
@@ -500,7 +500,7 @@ fun ProotTerminalPanel() {
                                 onClick = {
                                     selectedMirrorCountry = country
                                     mirrorUrl = mirrorProfiles.get(distribution, country.code).orEmpty()
-                                    status = if (mirrorUrl.isBlank()) "No saved URL for ${country.name}. Enter a public HTTPS mirror URL." else "Loaded ${country.name} mirror profile."
+                                    status = if (mirrorUrl.isBlank()) "${forgeText("No saved mirror URL for")} ${country.name}. ${forgeText("Enter an official HTTPS mirror URL.")}" else "${forgeText("Loaded")} ${country.name} ${forgeText("mirror profile")}."
                                     mirrorCountryQuery = ""
                                     showMirrorCountryPicker = false
                                 },
