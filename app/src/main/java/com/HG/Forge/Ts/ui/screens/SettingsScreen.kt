@@ -327,8 +327,8 @@ private fun AccountLifecycleSection(language: ForgeLanguage) {
                 }
 
                 Text(forgeTextFor("Change password", language), style = MaterialTheme.typography.titleMedium)
-                PasswordVisibilityField(value = newPassword, onValueChange = { newPassword = it }, label = "New password", enabled = !busy)
-                PasswordVisibilityField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = "Confirm new password", enabled = !busy)
+                PasswordVisibilityField(value = newPassword, onValueChange = { newPassword = it }, label = forgeText("New password"), enabled = !busy)
+                PasswordVisibilityField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = forgeText("Confirm new password"), enabled = !busy)
                 Text(forgeTextFor("At least 20 characters with uppercase, lowercase, a number, and a symbol.", language), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(
                     enabled = !busy && validPassword && newPassword == confirmPassword,
