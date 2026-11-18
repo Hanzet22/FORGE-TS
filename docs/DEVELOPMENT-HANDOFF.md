@@ -1,7 +1,7 @@
 # FORGE-TS Development Handoff
 
 **Snapshot date:** 2026-11-18  
-**Snapshot commit:** `411e67f` — `Fix composed UI text localization`  
+**Snapshot commit:** Latest `main` revision; this handoff is refreshed with the current change.  
 **Branch:** `main`  
 **Audience:** the next developer or coding agent opening this repository without conversation history.
 
@@ -32,9 +32,13 @@ The product combines local network utilities and educational references with bou
 | PRoot desktop | XFCE4 and TigerVNC bootstrap; loopback VNC/WebSocket path and in-app noVNC WebView | `data/simulation/ProotVncBootstrapSpec.kt`, `ui/screens/ProotVncViewerDialog.kt` | Requires a provisioned rootfs, installed packages and a running session. This is not embedded X11. |
 | Native Linux / embedded X11 / VMStation | Capability, workspace and display-session scaffolding exist | `data/simulation/RuntimeFoundationSupervisor.kt`, `data/simulation/LinuxUserlandFoundationSupervisor.kt`, `data/simulation/DisplaySessionController.kt`, `data/simulation/MagicDeskX11PlatformGate.kt` | No native Linux desktop engine, embedded X11 renderer/host bridge, or VM/KVM/QEMU execution adapter is registered. Treat these modes as unavailable/planned. |
 | Auth | Password-based Supabase Auth; encrypted Android Keystore session storage; lifecycle and recovery flows | `data/remote/SupabaseAuthClient.kt`, `data/remote/ForgeAuthSessionStore.kt`, `ui/screens/AuthGateScreen.kt` | MFA/TOTP/AAL2 app enforcement was removed. Historical MFA migrations/docs remain; do not infer it is active. |
-| Diagnostics | Local technical logs, trace IDs, bounded queued uploads, optional remote consent, Supabase ingest functions | `data/sync/`, `data/simulation/RuntimeDiagnosticLog.kt`, `supabase/functions/forge-diagnostic-ingest/` | Do not log secrets, passwords, terminal input/output, target domains, resolver addresses, files or network payloads. |
+| Diagnostics | Local technical logs, trace IDs, bounded queued uploads, optional remote consent, Supabase ingest functions; first-launch consent shares the root EN/ID language state with the app shell | `data/sync/`, `ui/DiagnosticConsentGate.kt`, `ui/localization/ForgeLanguage.kt`, `supabase/functions/forge-diagnostic-ingest/` | Remote upload remains opt-in; local logging remains enabled. Do not log secrets, passwords, terminal input/output, target domains, resolver addresses, files or network payloads. |
 
-### Important workstation distinctions
+#### Startup consent and localization wiring
+
+`MainActivity` owns one remembered `ForgeLanguageState` for the Compose activity tree and provides it through `LocalForgeLanguage` around both `ForgeApp` and `DiagnosticConsentGate`. This is required because the first-launch consent dialog calls `forgeText()`; placing the gate outside the provider previously caused `IllegalStateException: ForgeLanguageState was not provided` on a fresh install. Keep the fail-fast default in `LocalForgeLanguage`; do not mask missing providers with a fallback language. Language changes continue to update descendants through the same observable state instance.
+
+## Important workstation distinctions
 
 - **PRoot** is implemented for ARM64 distributions and can host a Linux userspace shell. It uses the Android/Linux host kernel.
 - **XFCE4 through VNC** is a package/bootstrap and loopback display path that can run when the device/rootfs/packages cooperate. It is separate from native XFCE and X11.
