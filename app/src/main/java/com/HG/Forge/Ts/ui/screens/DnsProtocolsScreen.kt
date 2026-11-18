@@ -88,7 +88,7 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                 DnsResolver.values().forEach { item -> FilterChip(resolver == item, { resolver = item }, label = { Text(item.label) }) }
             }
             Button(onClick = { viewModel.lookup(context.applicationContext, domain, selectedType, resolver) }, enabled = domain.isNotBlank() && !viewModel.isLoading, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Resolve DNS")) }
-            if (viewModel.isLoading) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(); Text(forgeText("Querying ${resolver.label} over HTTPS…")) }
+            if (viewModel.isLoading) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(); Text(forgeText("Querying") + " ${resolver.label} " + forgeText("over HTTPS…")) }
             viewModel.error?.let { Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) { Text(it, Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer) } }
             viewModel.result?.let { result ->
                 Card {
