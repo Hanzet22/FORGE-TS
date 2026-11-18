@@ -61,14 +61,14 @@ fun LinuxUserlandFoundationPanel() {
             ) {
                 Text(if (preparing) forgeText("Preparing…") else forgeText("Prepare Linux workspace"))
             }
-            error?.let { Text(forgeText("Preparation error: $it"), color = MaterialTheme.colorScheme.error) }
+            error?.let { Text("${forgeText("Preparation error:")} $it", color = MaterialTheme.colorScheme.error) }
             report?.let { current ->
-                Text(forgeText("Workspace status: ${current.status}"), style = MaterialTheme.typography.titleSmall)
-                Text(forgeText("Private root: ${current.rootPath}"), style = MaterialTheme.typography.bodySmall)
+                Text("${forgeText("Workspace status:")} ${current.status}", style = MaterialTheme.typography.titleSmall)
+                Text("${forgeText("Private root:")} ${current.rootPath}", style = MaterialTheme.typography.bodySmall)
                 Text(forgeText("Directories: rootfs=${current.rootfsDirectoryReady}, home=${current.homeDirectoryReady}, tmp=${current.temporaryDirectoryReady}, logs=${current.logDirectoryReady}"),
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(forgeText("Available app storage: ${current.availableStorageBytes / 1_073_741_824} GiB"),
+                Text("${forgeText("Available app storage:")} ${current.availableStorageBytes / 1_073_741_824} GiB",
                     style = MaterialTheme.typography.bodySmall
                 )
                 current.notes.forEach { note ->
