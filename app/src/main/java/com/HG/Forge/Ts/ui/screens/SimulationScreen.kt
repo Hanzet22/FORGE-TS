@@ -54,16 +54,25 @@ private enum class SimulationModule(val title: String) {
 fun SimulationScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val initialStatusMessage = forgeText("Ready. Offline engines are available.")
+    val initialRedisOutput = forgeText("No command executed yet.")
+    val initialLoopbackOutput = forgeText("Local server is stopped.")
+    val redisSetFailedMessage = forgeText("SET failed.")
+    val startingLocalServerMessage = forgeText("Starting local server...")
+    val localServerStartFailedMessage = forgeText("Could not start localhost server.")
+    val sendingLocalRequestMessage = forgeText("Sending local GET /health...")
+    val localRequestFailedMessage = forgeText("Local request failed.")
+
     var internetValidated by remember { mutableStateOf(false) }
     var selectedModule by remember { mutableStateOf(SimulationModule.REDIS) }
-    var statusMessage by remember { mutableStateOf(forgeText("Ready. Offline engines are available.")) }
+    var statusMessage by remember { mutableStateOf(initialStatusMessage) }
     var redisKey by remember { mutableStateOf("demo:welcome") }
     var redisValue by remember { mutableStateOf("FORGE-TS") }
     var redisTtl by remember { mutableStateOf("") }
-    var redisOutput by remember { mutableStateOf(forgeText("No command executed yet.")) }
+    var redisOutput by remember { mutableStateOf(initialRedisOutput) }
     var supabaseLabel by remember { mutableStateOf("lab-note") }
     var supabaseValue by remember { mutableStateOf("Hello from the local simulator") }
-    var loopbackOutput by remember { mutableStateOf(forgeText("Local server is stopped.")) }
+    var loopbackOutput by remember { mutableStateOf(initialLoopbackOutput) }
     var loopbackRunning by remember { mutableStateOf(false) }
     val loopbackServer = remember { LoopbackLabServer() }
 
@@ -133,7 +142,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                         try {
                             val ttl = redisTtl.toLongOrNull()
                             redisOutput = "SET ${redisKey}\n${RedisOfflineEngine.set(redisKey, redisValue, ttl)}"
-                        } catch (e: Exception) { redisOutput = e.message ?: forgeText("SET failed.") }
+                        } catch (e: Exception) { redisOutput = e.message ?: redisSetFailedMessage }
                     }) { Text(forgeText("SET")) }
                     OutlinedButton(onClick = { redisOutput = "GET ${redisKey}\n${RedisOfflineEngine.get(redisKey) ?: "(nil)"}" }) { Text(forgeText("GET")) }
                     OutlinedButton(onClick = { redisOutput = if (RedisOfflineEngine.delete(redisKey)) "DEL • 1 key removed" else "DEL • 0 keys removed" }) { Text(forgeText("DEL")) }
@@ -170,7 +179,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
                         scope.launch {
-                            loopbackOutput = forgeText("Starting local server...")
+                            loopbackOutput = startingLocalServerMessage
                             val result = withContext(Dispatchers.IO) {
                                 runCatching { loopbackServer.start() }
                             }
@@ -178,7 +187,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                                 loopbackRunning = true
                                 loopbackOutput = "Listening on 127.0.0.1:$port\nGET /health"
                             }.onFailure { error ->
-                                loopbackOutput = error.message ?: forgeText("Could not start localhost server.")
+                                loopbackOutput = error.message ?: localServerStartFailedMessage
                             }
                         }
                     }, enabled = !loopbackRunning) { Text(forgeText("Start localhost")) }
@@ -186,10 +195,10 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 }
                 Button(onClick = {
                     scope.launch {
-                        loopbackOutput = forgeText("Sending local GET /health...")
+                        loopbackOutput = sendingLocalRequestMessage
                         loopbackOutput = withContext(Dispatchers.IO) {
                             runCatching { loopbackServer.requestHealth() }
-                                .getOrElse { it.message ?: forgeText("Local request failed.") }
+                                .getOrElse { it.message ?: localRequestFailedMessage }
                         }
                     }
                 }, enabled = loopbackRunning, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Send local GET /health")) }
