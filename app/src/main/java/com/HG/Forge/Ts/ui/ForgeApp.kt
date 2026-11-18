@@ -177,12 +177,12 @@ fun ForgeApp() {
         Scaffold(
             bottomBar = {
                 NavigationBar {
-                    NavigationBarItem(selected = selectedTab == 0, onClick = { navigateToTab(0) }, icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") }, label = { Text(forgeText("Home")) })
-                    NavigationBarItem(selected = selectedTab == 1, onClick = { navigateToTab(1) }, icon = { Icon(Icons.Outlined.MenuBook, contentDescription = "Learn") }, label = { Text(forgeText("Learn")) })
-                    NavigationBarItem(selected = selectedTab == 2, onClick = { navigateToTab(2) }, icon = { Icon(Icons.Outlined.Calculate, contentDescription = "Network") }, label = { Text(forgeText("Network")) })
-                    NavigationBarItem(selected = selectedTab == 3, onClick = { navigateToTab(3) }, icon = { Icon(Icons.Outlined.Science, contentDescription = "Simulate") }, label = { Text(forgeText("Simulate")) })
-                    NavigationBarItem(selected = selectedTab == 4, onClick = { navigateToTab(4) }, icon = { Icon(Icons.Outlined.Build, contentDescription = "Tools") }, label = { Text(forgeText("Tools")) })
-                    NavigationBarItem(selected = selectedTab == 5, onClick = { navigateToTab(5) }, icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") }, label = { Text(forgeText("Settings")) })
+                    NavigationBarItem(selected = selectedTab == 0, onClick = { navigateToTab(0) }, icon = { Icon(Icons.Outlined.Home, contentDescription = forgeText("Home")) }, label = { Text(forgeText("Home")) })
+                    NavigationBarItem(selected = selectedTab == 1, onClick = { navigateToTab(1) }, icon = { Icon(Icons.Outlined.MenuBook, contentDescription = forgeText("Learn")) }, label = { Text(forgeText("Learn")) })
+                    NavigationBarItem(selected = selectedTab == 2, onClick = { navigateToTab(2) }, icon = { Icon(Icons.Outlined.Calculate, contentDescription = forgeText("Network")) }, label = { Text(forgeText("Network")) })
+                    NavigationBarItem(selected = selectedTab == 3, onClick = { navigateToTab(3) }, icon = { Icon(Icons.Outlined.Science, contentDescription = forgeText("Simulate")) }, label = { Text(forgeText("Simulate")) })
+                    NavigationBarItem(selected = selectedTab == 4, onClick = { navigateToTab(4) }, icon = { Icon(Icons.Outlined.Build, contentDescription = forgeText("Tools")) }, label = { Text(forgeText("Tools")) })
+                    NavigationBarItem(selected = selectedTab == 5, onClick = { navigateToTab(5) }, icon = { Icon(Icons.Outlined.Settings, contentDescription = forgeText("Settings")) }, label = { Text(forgeText("Settings")) })
                 }
             }
         ) { padding ->
