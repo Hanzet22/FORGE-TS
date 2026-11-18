@@ -112,7 +112,7 @@ fun DnsCatalogScreen(modifier: Modifier = Modifier) {
             providers.size.toString() + " provider profiles bundled for offline reference. Addresses are directory-listed snapshots, not live-tested resolver guarantees.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-        ) else Text(forgeText("${countries.size} countries from PublicDNS.xyz snapshots; directory entries are observations, not live-tested or endorsed resolvers."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        ) else Text(countries.size.toString() + " " + forgeText("countries from PublicDNS.xyz snapshots; directory entries are observations, not live-tested or endorsed resolvers."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
@@ -130,8 +130,8 @@ fun DnsCatalogScreen(modifier: Modifier = Modifier) {
             filteredCountries.forEach { country ->
                 Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                        Text(forgeText("${country.name} (${country.code})"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(forgeText("${country.ipv4.size} IPv4 • ${country.ipv6.size} IPv6 observations"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                        Text("${country.name} (${country.code})", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        Text("${country.ipv4.size} IPv4 • ${country.ipv6.size} IPv6 " + forgeText("observations"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                         if (family != "IPv6") country.ipv4.take(5).forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
                         if (family != "IPv4") country.ipv6.take(5).forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
                         Text(forgeText("Showing up to five addresses per family."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
