@@ -162,7 +162,7 @@ fun AuthGateScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) { Text(if (busy) forgeTextFor("Please wait...", language) else forgeTextFor("Update password", language)) }
             } else {
-                Text(forgeTextFor("The $requestedArea area requires a shared FORGE-TS account session.", language),
+                Text(forgeTextFor("A shared FORGE-TS account session is required to access this area.", language) + " " + forgeTextFor("Requested area:", language) + " " + requestedArea,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
