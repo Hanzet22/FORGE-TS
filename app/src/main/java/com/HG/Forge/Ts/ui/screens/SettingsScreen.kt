@@ -133,7 +133,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 FilterChip(
                     selected = selectedTheme == mode,
                     onClick = { scope.launch { repository.setThemeMode(mode) } },
-                    label = { Text(if (selectedTheme == mode) "Selected" else "Use") }
+                    label = { Text(forgeText(if (selectedTheme == mode) "Selected" else "Use")) }
                 )
             }
         }
@@ -346,12 +346,12 @@ private fun AccountLifecycleSection() {
                             result.onSuccess {
                                 newPassword = ""
                                 confirmPassword = ""
-                                status = "Password updated successfully."
-                            }.onFailure { status = it.message ?: "Password update failed." }
+                                status = forgeText("Password updated successfully.")
+                            }.onFailure { status = it.message ?: forgeText("Password update failed.") }
                             busy = false
                         }
                     }
-                ) { Text(if (busy) "Please wait…" else "Update password") }
+                ) { Text(if (busy) forgeText("Please wait…") else forgeText("Update password")) }
             }
             Text(status, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
