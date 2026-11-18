@@ -107,7 +107,7 @@ fun AuthGateScreen(
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                            Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) forgeText("Hide password") else forgeText("Show password"))
                         }
                     },
                     enabled = !busy
@@ -121,7 +121,7 @@ fun AuthGateScreen(
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                            Icon(if (confirmPasswordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password")
+                            Icon(if (confirmPasswordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (confirmPasswordVisible) forgeText("Hide password") else forgeText("Show password"))
                         }
                     },
                     enabled = !busy
@@ -130,7 +130,7 @@ fun AuthGateScreen(
                     onClick = {
                         scope.launch {
                             busy = true
-                            message = "Updating password..."
+                            message = forgeText("Updating password...")
                             val active = ForgeAuthSessionState.session
                             val result = withContext(Dispatchers.IO) {
                                 runCatching {
@@ -146,11 +146,11 @@ fun AuthGateScreen(
                                 ForgeAuthSessionState.completePasswordRecovery(context)
                                 password = ""
                                 confirmPassword = ""
-                                message = "Password updated. Your account is ready."
+                                message = forgeText("Password updated. Your account is ready.")
                                 onAuthenticated()
                             }.onFailure {
                                 ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.password_update", it), it)
-                                message = it.message ?: "Password update failed."
+                                message = it.message ?: forgeText("Password update failed.")
                             }
                             busy = false
                         }
@@ -158,7 +158,7 @@ fun AuthGateScreen(
                     enabled = !busy && validPassword && password == confirmPassword &&
                         ForgeAuthSessionState.session != null,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(if (busy) "Please wait..." else "Update password") }
+                ) { Text(if (busy) forgeText("Please wait...") else forgeText("Update password")) }
             } else {
                 Text(forgeText("The $requestedArea area requires a shared FORGE-TS account session."),
                     style = MaterialTheme.typography.bodyMedium,
@@ -183,7 +183,7 @@ fun AuthGateScreen(
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                                Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) forgeText("Hide password") else forgeText("Show password"))
                             }
                         },
                         enabled = !busy
@@ -196,7 +196,7 @@ fun AuthGateScreen(
                             onClick = {
                                 scope.launch {
                                     busy = true
-                                    message = "Signing in..."
+                                    message = forgeText("Signing in...")
                                     val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.signIn(email, password) }
@@ -204,25 +204,25 @@ fun AuthGateScreen(
                                     result.onSuccess { signedIn ->
                                         ForgeAuthSessionState.setSession(context, signedIn)
                                         ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.sign_in.succeeded", traceId = traceId)
-                                        message = "Email and password verified. Simulate and Tools are unlocked."
+                                        message = forgeText("Email and password verified. Simulate and Tools are unlocked.")
                                         onAuthenticated()
                                     }.onFailure {
                                         ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.sign_in", it), it, traceId)
-                                        message = it.message ?: "Sign-in failed."
+                                        message = it.message ?: forgeText("Sign-in failed.")
                                     }
                                     busy = false
                                 }
                             },
                             enabled = !busy && email.contains("@") && password.isNotBlank(),
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(if (busy) "Please wait..." else "Sign in") }
+                        ) { Text(if (busy) forgeText("Please wait...") else forgeText("Sign in")) }
                         OutlinedButton(
-                            onClick = { mode = "create"; message = "Create your FORGE-TS account." },
+                            onClick = { mode = "create"; message = forgeText("Create your FORGE-TS account.") },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(forgeText("Create account")) }
                         OutlinedButton(
-                            onClick = { mode = "reset"; message = "Enter your account email to receive a password reset link." },
+                            onClick = { mode = "reset"; message = forgeText("Enter your account email to receive a password reset link.") },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(forgeText("Reset password")) }
@@ -232,7 +232,7 @@ fun AuthGateScreen(
                             onClick = {
                                 scope.launch {
                                     busy = true
-                                    message = "Creating account..."
+                                    message = forgeText("Creating account...")
                                     val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.signUp(email, password) }
@@ -241,23 +241,23 @@ fun AuthGateScreen(
                                         ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.sign_up.succeeded", traceId = traceId)
                                         if (created != null) {
                                             ForgeAuthSessionState.setSession(context, created)
-                                            message = "Account created and authenticated."
+                                            message = forgeText("Account created and authenticated.")
                                             onAuthenticated()
                                         } else {
-                                            message = "Registration submitted. Check your email and open the verification link to return to FORGE-TS."
+                                            message = forgeText("Registration submitted. Check your email and open the verification link to return to FORGE-TS.")
                                         }
                                     }.onFailure {
                                         ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.sign_up", it), it, traceId)
-                                        message = it.message ?: "Account creation failed."
+                                        message = it.message ?: forgeText("Account creation failed.")
                                     }
                                     busy = false
                                 }
                             },
                             enabled = !busy && email.contains("@") && validPassword,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(if (busy) "Please wait..." else "Create account") }
+                        ) { Text(if (busy) forgeText("Please wait...") else forgeText("Create account")) }
                         OutlinedButton(
-                            onClick = { mode = "sign_in"; message = "Sign in to your existing account." },
+                            onClick = { mode = "sign_in"; message = forgeText("Sign in to your existing account.") },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(forgeText("Back to sign in")) }
@@ -267,26 +267,26 @@ fun AuthGateScreen(
                             onClick = {
                                 scope.launch {
                                     busy = true
-                                    message = "Sending password reset email..."
+                                    message = forgeText("Sending password reset email...")
                                     val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.requestPasswordReset(email) }
                                     }
                                     result.onSuccess {
                                         ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.password_reset.requested", traceId = traceId)
-                                        message = "If the account exists, a recovery link has been sent. Open it on this device to set a new password."
+                                        message = forgeText("If the account exists, a recovery link has been sent. Open it on this device to set a new password.")
                                     }.onFailure {
                                         ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.password_reset", it), it, traceId)
-                                        message = it.message ?: "Password reset request failed."
+                                        message = it.message ?: forgeText("Password reset request failed.")
                                     }
                                     busy = false
                                 }
                             },
                             enabled = !busy && email.contains("@"),
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(if (busy) "Please wait..." else "Send reset link") }
+                        ) { Text(if (busy) forgeText("Please wait...") else forgeText("Send reset link")) }
                         OutlinedButton(
-                            onClick = { mode = "sign_in"; message = "Sign in to your existing account." },
+                            onClick = { mode = "sign_in"; message = forgeText("Sign in to your existing account.") },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
                         ) { Text(forgeText("Back to sign in")) }
