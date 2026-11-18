@@ -601,7 +601,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
             }
         }
         item {
-            Text(forgeText("${filtered.size} REFERENCES"),
+            Text(filtered.size.toString() + " " + forgeText("REFERENCES"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
