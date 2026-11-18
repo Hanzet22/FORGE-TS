@@ -216,7 +216,7 @@ fun ProotTerminalPanel() {
                                 val result = manager.configureProotPackageMirror(distribution, mirrorUrl)
                                 status = result.message
                                 val country = selectedMirrorCountry
-                                if (result.applied && country != null) {
+                                if (result.accepted && country != null) {
                                     runCatching { mirrorProfiles.save(distribution, country.code, mirrorUrl) }
                                         .onFailure { status = "${result.message} Profile save failed: ${it.message ?: "storage unavailable"}" }
                                         .onSuccess { status = "${result.message} Saved for ${country.name}." }
