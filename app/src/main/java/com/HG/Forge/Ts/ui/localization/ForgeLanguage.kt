@@ -2234,6 +2234,7 @@ private val indonesianUiText = mapOf(
     "DNSSEC AD:" to "DNSSEC AD:",
     "RDAP unavailable:" to "RDAP tidak tersedia:",
     "Source:" to "Sumber:",
+
 )
 
 @Composable
