@@ -1,5 +1,7 @@
 # Phase 30 — PRoot Native Engine Packaging
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 **Status:** Android packaging contract and runtime prerequisites documented; native engine binaries are not generated or bundled yet.
 
 ## Decision summary

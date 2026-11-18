@@ -1,5 +1,7 @@
 # Phase 3 — DNS & Protocols
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Delivered scope
 - DNS-over-HTTPS lookup through Google Public DNS's JSON endpoint.
 - Original supported query types: A, AAAA, CNAME, MX, TXT, NS, SRV and CAA. Phase 11 expands the list; see the Phase 11 document.

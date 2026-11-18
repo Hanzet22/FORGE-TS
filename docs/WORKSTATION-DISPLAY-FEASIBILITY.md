@@ -1,5 +1,7 @@
 # WorkStation Embedded Display — Feasibility Review
 
+> **Current implementation status:** This document is an architecture/feasibility record. PRoot has since been implemented; Native Linux, embedded X11 and VM execution remain unavailable. Compare with the [development handoff](DEVELOPMENT-HANDOFF.md) before treating a plan or candidate as shipped.
+
 **Review date:** 2026-11-11  
 **Scope:** Embedded X11 for the existing Android application  
 **Decision:** Keep the display backend replaceable. Do not bundle a server until its Android API floor, protocol coverage, lifecycle, rendering and licensing are verified.

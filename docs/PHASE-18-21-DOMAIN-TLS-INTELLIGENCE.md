@@ -1,5 +1,7 @@
 # Phases 18–21 — Domain, DNSSEC and TLS Intelligence
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Phase 18 — DNSSEC and CAA evidence
 - Uses the existing Google Public DNS record explorer for DS, DNSKEY, RRSIG and NSEC records.
 - Presents the resolver's authenticated-data (AD) flag as resolver-provided validation evidence.

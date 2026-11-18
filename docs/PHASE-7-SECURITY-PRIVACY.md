@@ -1,5 +1,7 @@
 # Phase 7 — Security & Privacy Center
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Delivered scope
 - In-app disclosure of external providers and the data each feature sends.
 - Clear distinction between local-only features and network-backed features.

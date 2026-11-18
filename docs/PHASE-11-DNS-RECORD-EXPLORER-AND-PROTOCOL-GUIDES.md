@@ -1,5 +1,7 @@
 # Phase 11 — DNS Record Explorer & Protocol Guides
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Delivered scope
 - Expanded the live DNS-over-HTTPS lookup from the original eight types to A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, SOA, PTR, HTTPS, SVCB, DS, DNSKEY, TLSA, SSHFP, RRSIG and NSEC.
 - Configured Google Public DNS as the DNS-over-HTTPS resolver.

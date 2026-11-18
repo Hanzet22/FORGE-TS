@@ -1,6 +1,6 @@
 # FORGE-TS WorkStation — Existing Foundation Audit
 
-**Date:** 2026-11-16 (status update)
+**Audit date:** 2026-11-16; **current runtime table updated:** 2026-11-18
 **Repository:** Hanzet22/FORGE-TS  
 **Branch:** main  
 **Purpose:** Reconcile the approved WorkStation architecture with code already present before adding new runtime implementations.
@@ -22,7 +22,7 @@ Do not describe the gaps above as active runtimes in UI or release notes.
 
 | Component | Current behavior | Not implemented |
 |---|---|---|
-| `HybridRuntimeManager` | DataStore-backed registry, app-private workspaces, resource snapshot, conservative recovery, state transitions | Native/PRoot/VM execution adapters; `requestStart` currently returns a refusal because no adapter exists |
+| `HybridRuntimeManager` | DataStore-backed registry, app-private workspaces, resource snapshot, conservative recovery, state transitions and a PRoot adapter path | Native Linux and VM execution adapters |
 | `RuntimeFoundationSupervisor` | Android API/ABI and RAM/storage inspection; checks `/dev/kvm` visibility/read/write flags; creates images/instances/logs folders | Actual KVM initialization or VM execution; node visibility is not proof of KVM usability |
 | `LinuxUserlandFoundationSupervisor` | Prepares `forge-runtime/linux-userland/{rootfs,home,tmp,logs}` | Distro download, archive extraction, PRoot, XFCE, X11 |
 | `RouterOsImageImporter` | Copies a user-selected CHR ARM64 RAW image to app-private storage and verifies its bytes against a supplied SHA-256 | Authenticating the hash source, booting or executing RouterOS |
@@ -59,16 +59,16 @@ The existing DataStore-backed enum is:
 
 This vocabulary is the compatibility baseline. Any additions or renames require a migration/compatibility plan.
 
-## Required corrections before runtime implementation
+## Remaining gaps and guardrails
 
-1. Add adapter contracts to the existing HybridRuntimeManager; do not create a second runtime registry.
-2. Keep workspace-prepared, runtime-installed and runtime-running as distinct concepts.
-3. Treat `/dev/kvm` node inspection as a preliminary signal only.
-4. Mark RouterOS image staging as Coming Soon or hide it until the RouterOS module is formally released.
+1. Do not add a parallel runtime manager. Extend the current HybridRuntimeManager and keep the PRoot adapter path intact.
+2. Keep workspace-prepared, runtime-installed and runtime-running as separate concepts.
+3. Treat `/dev/kvm` visibility as preliminary inspection only; there is no registered VM engine.
+4. Keep RouterOS guest execution marked Coming Soon; image staging is not boot or execution.
 5. Keep Native Linux capability-gated and never silently fall back to PRoot.
-6. Decide the WorkStation Center navigation location; avoid duplicating the current Simulation panels.
-7. Reconcile the app's `targetSdk = 58` in Gradle with the README's stated target SDK 36.
+6. Embedded X11 still needs a compatible native backend and host bridge. The VNC/noVNC route is distinct from X11.
+7. Verify the current `app/build.gradle.kts` before updating SDK, ABI or NDK documentation.
 
 ## Conclusion
 
-The repository already contains a useful foundation layer. It is not an empty WorkStation project, but it also does not yet contain the actual Native Linux, PRoot, Embedded X11, RouterOS or VM execution runtimes.
+This audit records the earlier foundation review. Since that review, ARM64 PRoot provisioning/execution and the XFCE4/TigerVNC/noVNC path have been added. The current limit table at the top of this document and [the development handoff](DEVELOPMENT-HANDOFF.md) supersede this older conclusion: Native Linux, embedded X11, RouterOS guest execution and VM engines are still unavailable.

@@ -1,5 +1,7 @@
 # Phase 4 — Repository Explorer
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Delivered scope
 - Search public GitHub repositories using the official REST API.
 - Display repository name, description, star count, primary language and SPDX license identifier when available.

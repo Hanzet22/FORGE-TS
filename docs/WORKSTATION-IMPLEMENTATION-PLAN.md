@@ -1,5 +1,7 @@
 # FORGE-TS WorkStation — Implementation Plan
 
+> **Current implementation status:** This document is an architecture/feasibility record. PRoot has since been implemented; Native Linux, embedded X11 and VM execution remain unavailable. Compare with the [development handoff](DEVELOPMENT-HANDOFF.md) before treating a plan or candidate as shipped.
+
 **Status:** Active; P0 lifecycle journaling delivered; P1 display adapter contract, serialized host controller and MagicDesk X11 API/ABI admission gate delivered; Phase 45 guest-rootfs symlink compatibility recovery committed; native X11 engine and host bridge not integrated  
 **Baseline:** [Final Architecture Specification](WORKSTATION-ARCHITECTURE.md)  
 **Date:** 2026-11-10

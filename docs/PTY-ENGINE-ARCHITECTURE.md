@@ -24,7 +24,7 @@ The interactive PRoot adapter now launches its long-lived guest shell through th
 4. JNI PTY engine — owns native handles, master FD, child PID, polling, resize, signals, and cleanup.
 5. PRoot launcher — runs the existing packaged PRoot binary with the selected rootfs and guest shell.
 
-The terminal emulator is not the PTY process manager. Keep these responsibilities separate. Native PTY integration is present; the emulator dependency remains deferred pending compatibility review.
+The terminal emulator is not the PTY process manager. Keep these responsibilities separate. The native PTY and ConnectBot termlib UI integration are present; behavioral acceptance on physical devices remains pending.
 
 ## 4. Native session contract
 
@@ -90,7 +90,7 @@ Do not change rootfs provisioning, Supabase, Redis, account flows, or MikroTik/C
 
 ConnectBot termlib is an emulator/display component, not a PTY or process supervisor. Its documented data flow is PTY bytes into TerminalEmulator and keyboard bytes back through a callback, which fits the layer separation above.
 
-The repository declares Apache-2.0 and includes libvterm under MIT. The pinned org.connectbot:termlib:0.0.12 artifact declares Kotlin 2.2.21 and Compose BOM 2025.12.00. FORGE-TS uses Kotlin 2.2.21 and aligns its Compose BOM to 2025.12.00. The terminal view is connected to the native PTY using byte-preserving input/output callbacks and the PTY resize callback. The adapter reader signals new buffered output through a conflated Channel, and the UI awaits data instead of polling.
+The repository declares Apache-2.0 and includes libvterm under MIT. The app pins org.connectbot:termlib:0.0.12 and Kotlin 2.2.21; it currently uses Compose BOM 2026.06.00 (check `app/build.gradle.kts` for current pins). The terminal view is connected to the native PTY using byte-preserving input/output callbacks and the PTY resize callback. The adapter reader signals new buffered output through a conflated Channel, and the UI awaits data instead of polling.
 
 - termlib repository and license: https://github.com/connectbot/termlib
 - termlib API documentation: https://termlib.connectbot.org/main

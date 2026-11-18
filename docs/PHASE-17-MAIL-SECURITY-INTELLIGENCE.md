@@ -1,5 +1,7 @@
 # Phase 17 — Mail Security Intelligence
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Goal
 Add a native, passive DNS review of public domain-level email security configuration. The checks use Google Public DNS-over-HTTPS and do not send email, authenticate to mailboxes, connect to mail servers, or attempt delivery.
 

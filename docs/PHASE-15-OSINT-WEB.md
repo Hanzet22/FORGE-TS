@@ -1,5 +1,7 @@
 # Phase 15 — OSINT Web
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Objective
 Introduce a native Android OSINT workspace inspired by the public Web-Check project. FORGE-TS ports capabilities and workflows selectively rather than embedding the Astro/Express web application inside the Android APK.
 

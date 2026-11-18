@@ -1,5 +1,7 @@
 # Phase 45 — Multi-Distro Rootfs Compatibility Recovery
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 Status: source changes committed; Android build and physical-device distro launches are not yet verified.
 
 ## Problem addressed

@@ -1,5 +1,7 @@
 # Phase 41 — PRoot Baseline Guest Integration
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Scope
 
 This phase connects the existing PRoot launcher to the minimum Linux pseudo-filesystems and a predictable guest environment for the three managed ARM64 rootfs workspaces:

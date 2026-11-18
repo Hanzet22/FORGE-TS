@@ -1,5 +1,7 @@
 # Phase 18 — DNS Security Intelligence
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Scope
 Adds passive interpretation of Google Public DNS DNSSEC AD signals for sampled DS, DNSKEY and RRSIG lookups, plus a summary of CAA answers already retrieved by the DNS explorer.
 

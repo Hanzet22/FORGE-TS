@@ -1,5 +1,7 @@
 # Phase 31 — PRoot RootFS Provisioning
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 Status: Debian, Ubuntu, and Alpine ARM64 gzip rootfs sources are pinned and exposed through the PRoot terminal installation control. Runtime installation and on-device PRoot execution still require device validation.
 
 ## Verified upstream artifacts (2026-11-11)

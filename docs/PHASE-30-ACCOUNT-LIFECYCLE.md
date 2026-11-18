@@ -1,5 +1,7 @@
 # Phase 30 — Account Lifecycle & Session Management
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Account overview
 - Settings exposes the current Supabase account email and stable user ID.
 - Email verification state is read from the authenticated Supabase user endpoint; unavailable network/profile responses are shown as unavailable, not treated as unverified.

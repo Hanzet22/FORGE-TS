@@ -1,5 +1,7 @@
 # Phase 44 — Embedded X11 Candidate Admission Gate
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Candidate baseline
 - Project: `mekhontsev/magicdesk-x11`
 - Reviewed source revision: `0676518439b125cda7b4dd19a58f6763afbf81b2`

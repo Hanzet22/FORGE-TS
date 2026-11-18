@@ -1,5 +1,7 @@
 # Phase 33 — Native PTY Terminal Emulator Integration
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Scope
 
 Connect the existing Android Bionic PTY transport to a real VT terminal emulator for Debian, Ubuntu, and Alpine PRoot sessions. Keep PRoot process ownership, terminal parsing, Compose rendering, and byte transport as separate layers.

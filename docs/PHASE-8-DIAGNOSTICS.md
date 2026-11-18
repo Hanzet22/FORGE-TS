@@ -1,5 +1,7 @@
 # Phase 8 — Diagnostics & Monitoring
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Delivered scope
 - Read-only snapshot of Android's active network transport.
 - Reports whether Android sees internet capability and validated connectivity.

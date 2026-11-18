@@ -2,7 +2,7 @@
 
 **Document status:** Approved architecture baseline  
 **Specification:** v1.0  
-**Runtime execution status:** Not started; existing foundation scaffolding is already present  
+**Runtime execution status:** ARM64 PRoot is implemented; Native Linux, embedded X11 and VM execution engines remain unavailable
 **Repository:** `Hanzet22/FORGE-TS`  
 **Branch:** `main`  
 **Date:** 2026-11-10
@@ -13,28 +13,30 @@ Define the architecture for adding workstation and virtual-environment capabilit
 
 ## 2. Existing application baseline
 
+The section below is the approved target design. It is not a live status inventory. See the [development handoff](DEVELOPMENT-HANDOFF.md) and [foundation audit](WORKSTATION-FOUNDATION-AUDIT.md) for what is currently implemented.
+
 Repository inspection found:
 
 - Kotlin, Jetpack Compose and Material 3 Android application.
 - Application ID: `com.HG.Forge.Ts`.
 - `minSdk = 29` (Android 10).
 - `compileSdk = 36`.
-- Current `targetSdk = 58` in `app/build.gradle.kts`; the README currently describes target SDK 36, so this discrepancy must be reconciled before release work.
+- `targetSdk = 36` in `app/build.gradle.kts` (verify this file when updating Android platform support).
 - Java/Kotlin bytecode target 17.
 - Existing dependencies include AndroidX, Compose, Room, DataStore, WorkManager and Ktor.
-- No NDK/CMake, X11 server, PRoot binary or QEMU engine is currently declared in the inspected app Gradle file.
+- NDK/CMake and the ARM64 PRoot runtime are now declared/packaged. No embedded X11 server or QEMU/KVM VM engine is integrated.
 
 The implementation must preserve the existing app identity and Android 10 minimum unless a separately approved platform change is made. Runtime compatibility must be detected on-device; Android version alone is not sufficient.
 
-### Existing WorkStation foundation already in the repository
+### Existing WorkStation foundation and runtime code
 
 Source inspection found these existing components under `app/src/main/java/com/HG/Forge/Ts/data/simulation/` and `ui/screens/`:
 
-- `HybridRuntimeManager`: persistent DataStore registry, five environment entries, app-private workspaces, resource snapshots, conservative crash recovery and a guarded `requestStart()` that currently refuses execution because no execution adapter is implemented.
+- `HybridRuntimeManager`: persistent DataStore registry, environment entries, app-private workspaces, resource snapshots, conservative crash recovery and PRoot execution-adapter lifecycle. Native Linux and VM execution adapters remain unavailable.
 - `RuntimeFoundationSupervisor`: Android API/ABI, memory/storage and `/dev/kvm` node visibility/permission inspection; prepares `images`, `instances` and `logs`. A visible KVM node is not proof that KVM can be initialized or used.
-- `LinuxUserlandFoundationSupervisor`: prepares a private Linux-userland workspace only; it does not download, extract, mount or execute a distro.
+- `LinuxUserlandFoundationSupervisor`: prepares a private Linux-userland workspace. The active PRoot installer/executor lives in the concrete `Proot*` services; do not mistake workspace preparation alone for distro installation.
 - `RouterOsImageImporter`: accepts a user-selected CHR ARM64 RAW image and stages it after comparing its bytes with a user-supplied SHA-256. It does not authenticate the hash source, boot or execute the image.
-- `RuntimeFoundationPanel`, `LinuxUserlandFoundationPanel` and `SimulationEnvironmentLauncher` are currently shown inside `SimulationScreen`. The RouterOS CHR area is an informational version catalog with every entry marked Coming Soon; image import and runtime actions are not exposed. `ToolsScreen` does not yet contain a WorkStation Center.
+- Runtime foundation and simulation panels remain in `SimulationScreen`. PRoot shell and VNC tools are wired through the simulation/runtime UI. RouterOS CHR execution remains Coming Soon; an image import/staging helper is not a running guest. `ToolsScreen` is not a dedicated WorkStation Center.
 
 These are foundation/preparation features, not completed Native Linux, PRoot, X11, RouterOS or VM runtimes. The next implementation must extend these components instead of creating a second runtime manager.
 
@@ -121,7 +123,7 @@ Responsibilities:
 
 ## 6. XFCE Native
 
-**Status:** Planned.
+**Status:** Planned. Native Linux is separate from PRoot and has no registered execution engine in the app.
 
 XFCE Native uses a Native Linux Runtime adapter and is not a PRoot alias.
 
@@ -139,7 +141,7 @@ If requirements are absent, report `UNSUPPORTED` with a clear explanation. Never
 
 ## 7. XFCE4 PRoot
 
-**Status:** Planned.
+**Status:** ARM64 PRoot runtime is implemented for Debian, Ubuntu and Alpine. Interactive shell, package mirror handling and XFCE4/TigerVNC/noVNC bootstrap code are present. Device-level startup and desktop compatibility remain unverified; see the [development handoff](DEVELOPMENT-HANDOFF.md).
 
 Supported distributions:
 
@@ -310,7 +312,7 @@ No runtime dependency is added merely because it is available.
 - Evaluate Android ABI support, minimum OS, target SDK behavior, native build requirements and license obligations before selecting libraries.
 - Keep X11 and hypervisor implementations behind replaceable interfaces.
 - Record exact versions and source commits during implementation.
-- The current app Gradle configuration does not yet declare PRoot, QEMU, NDK/CMake or an embedded X11 backend.
+- The current app Gradle configuration declares NDK/CMake and packages the ARM64 PRoot runtime. No QEMU/KVM VM engine or embedded X11 backend is integrated.
 
 ## 14. Backend policy
 

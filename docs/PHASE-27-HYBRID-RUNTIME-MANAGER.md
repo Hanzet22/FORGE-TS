@@ -1,5 +1,7 @@
 # Phase 2 — Hybrid Runtime Manager
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 **Status:** P0 adapter contract, per-distribution PRoot workspace registry, and conservative device-capability reporting integrated. Actual execution remains gated until a concrete adapter and installed runtime are supplied.
 
 ## Implemented

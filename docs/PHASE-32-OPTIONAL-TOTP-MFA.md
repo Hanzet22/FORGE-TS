@@ -1,5 +1,7 @@
 # Optional authenticator MFA — FORGE-TS
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Policy
 
 - Password authentication remains available for accounts that have not opted into an authenticator factor.

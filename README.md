@@ -1,13 +1,15 @@
 # FORGE-TS
 **Network & Systems Toolkit** — a native Android app for network utilities, operating-system references and systems administration learning.
 
+> **Current development guide:** Start at [the development handoff](docs/DEVELOPMENT-HANDOFF.md), then browse the [documentation index](docs/INDEX.md). The phase documents below preserve historical scope; use the handoff and source to determine what is implemented today.
+
 ## Platform
 - Native Android APK built with Kotlin, Jetpack Compose and Material 3.
 - **Minimum supported OS: Android 10 (API 29).**
 - **Android 16 (API 36) and later:** built against API 36 and configured with target SDK 36; newer Android releases remain subject to compatibility verification.
 - Android 10 through Android 16+ is the intended supported device range; devices below Android 10 are not supported.
 - MVVM-oriented presentation and repository-based data boundaries.
-- Light professional UI direction: white, grey, navy and blue.
+- Jetpack Compose / Material 3 interface with light, dark and device-aware appearance options.
 - Selected namespace and application ID: `com.HG.Forge.Ts`.
 
 ## Implemented milestones
@@ -106,7 +108,7 @@ Hardens the diagnostic event ingestion boundary without changing the existing da
 
 
 ## WorkStation — Final Architecture Baseline
-The WorkStation architecture is documented separately from implemented milestones. Existing foundation code already provides a DataStore-backed HybridRuntimeManager, device/resource inspection, private Linux workspace preparation and a SHA-256-checked RouterOS image staging helper; these do not execute guest runtimes. The approved target adds XFCE Native (capability-gated Native Linux), XFCE4 PRoot for Debian/Ubuntu/Alpine (Download Online initially; **Bring the ISO's — Coming Soon**), an in-app Embedded X11 display target, an independent VM engine adapter (KVM when available, QEMU TCG where supported), app-managed storage and a central Hybrid Manager. RouterOS MikroTik remains **Coming Soon**. See [Final Architecture Specification](docs/WORKSTATION-ARCHITECTURE.md), [Implementation Plan](docs/WORKSTATION-IMPLEMENTATION-PLAN.md), [Existing Foundation Audit](docs/WORKSTATION-FOUNDATION-AUDIT.md) and [Embedded Display Feasibility](docs/WORKSTATION-DISPLAY-FEASIBILITY.md).
+The WorkStation architecture is documented separately from active runtimes. ARM64 PRoot supports Debian, Ubuntu and Alpine rootfs lifecycles, an interactive PTY shell, package mirror configuration and an XFCE4/TigerVNC bootstrap with an in-app noVNC viewer path. Physical-device compatibility still needs verification. Native Linux desktop, an embedded X11 server and VMStation do not have registered execution engines. RouterOS execution remains Coming Soon. See the [development handoff](docs/DEVELOPMENT-HANDOFF.md) before reading the historical [architecture specification](docs/WORKSTATION-ARCHITECTURE.md), [implementation plan](docs/WORKSTATION-IMPLEMENTATION-PLAN.md), [foundation audit](docs/WORKSTATION-FOUNDATION-AUDIT.md) and [display feasibility review](docs/WORKSTATION-DISPLAY-FEASIBILITY.md).
 
 ### Phase 42 — Offline DNS Provider Catalog
 Adds an offline, searchable catalog of 30 provider profiles normalized from the saved PublicDNS.xyz snapshots. The Tools tab supports provider/IP search and IPv4/IPv6 filtering. Each entry retains its source profile URL and is clearly marked as directory-listed, not live-tested. Country directory IPs are not treated as verified public recursive resolvers, and the catalog does not change Android or PRoot DNS settings. See [Phase 42](docs/PHASE-42-DNS-PROVIDER-CATALOG.md).
@@ -122,5 +124,7 @@ Pins the reviewed MagicDesk X11 candidate revision and adds an API 34+/ARM64 adm
 ### Phase 45 — Multi-Distro Rootfs Compatibility Recovery
 Fixes guest-rootfs symlink interpretation shared by Alpine, Debian and Ubuntu. Absolute and relative Linux guest symlinks are resolved inside the selected rootfs rather than against Android's host filesystem; provisioning and PRoot startup now use the same bounded resolver to validate a readable executable shell. This is a source-level compatibility fix, not a claim of physical-device distro startup verification. See [Phase 45](docs/PHASE-45-MULTIDISTRO-ROOTFS-COMPATIBILITY.md).
 
-### Phase 46 — Auth, Diagnostics & Guided Learning Follow-up
-Removes the optional TOTP/AAL2 flow from Android, the Redis gateway and the lab-record policy; the migration removes only the MFA-specific restrictive policy and leaves owner-scoped RLS in place. Auth errors now identify the rejected Auth operation on HTTP 405 and validate the configured project API origin. Diagnostic journal read/write and upload failures now reach a safe local log sink, and Auth, OSINT inspection, PRoot and DNS lifecycle events can be correlated without recording credentials, target domains, resolver addresses or terminal output. PRoot no longer writes raw interactive session output to a local log file; Android Private DNS remains respected, with resolver state recorded as a safe event. Learn adds four guided course tracks with locally stored lesson completion. The repository does not include a Gradle wrapper, so an Android build could not be run in this checkout. The Supabase Auth log entry observed during investigation was `GET /` with HTTP 405 and did not identify a failing app Auth endpoint; verify the exact runtime request against a fresh device trace. This follow-up does not claim an integrated XFCE display backend; embedded X11 remains pending as described in Phases 43–44.
+### Current auth, diagnostics, learning and UI status
+The active app and backend no longer enforce the former optional TOTP/AAL2 flow; migration history is retained and owner-scoped RLS remains. Auth diagnostics identify the rejected operation for HTTP 405 and validate the configured project API origin. Diagnostic journal and upload failures reach a safe local sink; trace IDs correlate lifecycle events without writing credentials, target names, resolver addresses or terminal output. Android Private DNS remains respected. Learn has 12 guided tracks with locally stored lesson completion. The UI supports EN/ID for its current literal-string catalog, and the intro player adapts to screen bounds without stretching. See the [development handoff](docs/DEVELOPMENT-HANDOFF.md) for the implementation map, limitations and latest CI runs.
+
+The latest checked-in baseline passed the Android Debug APK build and CodeQL workflows. The repository has no Gradle wrapper; CI installs JDK 17 and Gradle 8.13. Compilation does not establish physical-device PRoot, VNC, native Linux, X11 or VM compatibility. Native Linux desktop, embedded X11 and VM execution remain unavailable until their engines are integrated.

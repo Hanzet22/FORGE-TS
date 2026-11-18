@@ -1,5 +1,7 @@
 # Phase 31 — Authenticator MFA (TOTP)
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Status: Planned, not implemented
 
 The current FORGE-TS source does not contain a TOTP enrollment, factor-listing, challenge, verification, unenrollment, or AAL2 sign-in enforcement flow. The existing sign-in implementation is password-based.

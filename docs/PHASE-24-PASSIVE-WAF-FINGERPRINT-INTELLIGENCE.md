@@ -1,5 +1,7 @@
 # Phase 24 — Passive WAF Fingerprint Intelligence
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Goal
 Expand the existing edge/firewall hint into a dedicated, evidence-based WAF fingerprint finding using only the ordinary HTTP response already collected by NativeWebCheckRepository.
 

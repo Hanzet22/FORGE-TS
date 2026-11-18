@@ -1,5 +1,7 @@
 # IP & Network Registry Intelligence
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 FORGE-TS resolves the target's ordinary A/AAAA DNS answers and performs at most one read-only IP RDAP lookup for the first returned literal address.
 
 ## Displayed fields

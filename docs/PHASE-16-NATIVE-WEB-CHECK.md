@@ -1,5 +1,7 @@
 # Phase 16 — Native Web-Check Expansion
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Goal
 Expand Phase 15 into a native Kotlin/Jetpack Compose website-inspection workflow inspired by the upstream Web-Check project. This is a native reimplementation of selected capabilities, not a bundled copy of the upstream Astro/Express/Puppeteer application.
 

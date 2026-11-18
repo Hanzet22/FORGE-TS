@@ -1,5 +1,7 @@
 # Phase 9 — Quality & Release Preparation
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 This phase prepares the project for a later release decision. It does not publish, sign or submit an application.
 
 ## Checklist

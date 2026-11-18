@@ -1,5 +1,7 @@
 # Phase 1 — Core Networking
 
+> **Status context:** This document records phase scope, design assumptions or acceptance criteria and may describe work that was later changed. The live implementation state is summarized in the [development handoff](DEVELOPMENT-HANDOFF.md); verify current source and CI before claiming a feature is available.
+
 ## Included tools
 - **CIDR Calculator:** local IPv4/IPv6 calculations, prefix, network, IPv4 subnet mask, broadcast (where applicable), usable IPv4 host range/count, total addresses and binary representation.
 - **VLSM Planner:** local IPv4 subnet allocation from a base prefix using named host requirements, largest-first sorting, block alignment and capacity checks.
