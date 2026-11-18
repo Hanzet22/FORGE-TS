@@ -657,7 +657,7 @@ fun KnowledgeCenterScreen(modifier: Modifier = Modifier) {
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(if (entry.id in completedLessonIds) "Mark as not complete" else "Mark lesson complete")
+                            Text(forgeText(if (entry.id in completedLessonIds) "Mark as not complete" else "Mark lesson complete"))
                         }
                         LessonSection("8 · BUGS & TROUBLESHOOTING", guidance.troubleshooting)
                         LessonSection("STANDARDS & FURTHER READING", guidance.standards)
