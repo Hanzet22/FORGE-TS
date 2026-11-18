@@ -1,6 +1,7 @@
 package com.HG.Forge.Ts.ui.screens
 
-import com.HG.Forge.Ts.ui.localization.forgeText
+import com.HG.Forge.Ts.ui.localization.forgeTextFor
+import com.HG.Forge.Ts.ui.localization.LocalForgeLanguage
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,6 +56,7 @@ fun AuthGateScreen(
     recoveryMode: Boolean = false
 ) {
     val scope = rememberCoroutineScope()
+    val language = LocalForgeLanguage.current.language
     val context = LocalContext.current
     val authClient = remember {
         SupabaseAuthClient(
@@ -87,14 +89,14 @@ fun AuthGateScreen(
             Modifier.fillMaxWidth().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(forgeText("FORGE-TS ACCOUNT"), style = MaterialTheme.typography.titleLarge)
+            Text(forgeTextFor("FORGE-TS ACCOUNT", language), style = MaterialTheme.typography.titleLarge)
             Text(
                 if (recoveryMode) "Reset password" else "Account authentication",
                 style = MaterialTheme.typography.headlineSmall
             )
 
             if (recoveryMode) {
-                Text(forgeText("Recovery link verified. Set a new password to finish account recovery."),
+                Text(forgeTextFor("Recovery link verified. Set a new password to finish account recovery.", language),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -102,12 +104,12 @@ fun AuthGateScreen(
                     value = password,
                     onValueChange = { password = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(forgeText("New password")) },
+                    label = { Text(forgeTextFor("New password", language)) },
                     singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) forgeText("Hide password") else forgeText("Show password"))
+                            Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) forgeTextFor("Hide password", language) else forgeTextFor("Show password", language))
                         }
                     },
                     enabled = !busy
@@ -116,12 +118,12 @@ fun AuthGateScreen(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(forgeText("Confirm new password")) },
+                    label = { Text(forgeTextFor("Confirm new password", language)) },
                     singleLine = true,
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                            Icon(if (confirmPasswordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (confirmPasswordVisible) forgeText("Hide password") else forgeText("Show password"))
+                            Icon(if (confirmPasswordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (confirmPasswordVisible) forgeTextFor("Hide password", language) else forgeTextFor("Show password", language))
                         }
                     },
                     enabled = !busy
@@ -130,7 +132,7 @@ fun AuthGateScreen(
                     onClick = {
                         scope.launch {
                             busy = true
-                            message = forgeText("Updating password...")
+                            message = forgeTextFor("Updating password...", language)
                             val active = ForgeAuthSessionState.session
                             val result = withContext(Dispatchers.IO) {
                                 runCatching {
@@ -146,11 +148,11 @@ fun AuthGateScreen(
                                 ForgeAuthSessionState.completePasswordRecovery(context)
                                 password = ""
                                 confirmPassword = ""
-                                message = forgeText("Password updated. Your account is ready.")
+                                message = forgeTextFor("Password updated. Your account is ready.", language)
                                 onAuthenticated()
                             }.onFailure {
                                 ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.password_update", it), it)
-                                message = it.message ?: forgeText("Password update failed.")
+                                message = it.message ?: forgeTextFor("Password update failed.", language)
                             }
                             busy = false
                         }
@@ -158,9 +160,9 @@ fun AuthGateScreen(
                     enabled = !busy && validPassword && password == confirmPassword &&
                         ForgeAuthSessionState.session != null,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(if (busy) forgeText("Please wait...") else forgeText("Update password")) }
+                ) { Text(if (busy) forgeTextFor("Please wait...", language) else forgeTextFor("Update password", language)) }
             } else {
-                Text(forgeText("The $requestedArea area requires a shared FORGE-TS account session."),
+                Text(forgeTextFor("The $requestedArea area requires a shared FORGE-TS account session.", language),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -168,7 +170,7 @@ fun AuthGateScreen(
                     value = email,
                     onValueChange = { email = it.trimStart() },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(forgeText("Email")) },
+                    label = { Text(forgeTextFor("Email", language)) },
                     singleLine = true,
                     enabled = !busy
                 )
@@ -178,12 +180,12 @@ fun AuthGateScreen(
                         value = password,
                         onValueChange = { password = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text(forgeText("Password")) },
+                        label = { Text(forgeTextFor("Password", language)) },
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) forgeText("Hide password") else forgeText("Show password"))
+                                Icon(if (passwordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, contentDescription = if (passwordVisible) forgeTextFor("Hide password", language) else forgeTextFor("Show password", language))
                             }
                         },
                         enabled = !busy
@@ -196,7 +198,7 @@ fun AuthGateScreen(
                             onClick = {
                                 scope.launch {
                                     busy = true
-                                    message = forgeText("Signing in...")
+                                    message = forgeTextFor("Signing in...", language)
                                     val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.signIn(email, password) }
@@ -204,35 +206,35 @@ fun AuthGateScreen(
                                     result.onSuccess { signedIn ->
                                         ForgeAuthSessionState.setSession(context, signedIn)
                                         ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.sign_in.succeeded", traceId = traceId)
-                                        message = forgeText("Email and password verified. Simulate and Tools are unlocked.")
+                                        message = forgeTextFor("Email and password verified. Simulate and Tools are unlocked.", language)
                                         onAuthenticated()
                                     }.onFailure {
                                         ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.sign_in", it), it, traceId)
-                                        message = it.message ?: forgeText("Sign-in failed.")
+                                        message = it.message ?: forgeTextFor("Sign-in failed.", language)
                                     }
                                     busy = false
                                 }
                             },
                             enabled = !busy && email.contains("@") && password.isNotBlank(),
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(if (busy) forgeText("Please wait...") else forgeText("Sign in")) }
+                        ) { Text(if (busy) forgeTextFor("Please wait...", language) else forgeTextFor("Sign in", language)) }
                         OutlinedButton(
-                            onClick = { mode = "create"; message = forgeText("Create your FORGE-TS account.") },
+                            onClick = { mode = "create"; message = forgeTextFor("Create your FORGE-TS account.", language) },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(forgeText("Create account")) }
+                        ) { Text(forgeTextFor("Create account", language)) }
                         OutlinedButton(
-                            onClick = { mode = "reset"; message = forgeText("Enter your account email to receive a password reset link.") },
+                            onClick = { mode = "reset"; message = forgeTextFor("Enter your account email to receive a password reset link.", language) },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(forgeText("Reset password")) }
+                        ) { Text(forgeTextFor("Reset password", language)) }
                     }
                     "create" -> {
                         Button(
                             onClick = {
                                 scope.launch {
                                     busy = true
-                                    message = forgeText("Creating account...")
+                                    message = forgeTextFor("Creating account...", language)
                                     val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.signUp(email, password) }
@@ -241,65 +243,65 @@ fun AuthGateScreen(
                                         ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.sign_up.succeeded", traceId = traceId)
                                         if (created != null) {
                                             ForgeAuthSessionState.setSession(context, created)
-                                            message = forgeText("Account created and authenticated.")
+                                            message = forgeTextFor("Account created and authenticated.", language)
                                             onAuthenticated()
                                         } else {
-                                            message = forgeText("Registration submitted. Check your email and open the verification link to return to FORGE-TS.")
+                                            message = forgeTextFor("Registration submitted. Check your email and open the verification link to return to FORGE-TS.", language)
                                         }
                                     }.onFailure {
                                         ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.sign_up", it), it, traceId)
-                                        message = it.message ?: forgeText("Account creation failed.")
+                                        message = it.message ?: forgeTextFor("Account creation failed.", language)
                                     }
                                     busy = false
                                 }
                             },
                             enabled = !busy && email.contains("@") && validPassword,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(if (busy) forgeText("Please wait...") else forgeText("Create account")) }
+                        ) { Text(if (busy) forgeTextFor("Please wait...", language) else forgeTextFor("Create account", language)) }
                         OutlinedButton(
-                            onClick = { mode = "sign_in"; message = forgeText("Sign in to your existing account.") },
+                            onClick = { mode = "sign_in"; message = forgeTextFor("Sign in to your existing account.", language) },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(forgeText("Back to sign in")) }
+                        ) { Text(forgeTextFor("Back to sign in", language)) }
                     }
                     else -> {
                         Button(
                             onClick = {
                                 scope.launch {
                                     busy = true
-                                    message = forgeText("Sending password reset email...")
+                                    message = forgeTextFor("Sending password reset email...", language)
                                     val traceId = ForgeDiagnostics.newTraceId()
                                     val result = withContext(Dispatchers.IO) {
                                         runCatching { authClient.requestPasswordReset(email) }
                                     }
                                     result.onSuccess {
                                         ForgeDiagnostics.log(context, "INFO", "SupabaseAuth", "auth.password_reset.requested", traceId = traceId)
-                                        message = forgeText("If the account exists, a recovery link has been sent. Open it on this device to set a new password.")
+                                        message = forgeTextFor("If the account exists, a recovery link has been sent. Open it on this device to set a new password.", language)
                                     }.onFailure {
                                         ForgeDiagnostics.log(context, "ERROR", "SupabaseAuth", authFailureEvent("auth.password_reset", it), it, traceId)
-                                        message = it.message ?: forgeText("Password reset request failed.")
+                                        message = it.message ?: forgeTextFor("Password reset request failed.", language)
                                     }
                                     busy = false
                                 }
                             },
                             enabled = !busy && email.contains("@"),
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(if (busy) forgeText("Please wait...") else forgeText("Send reset link")) }
+                        ) { Text(if (busy) forgeTextFor("Please wait...", language) else forgeTextFor("Send reset link", language)) }
                         OutlinedButton(
-                            onClick = { mode = "sign_in"; message = forgeText("Sign in to your existing account.") },
+                            onClick = { mode = "sign_in"; message = forgeTextFor("Sign in to your existing account.", language) },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text(forgeText("Back to sign in")) }
+                        ) { Text(forgeTextFor("Back to sign in", language)) }
                     }
                 }
-                Text(forgeText("Password policy: at least 20 characters, including uppercase, lowercase, a number, and a symbol."),
+                Text(forgeTextFor("Password policy: at least 20 characters, including uppercase, lowercase, a number, and a symbol.", language),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Text(message, style = MaterialTheme.typography.bodySmall)
-            Text(forgeText("Account credentials are verified by Supabase Auth. Session tokens are encrypted with Android Keystore on this device."),
+            Text(forgeTextFor("Account credentials are verified by Supabase Auth. Session tokens are encrypted with Android Keystore on this device.", language),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
