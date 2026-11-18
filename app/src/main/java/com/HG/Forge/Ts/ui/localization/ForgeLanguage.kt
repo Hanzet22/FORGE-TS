@@ -414,6 +414,12 @@ private val indonesianUiText = mapOf(
     "Answer" to "Jawaban",
     "Authority" to "Otoritas",
     "Additional" to "Tambahan",
+    "Preparing rootfs for" to "Menyiapkan rootfs untuk",
+    "downloading, verifying SHA-256 and extracting…" to "mengunduh, memverifikasi SHA-256, dan mengekstrak…",
+    "Saved HTTPS mirror profile for" to "Menyimpan profil mirror HTTPS untuk",
+    "Loaded" to "Dimuat",
+    "No saved mirror URL for" to "Belum ada URL mirror yang tersimpan untuk",
+    "Password updated successfully." to "Kata sandi berhasil diperbarui.",
 )
 
 @Composable
