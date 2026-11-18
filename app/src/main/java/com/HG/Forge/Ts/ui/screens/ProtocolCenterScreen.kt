@@ -137,38 +137,38 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
                 Text(forgeText("← Back to Protocol Center"))
             }
             Text(current.name, style = MaterialTheme.typography.headlineSmall)
-            Text(forgeText("${current.category} · ${current.layer}"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(current.overview, style = MaterialTheme.typography.bodyLarge)
-            ProtocolDetail("1. Penjelasan", current.overview)
-            ProtocolDetail("2. Detail teknis", current.technical)
-            ProtocolDetail("3. Penggunaan", current.usage)
-            ProtocolDetail("4. Fungsi", current.function)
-            ProtocolDetail("5. Pros", current.pros)
-            ProtocolDetail("6. Cons", current.cons)
-            ProtocolDetail("7. Hambatan", current.hurdles)
-            ProtocolDetail("8. Standar / Draft / Registry", current.standard)
-            ProtocolDetail("9. Cocok / tidak cocok digunakan", current.fit)
-            ProtocolDetail("10. Environment yang sesuai", current.environment)
+            Text("${forgeText(current.category)} · ${forgeText(current.layer)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText(current.overview), style = MaterialTheme.typography.bodyLarge)
+            ProtocolDetail("1. Penjelasan", forgeText(current.overview))
+            ProtocolDetail("2. Detail teknis", forgeText(current.technical))
+            ProtocolDetail("3. Penggunaan", forgeText(current.usage))
+            ProtocolDetail("4. Fungsi", forgeText(current.function))
+            ProtocolDetail("5. Pros", forgeText(current.pros))
+            ProtocolDetail("6. Cons", forgeText(current.cons))
+            ProtocolDetail("7. Hambatan", forgeText(current.hurdles))
+            ProtocolDetail("8. Standar / Draft / Registry", forgeText(current.standard))
+            ProtocolDetail("9. Cocok / tidak cocok digunakan", forgeText(current.fit))
+            ProtocolDetail("10. Environment yang sesuai", forgeText(current.environment))
             Text(forgeText("Full technical documentation"), style = MaterialTheme.typography.titleLarge)
             Text(forgeText("The following chapters are protocol-specific. Shared concepts are explained only where they apply; implementation details can differ by version and vendor."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (deep != null) {
-                ProtocolDetail("11. Architecture & component roles", deep.architecture)
-                ProtocolDetail("12. Packet, frame & message model", deep.wireModel)
-                ProtocolDetail("13. Operation lifecycle", deep.lifecycle)
-                ProtocolDetail("14. Security model & trust boundaries", deep.security)
-                ProtocolDetail("15. Performance characteristics", deep.performance)
-                ProtocolDetail("16. Deployment & interoperability", deep.operations)
-                ProtocolDetail("17. Troubleshooting methodology", deep.troubleshooting)
-                ProtocolDetail("18. Primary specifications & references", deep.references)
+                ProtocolDetail(forgeText("Architecture & component roles"), forgeText(deep.architecture))
+                ProtocolDetail(forgeText("Packet, frame & message model"), forgeText(deep.wireModel))
+                ProtocolDetail(forgeText("Operation lifecycle"), forgeText(deep.lifecycle))
+                ProtocolDetail(forgeText("Security model & trust boundaries"), forgeText(deep.security))
+                ProtocolDetail(forgeText("Performance characteristics"), forgeText(deep.performance))
+                ProtocolDetail(forgeText("Deployment & interoperability"), forgeText(deep.operations))
+                ProtocolDetail(forgeText("Troubleshooting methodology"), forgeText(deep.troubleshooting))
+                ProtocolDetail(forgeText("Primary specifications & references"), forgeText(deep.references))
             } else {
-                ProtocolDetail("Full technical chapter", "A protocol-specific chapter has not yet been added for this entry.")
+                ProtocolDetail(forgeText("Full technical chapter"), forgeText("A protocol-specific chapter has not yet been added for this entry."))
             }
             ProtocolDetail(
-                "Standards status verification",
-                "An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols"
+                forgeText("Standards status verification"),
+                forgeText("An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols")
             )
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Text(forgeText("Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan."),
@@ -184,7 +184,7 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
     } else {
         Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(forgeText("Protocol Center"), style = MaterialTheme.typography.headlineSmall)
-            Text(forgeText("${protocolProfiles.size} protocol and protocol-family references · offline learning guide"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("${protocolProfiles.size} ${forgeText("protocol and protocol-family references · offline learning guide")}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             OutlinedTextField(
                 value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
                 label = { Text(forgeText("Search protocol")) }, placeholder = { Text(forgeText("e.g. BGP, DNS, VLAN, MQTT")) }, singleLine = true
@@ -194,17 +194,17 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 categories.forEach { category ->
-                    FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
+                    FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(forgeText(category)) })
                 }
             }
-            Text(forgeText("${visible.size} result(s)"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("${visible.size} ${forgeText("result(s)")}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             visible.forEach { item ->
                 Card(onClick = { selectedProtocol = item }, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                        Text(item.category.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        Text(forgeText(item.category).uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                         Text(item.name, style = MaterialTheme.typography.titleMedium)
-                        Text(item.layer, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(item.overview, style = MaterialTheme.typography.bodyMedium)
+                        Text(forgeText(item.layer), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(forgeText(item.overview), style = MaterialTheme.typography.bodyMedium)
                         Text(forgeText("Tap to open dedicated protocol page →"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
