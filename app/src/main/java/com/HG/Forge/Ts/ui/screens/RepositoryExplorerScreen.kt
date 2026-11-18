@@ -82,11 +82,11 @@ fun RepositoryExplorerScreen(
                         if (repository.description.isNotBlank()) {
                             Text(repository.description, style = MaterialTheme.typography.bodyMedium)
                         }
-                        Text(forgeText("★ ${repository.stars}  ·  ${repository.language.ifBlank { "Language not specified" }}"),
+                        Text(forgeText("Stars") + ": ${repository.stars}  ·  " + forgeText("Language:") + " " + forgeText(repository.language.ifBlank { "Language not specified" }),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        Text(forgeText("License: ${repository.license}"), style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText("License:") + " ${repository.license}", style = MaterialTheme.typography.bodySmall)
                         OutlinedButton(onClick = { uriHandler.openUri(repository.htmlUrl) }) {
                             Text(forgeText("Open on GitHub"))
                         }
