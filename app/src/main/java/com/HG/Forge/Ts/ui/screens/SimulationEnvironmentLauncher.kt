@@ -64,7 +64,7 @@ fun SimulationEnvironmentLauncher() {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(environment.title, style = MaterialTheme.typography.titleMedium)
                         Text(forgeText("Lifecycle: ${environment.lifecycle}"), style = MaterialTheme.typography.labelMedium)
-                        Text(if (environment.workspaceReady) "Workspace: prepared and verified" else "Workspace: not prepared / not verified", style = MaterialTheme.typography.bodySmall)
+                        Text(forgeText(if (environment.workspaceReady) "Workspace: prepared and verified" else "Workspace: not prepared / not verified"), style = MaterialTheme.typography.bodySmall)
                         Text(environment.notes.joinToString(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(onClick = {
@@ -72,7 +72,7 @@ fun SimulationEnvironmentLauncher() {
                                     val result = manager.prepareWorkspace(environment.id)
                                     message = result.message; snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
                                 }
-                            }) { Text(if (environment.workspaceReady) "Refresh workspace" else "Prepare workspace") }
+                            }) { Text(forgeText(if (environment.workspaceReady) "Refresh workspace" else "Prepare workspace")) }
                             OutlinedButton(onClick = {
                                 scope.launch {
                                     val result = manager.requestStart(environment.id)
@@ -94,14 +94,14 @@ fun SimulationEnvironmentLauncher() {
                         Column(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(instance.distribution.name, style = MaterialTheme.typography.titleSmall)
                             Text(forgeText("Lifecycle: ${instance.lifecycle}"), style = MaterialTheme.typography.bodySmall)
-                            Text(if (instance.workspaceReady) "Workspace prepared" else "Workspace not prepared", style = MaterialTheme.typography.bodySmall)
+                            Text(forgeText(if (instance.workspaceReady) "Workspace prepared" else "Workspace not prepared"), style = MaterialTheme.typography.bodySmall)
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 OutlinedButton(onClick = {
                                     scope.launch {
                                         val result = manager.prepareProotInstance(instance.distribution)
                                         message = result.message; snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
                                     }
-                                }) { Text(if (instance.workspaceReady) "Refresh" else "Prepare") }
+                                }) { Text(forgeText(if (instance.workspaceReady) "Refresh" else "Prepare")) }
                                 Button(
                                     enabled = installing == null &&
                                         instance.lifecycle != RuntimeLifecycleState.RUNNING &&
@@ -120,7 +120,7 @@ fun SimulationEnvironmentLauncher() {
                                             }
                                         }
                                     }
-                                ) { Text(if (installing == instance.distribution) "Installing…" else "Install rootfs") }
+                                ) { Text(if (installing == instance.distribution) forgeText("Installing…") else forgeText("Install rootfs")) }
                                 OutlinedButton(
                                     enabled = instance.lifecycle == RuntimeLifecycleState.READY ||
                                         instance.lifecycle == RuntimeLifecycleState.STOPPED ||
@@ -191,7 +191,7 @@ fun SimulationEnvironmentLauncher() {
             OutlinedButton(onClick = {
                 scope.launch {
                     snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
-                    message = "Device resources and persistent registry refreshed."
+                    message = forgeText("Device resources and persistent registry refreshed.")
                 }
             }, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Refresh manager status")) }
         }
