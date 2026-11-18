@@ -187,7 +187,7 @@ fun ProotTerminalPanel() {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { showMirrorCountryPicker = true }, enabled = !busy) {
-                    Text(selectedMirrorCountry?.let { "${it.name} mirror profile" } ?: "Choose country profile")
+                    Text(selectedMirrorCountry?.let { "${it.name} • ${forgeText("mirror profile")}" } ?: forgeText("Choose country profile"))
                 }
                 selectedMirrorCountry?.let { country ->
                     TextButton(onClick = {
@@ -294,7 +294,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle !in setOf("RUNNING", "STARTING", "RECOVERY_REQUIRED")
-                ) { Text(if (lifecycle == "READY" || lifecycle == "STOPPED") "Repair RootFS" else "Install RootFS") }
+                ) { Text(forgeText(if (lifecycle == "READY" || lifecycle == "STOPPED") "Repair RootFS" else "Install RootFS")) }
                 OutlinedButton(
                     onClick = { refreshState() },
                     enabled = !busy
