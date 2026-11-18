@@ -44,6 +44,8 @@ import org.connectbot.terminal.TerminalEmulatorFactory
 import java.security.SecureRandom
 
 private data class MirrorCountryOption(val code: String, val name: String)
+private data class OfficialAlpineMirror(val countryCode: String, val location: String, val host: String, val url: String)
+private data class OfficialAlpineMirrorCatalog(val capturedAt: String, val mirrors: List<OfficialAlpineMirror>)
 
 private fun loadMirrorCountryOptions(context: android.content.Context): List<MirrorCountryOption> {
     val json = context.assets.open("dns-catalog/country-index.json").bufferedReader().use { it.readText() }
@@ -58,12 +60,36 @@ private fun loadMirrorCountryOptions(context: android.content.Context): List<Mir
     }
 }
 
+private fun loadOfficialAlpineMirrors(context: android.content.Context): OfficialAlpineMirrorCatalog {
+    val json = JSONObject(context.assets.open("proot-runtime/alpine-mirrors.json").bufferedReader().use { it.readText() })
+    val mirrors = json.getJSONArray("mirrors")
+    val entries = buildList {
+        for (index in 0 until mirrors.length()) {
+            val item = mirrors.getJSONObject(index)
+            val url = item.optString("url")
+            if (url.startsWith("https://") && url.endsWith("/alpine")) {
+                add(OfficialAlpineMirror(
+                    countryCode = item.optString("countryCode"),
+                    location = item.optString("countryOrLocation"),
+                    host = item.optString("host"),
+                    url = url
+                ))
+            }
+        }
+    }
+    return OfficialAlpineMirrorCatalog(json.optString("capturedAt"), entries)
+}
+
 @Composable
 fun ProotTerminalPanel() {
     val context = LocalContext.current
     val manager = remember(context) { HybridRuntimeManager(context) }
     val mirrorProfiles = remember(context) { ProotMirrorProfileStore(context) }
     val mirrorCountries = remember(context) { runCatching { loadMirrorCountryOptions(context) }.getOrElse { emptyList() } }
+    val officialAlpineCatalog = remember(context) {
+        runCatching { loadOfficialAlpineMirrors(context) }.getOrElse { OfficialAlpineMirrorCatalog("", emptyList()) }
+    }
+    val officialAlpineMirrors = officialAlpineCatalog.mirrors
     val scope = rememberCoroutineScope()
     var distribution by remember { mutableStateOf(ProotDistribution.DEBIAN) }
     var lifecycle by remember { mutableStateOf("Loading runtime registry…") }
@@ -73,7 +99,9 @@ fun ProotTerminalPanel() {
     var vncReady by remember { mutableStateOf(false) }
     var showBuiltInVnc by remember { mutableStateOf(false) }
     var showMirrorCountryPicker by remember { mutableStateOf(false) }
+    var showAlpineMirrorPicker by remember { mutableStateOf(false) }
     var mirrorCountryQuery by remember { mutableStateOf("") }
+    var alpineMirrorQuery by remember { mutableStateOf("") }
     var selectedMirrorCountry by remember { mutableStateOf<MirrorCountryOption?>(null) }
     var mirrorUrl by remember(distribution) { mutableStateOf("") }
 
@@ -181,6 +209,16 @@ fun ProotTerminalPanel() {
                 supportingText = { Text("Enter an official HTTPS URL. You can save it to one of ${mirrorCountries.size} country profiles; package signatures remain enabled.") },
                 singleLine = true
             )
+            if (distribution == ProotDistribution.ALPINE) {
+                OutlinedButton(onClick = { showAlpineMirrorPicker = true }, enabled = !busy && officialAlpineMirrors.isNotEmpty()) {
+                    Text("Browse ${officialAlpineMirrors.size} official Alpine mirrors")
+                }
+                Text(
+                    "Alpine mirror status snapshot: ${officialAlpineCatalog.capturedAt} · HTTPS · aarch64 v3.24 index reported OK by upstream.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             selectedMirrorCountry?.let { country ->
                 OutlinedButton(
                     onClick = {
@@ -475,6 +513,46 @@ fun ProotTerminalPanel() {
                 }
             },
             confirmButton = { TextButton(onClick = { showMirrorCountryPicker = false }) { Text("Close") } }
+        )
+    }
+    if (showAlpineMirrorPicker) {
+        val filteredMirrors = officialAlpineMirrors.filter {
+            alpineMirrorQuery.isBlank() || it.location.contains(alpineMirrorQuery, ignoreCase = true) ||
+                it.host.contains(alpineMirrorQuery, ignoreCase = true)
+        }
+        AlertDialog(
+            onDismissRequest = { showAlpineMirrorPicker = false },
+            title = { Text("Official Alpine HTTPS mirrors") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = alpineMirrorQuery,
+                        onValueChange = { alpineMirrorQuery = it.take(80) },
+                        label = { Text("Search location or host") },
+                        singleLine = true
+                    )
+                    LazyColumn(modifier = Modifier.height(360.dp)) {
+                        items(filteredMirrors, key = { it.url }) { mirror ->
+                            TextButton(
+                                onClick = {
+                                    mirrorUrl = mirror.url
+                                    selectedMirrorCountry = mirrorCountries.firstOrNull { it.code == mirror.countryCode }
+                                    status = "Selected official Alpine mirror ${mirror.host}; upstream reported aarch64 v3.24 index OK in the ${officialAlpineCatalog.capturedAt} snapshot."
+                                    alpineMirrorQuery = ""
+                                    showAlpineMirrorPicker = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    Text(mirror.location, style = MaterialTheme.typography.labelLarge)
+                                    Text(mirror.host, style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showAlpineMirrorPicker = false }) { Text("Close") } }
         )
     }
 }
