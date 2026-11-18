@@ -29,8 +29,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import com.HG.Forge.Ts.ui.localization.ForgeLanguageState
-import com.HG.Forge.Ts.ui.localization.LocalForgeLanguage
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -66,7 +64,6 @@ fun ForgeApp() {
     var navigationTraceId by remember { mutableStateOf<String?>(null) }
     var selectedToolsSubtab by remember { mutableIntStateOf(0) }
     val context = LocalContext.current
-    val languageState = remember(context) { ForgeLanguageState(context) }
     val tabStateHolder = rememberSaveableStateHolder()
     val authClient = remember(context) {
         SupabaseAuthClient(
@@ -176,7 +173,6 @@ fun ForgeApp() {
         }
     }
 
-    CompositionLocalProvider(LocalForgeLanguage provides languageState) {
     Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
         Scaffold(
             bottomBar = {
@@ -256,7 +252,6 @@ fun ForgeApp() {
                 recoveryMode = true
             )
         }
-    }
     }
 }
 
