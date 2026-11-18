@@ -2228,6 +2228,12 @@ private val indonesianUiText = mapOf(
     "Workspace status:" to "Status ruang kerja:",
     "Private root:" to "Direktori root pribadi:",
     "Available app storage:" to "Ruang penyimpanan aplikasi tersedia:",
+    "Domain report:" to "Laporan domain:",
+    "of" to "dari",
+    "DNS checks completed" to "Pemeriksaan DNS telah selesai",
+    "DNSSEC AD:" to "DNSSEC AD:",
+    "RDAP unavailable:" to "RDAP tidak tersedia:",
+    "Source:" to "Sumber:",
 )
 
 @Composable
