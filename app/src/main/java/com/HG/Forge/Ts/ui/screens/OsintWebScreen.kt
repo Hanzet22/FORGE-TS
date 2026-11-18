@@ -226,12 +226,12 @@ fun OsintWebScreen(
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(report.domain, style = MaterialTheme.typography.titleMedium)
-                    Text(forgeText("Registrar: ${report.registrar ?: "Not disclosed"}")
+                    Text(forgeText("Registrar: ${report.registrar ?: "Not disclosed"}"))
                     report.handle?.let { Text(forgeText("RDAP handle: $it"), style = MaterialTheme.typography.bodySmall) }
-                    Text(forgeText("Domain statuses: ${report.statuses.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Domain statuses: ${report.statuses.joinToString().ifBlank { "Not returned" }}"), style = MaterialTheme.typography.bodySmall)
                     Text(forgeText("Registration events:"), style = MaterialTheme.typography.labelLarge)
                     report.events.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
-                    Text(forgeText("Nameservers: ${report.nameServers.joinToString().ifBlank { "Not returned" }}", style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Nameservers: ${report.nameServers.joinToString().ifBlank { "Not returned" }}"), style = MaterialTheme.typography.bodySmall)
                     Text(forgeText("Source: ${report.source} · Public RDAP metadata only; registrant contact/vCard data is not collected."), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -245,12 +245,12 @@ fun OsintWebScreen(
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(report.address, style = MaterialTheme.typography.titleMedium)
-                    Text(forgeText("IP version: ${report.ipVersion ?: "Not reported"}")
-                    Text(forgeText("Network: ${report.networkName ?: "Not reported"}")
-                    Text(forgeText("Handle: ${report.handle ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
-                    Text(forgeText("Range: ${report.startAddress ?: "?"} – ${report.endAddress ?: "?"}", style = MaterialTheme.typography.bodySmall)
-                    Text(forgeText("Country/region code: ${report.country ?: "Not reported"}", style = MaterialTheme.typography.bodySmall)
-                    Text(forgeText("Origin ASN: ${report.asn?.let { "AS$it" } ?: "Not returned"}")
+                    Text(forgeText("IP version: ${report.ipVersion ?: "Not reported"}"))
+                    Text(forgeText("Network: ${report.networkName ?: "Not reported"}"))
+                    Text(forgeText("Handle: ${report.handle ?: "Not reported"}"), style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Range: ${report.startAddress ?: "?"} – ${report.endAddress ?: "?"}"), style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Country/region code: ${report.country ?: "Not reported"}"), style = MaterialTheme.typography.bodySmall)
+                    Text(forgeText("Origin ASN: ${report.asn?.let { "AS$it" } ?: "Not returned"}"))
                     report.asnHolder?.let { Text(forgeText("Network holder: $it"), style = MaterialTheme.typography.bodySmall) }
                     report.announcedPrefix?.let { Text(forgeText("Announced prefix: $it"), style = MaterialTheme.typography.bodySmall) }
                     Text(forgeText("Registry source: ${report.source}"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

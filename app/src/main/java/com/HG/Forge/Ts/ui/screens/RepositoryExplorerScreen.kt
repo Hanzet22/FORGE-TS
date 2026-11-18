@@ -82,7 +82,7 @@ fun RepositoryExplorerScreen(
                         if (repository.description.isNotBlank()) {
                             Text(repository.description, style = MaterialTheme.typography.bodyMedium)
                         }
-                        Text(forgeText("★ ${repository.stars}  ·  ${repository.language.ifBlank { "Language not specified" }}",
+                        Text(forgeText("★ ${repository.stars}  ·  ${repository.language.ifBlank { "Language not specified" }}"),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )

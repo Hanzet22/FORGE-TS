@@ -276,9 +276,9 @@ private fun AccountLifecycleSection() {
                 Text(forgeText("Not signed in"), style = MaterialTheme.typography.titleMedium)
                 Text(forgeText("Open Simulate or Tools to create an account or sign in."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
-                Text(forgeText("Email: ${profile?.email ?: session.email ?: "Unavailable"}", style = MaterialTheme.typography.bodyMedium)
+                Text(forgeText("Email: ${profile?.email ?: session.email ?: "Unavailable"}"), style = MaterialTheme.typography.bodyMedium)
                 Text(forgeText("User ID: ${session.userId}"), style = MaterialTheme.typography.bodySmall)
-                Text(forgeText("Email status: ${profile?.let { if (it.isEmailVerified) "Verified" else "Not verified" } ?: "Checking…"}", style = MaterialTheme.typography.bodyMedium)
+                Text(forgeText("Email status: ${profile?.let { if (it.isEmailVerified) "Verified" else "Not verified" } ?: "Checking…"}"), style = MaterialTheme.typography.bodyMedium)
                 Text(forgeText("Session expires: ${Date(session.expiresAtEpochSeconds * 1000L)}"), style = MaterialTheme.typography.bodySmall)
                 profile?.createdAt?.let { Text(forgeText("Account created: $it"), style = MaterialTheme.typography.bodySmall) }
                 profile?.lastSignInAt?.let { Text(forgeText("Last sign-in: $it"), style = MaterialTheme.typography.bodySmall) }
