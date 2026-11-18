@@ -1,6 +1,7 @@
 package com.HG.Forge.Ts.ui.screens
 
-import com.HG.Forge.Ts.ui.localization.forgeText
+import com.HG.Forge.Ts.ui.localization.forgeTextFor
+import com.HG.Forge.Ts.ui.localization.LocalForgeLanguage
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -84,6 +85,7 @@ private fun loadOfficialAlpineMirrors(context: android.content.Context): Officia
 @Composable
 fun ProotTerminalPanel() {
     val context = LocalContext.current
+    val language = LocalForgeLanguage.current.language
     val manager = remember(context) { HybridRuntimeManager(context) }
     val mirrorProfiles = remember(context) { ProotMirrorProfileStore(context) }
     val mirrorCountries = remember(context) { runCatching { loadMirrorCountryOptions(context) }.getOrElse { emptyList() } }
@@ -93,8 +95,8 @@ fun ProotTerminalPanel() {
     val officialAlpineMirrors = officialAlpineCatalog.mirrors
     val scope = rememberCoroutineScope()
     var distribution by remember { mutableStateOf(ProotDistribution.DEBIAN) }
-    var lifecycle by remember { mutableStateOf(forgeText("Loading runtime registry…")) }
-    var status by remember { mutableStateOf(forgeText("Native PTY terminal is ready.")) }
+    var lifecycle by remember { mutableStateOf(forgeTextFor("Loading runtime registry…", language)) }
+    var status by remember { mutableStateOf(forgeTextFor("Native PTY terminal is ready.", language)) }
     var busy by remember { mutableStateOf(false) }
     var vncPassword by remember { mutableStateOf("") }
     var vncReady by remember { mutableStateOf(false) }
@@ -134,7 +136,7 @@ fun ProotTerminalPanel() {
 
     LaunchedEffect(manager) {
         val result = manager.initialize()
-        lifecycle = if (result.accepted) forgeText("Registry ready") else forgeText(result.message)
+        lifecycle = if (result.accepted) forgeTextFor("Registry ready", language) else forgeTextFor(result.message, language)
         refreshState()
     }
 
@@ -170,8 +172,8 @@ fun ProotTerminalPanel() {
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(forgeText("PRoot Terminal"), style = MaterialTheme.typography.titleLarge)
-            Text(forgeText("Native PTY + VT emulator • ANSI colors, cursor, scrollback, keyboard input and terminal resize."),
+            Text(forgeTextFor("PRoot Terminal", language), style = MaterialTheme.typography.titleLarge)
+            Text(forgeTextFor("Native PTY + VT emulator • ANSI colors, cursor, scrollback, keyboard input and terminal resize.", language),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -187,33 +189,33 @@ fun ProotTerminalPanel() {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { showMirrorCountryPicker = true }, enabled = !busy) {
-                    Text(selectedMirrorCountry?.let { "${it.name} • ${forgeText("mirror profile")}" } ?: forgeText("Choose country profile"))
+                    Text(selectedMirrorCountry?.let { "${it.name} • ${forgeTextFor("mirror profile", language)}" } ?: forgeTextFor("Choose country profile", language))
                 }
                 selectedMirrorCountry?.let { country ->
                     TextButton(onClick = {
                         mirrorUrl = mirrorProfiles.get(distribution, country.code).orEmpty()
-                        status = if (mirrorUrl.isBlank()) "${forgeText("No saved mirror URL for")} ${distribution.name} / ${country.name}. ${forgeText("Enter an official HTTPS mirror URL.")}" else "${forgeText("Loaded")} ${country.name} HTTPS ${forgeText("mirror profile")}."
-                    }, enabled = !busy) { Text(forgeText("Load saved")) }
+                        status = if (mirrorUrl.isBlank()) "${forgeTextFor("No saved mirror URL for", language)} ${distribution.name} / ${country.name}. ${forgeTextFor("Enter an official HTTPS mirror URL.", language)}" else "${forgeTextFor("Loaded", language)} ${country.name} HTTPS ${forgeTextFor("mirror profile", language)}."
+                    }, enabled = !busy) { Text(forgeTextFor("Load saved", language)) }
                 }
             }
             OutlinedTextField(
                 value = mirrorUrl,
                 onValueChange = { mirrorUrl = it.take(300) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(forgeText("HTTPS package mirror")) },
+                label = { Text(forgeTextFor("HTTPS package mirror", language)) },
                 placeholder = { Text(when (distribution) {
                     ProotDistribution.DEBIAN -> "https://mirror.example/debian"
                     ProotDistribution.UBUNTU -> "https://mirror.example/ubuntu-ports"
                     ProotDistribution.ALPINE -> "https://mirror.example/alpine"
                 }) },
-                supportingText = { Text(forgeText("Enter an official HTTPS URL. You can save it to one of ${mirrorCountries.size} country profiles; package signatures remain enabled.")) },
+                supportingText = { Text(forgeTextFor("Enter an official HTTPS URL. You can save it to one of ${mirrorCountries.size} country profiles; package signatures remain enabled.", language)) },
                 singleLine = true
             )
             if (distribution == ProotDistribution.ALPINE) {
                 OutlinedButton(onClick = { showAlpineMirrorPicker = true }, enabled = !busy && officialAlpineMirrors.isNotEmpty()) {
-                    Text(forgeText("Browse ${officialAlpineMirrors.size} official Alpine mirrors"))
+                    Text(forgeTextFor("Browse ${officialAlpineMirrors.size} official Alpine mirrors", language))
                 }
-                Text(forgeText("Alpine mirror status snapshot: ${officialAlpineCatalog.capturedAt} · HTTPS · aarch64 v3.24 index reported OK by upstream."),
+                Text(forgeTextFor("Alpine mirror status snapshot: ${officialAlpineCatalog.capturedAt} · HTTPS · aarch64 v3.24 index reported OK by upstream.", language),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -222,11 +224,11 @@ fun ProotTerminalPanel() {
                 OutlinedButton(
                     onClick = {
                         runCatching { mirrorProfiles.save(distribution, country.code, mirrorUrl) }
-                            .onSuccess { status = "${forgeText("Saved HTTPS mirror profile for")} ${country.name} (${distribution.name})." }
-                            .onFailure { status = it.message ?: forgeText("Could not save this mirror profile.") }
+                            .onSuccess { status = "${forgeTextFor("Saved HTTPS mirror profile for", language)} ${country.name} (${distribution.name})." }
+                            .onFailure { status = it.message ?: forgeTextFor("Could not save this mirror profile.", language) }
                     },
                     enabled = !busy && mirrorUrl.isNotBlank()
-                ) { Text(forgeText("Save ${country.name} profile")) }
+                ) { Text(forgeTextFor("Save ${country.name} profile", language)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
@@ -244,7 +246,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle != "RUNNING"
-                ) { Text(forgeText("Use official HTTPS mirror")) }
+                ) { Text(forgeTextFor("Use official HTTPS mirror", language)) }
                 OutlinedButton(
                     onClick = {
                         scope.launch {
@@ -262,7 +264,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle != "RUNNING" && mirrorUrl.isNotBlank()
-                ) { Text(forgeText("Apply mirror")) }
+                ) { Text(forgeTextFor("Apply mirror", language)) }
                 OutlinedButton(
                     onClick = {
                         scope.launch {
@@ -274,15 +276,15 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle != "RUNNING"
-                ) { Text(forgeText("Restore default")) }
+                ) { Text(forgeTextFor("Restore default", language)) }
             }
-            Text(forgeText("Lifecycle: $lifecycle"), style = MaterialTheme.typography.labelMedium)
+            Text(forgeTextFor("Lifecycle: $lifecycle", language), style = MaterialTheme.typography.labelMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
                     onClick = {
                         scope.launch {
                             busy = true
-                            status = "${forgeText("Preparing rootfs for")} ${distribution.name}: ${forgeText("downloading, verifying SHA-256 and extracting…")}"
+                            status = "${forgeTextFor("Preparing rootfs for", language)} ${distribution.name}: ${forgeTextFor("downloading, verifying SHA-256 and extracting…", language)}"
                             try {
                                 val result = manager.installProotRootfs(distribution)
                                 status = result.message
@@ -294,18 +296,18 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle !in setOf("RUNNING", "STARTING", "RECOVERY_REQUIRED")
-                ) { Text(forgeText(if (lifecycle == "READY" || lifecycle == "STOPPED") "Repair RootFS" else "Install RootFS")) }
+                ) { Text(forgeTextFor(if (lifecycle == "READY" || lifecycle == "STOPPED") "Repair RootFS" else "Install RootFS", language)) }
                 OutlinedButton(
                     onClick = { refreshState() },
                     enabled = !busy
-                ) { Text(forgeText("Refresh")) }
+                ) { Text(forgeTextFor("Refresh", language)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
                     onClick = {
                         scope.launch {
                             busy = true
-                            status = forgeText("Preparing XFCE4 bootstrap…")
+                            status = forgeTextFor("Preparing XFCE4 bootstrap…", language)
                             try {
                                 val result = manager.prepareProotDesktop(distribution) { stage ->
                                     status = stage
@@ -318,7 +320,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
-                ) { Text(forgeText("Prepare / Repair XFCE4")) }
+                ) { Text(forgeTextFor("Prepare / Repair XFCE4", language)) }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -326,7 +328,7 @@ fun ProotTerminalPanel() {
                     onClick = {
                         scope.launch {
                             busy = true
-                            status = forgeText("Preparing TigerVNC server…")
+                            status = forgeTextFor("Preparing TigerVNC server…", language)
                             try {
                                 val result = manager.prepareProotVncServer(distribution) { stage -> status = stage }
                                 status = result.message
@@ -337,7 +339,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
-                ) { Text(forgeText("Install / Repair VNC Viewer")) }
+                ) { Text(forgeTextFor("Install / Repair VNC Viewer", language)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
@@ -347,7 +349,7 @@ fun ProotTerminalPanel() {
                         val password = buildString { repeat(8) { append(alphabet[random.nextInt(alphabet.length)]) } }
                         scope.launch {
                             busy = true
-                            status = forgeText("Starting localhost-only TigerVNC and XFCE4…")
+                            status = forgeTextFor("Starting localhost-only TigerVNC and XFCE4…", language)
                             try {
                                 val result = manager.startProotDesktop(distribution, password)
                                 status = result.message
@@ -360,7 +362,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
-                ) { Text(forgeText("Start Desktop")) }
+                ) { Text(forgeTextFor("Start Desktop", language)) }
                 OutlinedButton(
                     onClick = {
                         scope.launch {
@@ -376,29 +378,29 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
-                ) { Text(forgeText("Stop Desktop")) }
+                ) { Text(forgeTextFor("Stop Desktop", language)) }
             }
             if (vncReady) {
-                Text(forgeText("VNC server: loopback:5901 · built-in viewer: localhost:6080"), style = MaterialTheme.typography.labelMedium)
-                Text(forgeText("Temporary VNC password: $vncPassword"), style = MaterialTheme.typography.bodyMedium)
+                Text(forgeTextFor("VNC server: loopback:5901 · built-in viewer: localhost:6080", language), style = MaterialTheme.typography.labelMedium)
+                Text(forgeTextFor("Temporary VNC password: $vncPassword", language), style = MaterialTheme.typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
                         onClick = {
                             val clipboard = context.getSystemService(ClipboardManager::class.java)
                             clipboard?.setPrimaryClip(ClipData.newPlainText("FORGE-TS VNC password", vncPassword))
-                            status = forgeText("Temporary VNC password copied to clipboard.")
+                            status = forgeTextFor("Temporary VNC password copied to clipboard.", language)
                         }
-                    ) { Text(forgeText("Copy Password")) }
-                    Button(onClick = { showBuiltInVnc = true }) { Text(forgeText("Open built-in viewer")) }
+                    ) { Text(forgeTextFor("Copy Password", language)) }
+                    Button(onClick = { showBuiltInVnc = true }) { Text(forgeTextFor("Open built-in viewer", language)) }
                     OutlinedButton(
                         onClick = {
                             runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("vnc://127.0.0.1:5901")))
                             }.onFailure {
-                                status = forgeText("No VNC viewer is registered. Install a compatible viewer such as AVNC, then open the endpoint again.")
+                                status = forgeTextFor("No VNC viewer is registered. Install a compatible viewer such as AVNC, then open the endpoint again.", language)
                             }
                         }
-                    ) { Text(forgeText("External viewer")) }
+                    ) { Text(forgeTextFor("External viewer", language)) }
                 }
             }
 
@@ -426,7 +428,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle != "RUNNING"
-                ) { Text(forgeText("Start")) }
+                ) { Text(forgeTextFor("Start", language)) }
                 OutlinedButton(
                     onClick = {
                         scope.launch {
@@ -445,7 +447,7 @@ fun ProotTerminalPanel() {
                         }
                     },
                     enabled = !busy && lifecycle == "RUNNING"
-                ) { Text(forgeText("Stop")) }
+                ) { Text(forgeTextFor("Stop", language)) }
             }
             Text(
                 status,
@@ -471,17 +473,17 @@ fun ProotTerminalPanel() {
         }
         AlertDialog(
             onDismissRequest = { showMirrorCountryPicker = false },
-            title = { Text(forgeText("Choose a country profile")) },
+            title = { Text(forgeTextFor("Choose a country profile", language)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(forgeText("This profile saves a mirror URL you provide. Country selection does not imply a public mirror is hosted there."),
+                    Text(forgeTextFor("This profile saves a mirror URL you provide. Country selection does not imply a public mirror is hosted there.", language),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     OutlinedTextField(
                         value = mirrorCountryQuery,
                         onValueChange = { mirrorCountryQuery = it.take(50) },
-                        label = { Text(forgeText("Search ${mirrorCountries.size} countries")) },
+                        label = { Text(forgeTextFor("Search ${mirrorCountries.size} countries", language)) },
                         singleLine = true
                     )
                     LazyColumn(modifier = Modifier.height(320.dp)) {
@@ -493,24 +495,24 @@ fun ProotTerminalPanel() {
                                     showMirrorCountryPicker = false
                                 },
                                 modifier = Modifier.fillMaxWidth()
-                            ) { Text(forgeText("Manual URL (no country profile)"), modifier = Modifier.fillMaxWidth()) }
+                            ) { Text(forgeTextFor("Manual URL (no country profile)", language), modifier = Modifier.fillMaxWidth()) }
                         }
                         items(filteredCountries, key = { it.code }) { country ->
                             TextButton(
                                 onClick = {
                                     selectedMirrorCountry = country
                                     mirrorUrl = mirrorProfiles.get(distribution, country.code).orEmpty()
-                                    status = if (mirrorUrl.isBlank()) "${forgeText("No saved mirror URL for")} ${country.name}. ${forgeText("Enter an official HTTPS mirror URL.")}" else "${forgeText("Loaded")} ${country.name} ${forgeText("mirror profile")}."
+                                    status = if (mirrorUrl.isBlank()) "${forgeTextFor("No saved mirror URL for", language)} ${country.name}. ${forgeTextFor("Enter an official HTTPS mirror URL.", language)}" else "${forgeTextFor("Loaded", language)} ${country.name} ${forgeTextFor("mirror profile", language)}."
                                     mirrorCountryQuery = ""
                                     showMirrorCountryPicker = false
                                 },
                                 modifier = Modifier.fillMaxWidth()
-                            ) { Text(forgeText("${country.name} (${country.code})"), modifier = Modifier.fillMaxWidth()) }
+                            ) { Text(forgeTextFor("${country.name} (${country.code})", language), modifier = Modifier.fillMaxWidth()) }
                         }
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { showMirrorCountryPicker = false }) { Text(forgeText("Close")) } }
+            confirmButton = { TextButton(onClick = { showMirrorCountryPicker = false }) { Text(forgeTextFor("Close", language)) } }
         )
     }
     if (showAlpineMirrorPicker) {
@@ -520,13 +522,13 @@ fun ProotTerminalPanel() {
         }
         AlertDialog(
             onDismissRequest = { showAlpineMirrorPicker = false },
-            title = { Text(forgeText("Official Alpine HTTPS mirrors")) },
+            title = { Text(forgeTextFor("Official Alpine HTTPS mirrors", language)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = alpineMirrorQuery,
                         onValueChange = { alpineMirrorQuery = it.take(80) },
-                        label = { Text(forgeText("Search location or host")) },
+                        label = { Text(forgeTextFor("Search location or host", language)) },
                         singleLine = true
                     )
                     LazyColumn(modifier = Modifier.height(360.dp)) {
@@ -550,7 +552,7 @@ fun ProotTerminalPanel() {
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { showAlpineMirrorPicker = false }) { Text(forgeText("Close")) } }
+            confirmButton = { TextButton(onClick = { showAlpineMirrorPicker = false }) { Text(forgeTextFor("Close", language)) } }
         )
     }
 }
