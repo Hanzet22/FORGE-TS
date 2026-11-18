@@ -170,7 +170,7 @@ fun SimulationEnvironmentLauncher() {
                     }
                 }
             }
-            ResourceSummary(snapshot)
+            ResourceSummary(snapshot, language)
             snapshot.foundation?.let { foundation ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -202,7 +202,7 @@ fun SimulationEnvironmentLauncher() {
 }
 
 @Composable
-private fun ResourceSummary(snapshot: HybridRuntimeSnapshot) {
+private fun ResourceSummary(snapshot: HybridRuntimeSnapshot, language: com.HG.Forge.Ts.ui.localization.ForgeLanguage) {
     val resources = snapshot.resources
     Card {
         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
