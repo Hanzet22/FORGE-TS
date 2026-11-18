@@ -126,7 +126,7 @@ fun NetworkIpAllocationScreen(modifier: Modifier = Modifier) {
         if (required != null && prefix != null && addressCount != null && usable != null) {
             Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(forgeText("$selected IPv4 estimate"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(selected.toString() + " " + forgeText("IPv4 estimate"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Text(forgeText("/$prefix"), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     PlannerRow("Capacity target", "$required addresses")
                     PlannerRow("Total block", "$addressCount addresses")
