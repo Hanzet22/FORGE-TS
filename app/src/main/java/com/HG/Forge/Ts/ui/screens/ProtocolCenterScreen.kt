@@ -171,14 +171,14 @@ fun ProtocolCenterScreen(modifier: Modifier = Modifier) {
                 forgeText("An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols")
             )
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                Text(forgeText("Catatan: kesesuaian bergantung pada versi implementasi, kebijakan jaringan, dan kebutuhan sistem. Protokol proxy/VPN di sini hanya referensi edukasi; aplikasi tidak menjalankan tunnel atau mengubah konfigurasi jaringan."),
+                Text(forgeText("Note: compatibility depends on the implementation version, network policy, and system requirements. Proxy/VPN protocols here are educational references only; the app does not run tunnels or change network configuration."),
                     Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             OutlinedButton(onClick = { selectedProtocol = null }, modifier = Modifier.fillMaxWidth()) {
-                Text(forgeText("Kembali ke daftar protokol"))
+                Text(forgeText("Back to protocol list"))
             }
         }
     } else {
