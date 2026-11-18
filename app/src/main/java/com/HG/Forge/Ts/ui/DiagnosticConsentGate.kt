@@ -32,7 +32,7 @@ fun DiagnosticConsentGate() {
                         "pseudonymous installation ID. Technical exception traces are bounded. It does not collect " +
                         "IMEI or serial numbers, location, passwords, terminal input/output, message contents, files, " +
                         "or network payloads. Remote upload is optional and can be turned off in Settings at any time."
-                )
+                ))
             },
             confirmButton = {
                 TextButton(onClick = {

@@ -354,7 +354,7 @@ private fun LessonSection(title: String, lines: List<String>) {
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
         lines.forEach { line ->
-            Text(forgeText("• " + line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(forgeText("• ") + line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -402,9 +402,9 @@ private fun SimulationPanel(entryId: String) {
                     val p = prefix.toInt()
                     val total = 1 shl (32 - p)
                     Text(forgeText("IPv4 prefix calculator"), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                    Text(forgeText("Example network: 192.0.2.0/" + p, style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("Example network: 192.0.2.0/") + p, style = MaterialTheme.typography.bodyMedium)
                     Slider(value = prefix, onValueChange = { prefix = it }, valueRange = 24f..30f, steps = 5)
-                    Text(forgeText("Prefix /" + p + " · " + total + " total addresses · " + (total - 2) + " conventional usable host addresses", style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("Prefix /") + p + " · " + total + " total addresses · " + (total - 2) + " conventional usable host addresses", style = MaterialTheme.typography.bodyMedium)
                     Text(forgeText("Educational fixture only. /31 and /32 have different use cases and are not included in this simple host-count exercise."), style = MaterialTheme.typography.bodySmall)
                 }
                 "http-basics" -> {
@@ -446,9 +446,9 @@ private fun SimulationPanel(entryId: String) {
                         Button(onClick = { destination = "192.0.2.77" }) { Text(forgeText("Host A")) }
                         Button(onClick = { destination = "198.51.100.9" }) { Text(forgeText("Host B")) }
                     }
-                    Text(forgeText("Destination: " + destination, style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("Destination: ") + destination, style = MaterialTheme.typography.bodyMedium)
                     val route = if (destination == "192.0.2.77") "192.0.2.0/24 → Lab gateway (most specific match)" else "198.51.100.0/24 → Office gateway (most specific match)"
-                    Text(forgeText("Selected route: " + route, style = MaterialTheme.typography.bodyMedium)
+                    Text(forgeText("Selected route: ") + route, style = MaterialTheme.typography.bodyMedium)
                     Text(forgeText("The simulator uses fixed documentation-only routes."), style = MaterialTheme.typography.bodySmall)
                 }
             }
