@@ -119,16 +119,16 @@ fun DnsProtocolsScreen(modifier: Modifier = Modifier, viewModel: DnsProtocolsVie
                 val open = expanded == guide.name
                 Card(onClick = { expanded = if(open) null else guide.name }, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                        Text(guide.group.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        Text(forgeText(guide.group).uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                         Text(guide.name, style = MaterialTheme.typography.titleMedium)
-                        Text(guide.overview, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(forgeText(guide.overview), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if(open) {
-                            Detail("Cara menggunakan", guide.how)
-                            Detail("Kelebihan", guide.pros)
-                            Detail("Kekurangan", guide.cons)
-                            Detail("Risiko", guide.risks)
+                            Detail("Cara menggunakan", forgeText(guide.how))
+                            Detail("Kelebihan", forgeText(guide.pros))
+                            Detail("Kekurangan", forgeText(guide.cons))
+                            Detail("Risiko", forgeText(guide.risks))
                             Detail("Referensi", guide.refs)
-                        } else Text(forgeText("Tap untuk membuka detail"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                        } else Text(forgeText("Tap to open details"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
