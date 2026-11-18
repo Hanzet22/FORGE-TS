@@ -2212,6 +2212,22 @@ private val indonesianUiText = mapOf(
     "An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols" to "Nomor RFC adalah pengenal dokumen, bukan klaim otomatis atas status Standar Internet. Periksa catatan RFC Editor dan IETF Datatracker terkini untuk mengetahui status, pembaruan, pencabutan, errata, dan penetapan Standar Internet (STD) apa pun. IEEE, ISO/IEC, ITU-T, OASIS, dan spesifikasi proyek menggunakan proses publikasi dan pemeliharaan masing-masing. Internet-Drafts merupakan dokumen yang masih dalam proses pengembangan dan dapat kedaluwarsa atau berubah.\n\nEditor RFC: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nPendaftaran Protokol IANA: https://www.iana.org/protocols",
     "protocol and protocol-family references · offline learning guide" to "referensi protokol dan keluarga protokol · panduan belajar tanpa koneksi internet",
     "result(s)" to "hasil",
+    "Registrar:" to "Registrar:",
+    "Not disclosed" to "Tidak diungkapkan",
+    "RDAP handle:" to "Handle RDAP:",
+    "Domain statuses:" to "Status domain:",
+    "Not returned" to "Tidak tersedia",
+    "Nameservers:" to "Nameserver:",
+    "Public RDAP metadata only; registrant contact/vCard data is not collected." to "Hanya metadata RDAP publik; data kontak pendaftar/vCard tidak dikumpulkan.",
+    "Network attribution unavailable:" to "Atribusi jaringan tidak tersedia:",
+    "Not reported" to "Tidak dilaporkan",
+    "Website inspection:" to "Pemeriksaan situs web:",
+    "Final URL:" to "URL akhir:",
+    "Checked:" to "Waktu pemeriksaan:",
+    "Preparation error:" to "Kesalahan persiapan:",
+    "Workspace status:" to "Status ruang kerja:",
+    "Private root:" to "Direktori root pribadi:",
+    "Available app storage:" to "Ruang penyimpanan aplikasi tersedia:",
 )
 
 @Composable
