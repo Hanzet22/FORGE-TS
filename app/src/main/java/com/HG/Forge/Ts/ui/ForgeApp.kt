@@ -287,7 +287,7 @@ private fun AuthenticatedAccessBanner() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
-            Text(forgeText("AUTHENTICATED • ${session.email ?: session.userId}"), style = MaterialTheme.typography.labelMedium)
+            Text(forgeText("AUTHENTICATED") + " • ${session.email ?: session.userId}", style = MaterialTheme.typography.labelMedium)
             Text(forgeText("Simulate & Tools access enabled"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         TextButton(onClick = {
