@@ -1,5 +1,7 @@
 package com.HG.Forge.Ts.ui.components
 
+import com.HG.Forge.Ts.ui.localization.forgeText
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
@@ -29,7 +31,7 @@ fun PasswordVisibilityField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
-        label = { Text(label) },
+        label = { Text(forgeText(label)) },
         singleLine = true,
         enabled = enabled,
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -37,7 +39,7 @@ fun PasswordVisibilityField(
             IconButton(onClick = { visible = !visible }, enabled = enabled) {
                 Icon(
                     imageVector = if (visible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                    contentDescription = if (visible) "Hide password" else "Show password"
+                    contentDescription = if (visible) forgeText("Hide password") else forgeText("Show password")
                 )
             }
         }
