@@ -60,7 +60,7 @@ fun RuntimeFoundationPanel() {
                         }
                     },
                     enabled = !inspecting
-                ) { Text(if (inspecting) "Inspecting…" else "Inspect device") }
+                ) { Text(if (inspecting) forgeText("Inspecting…") else forgeText("Inspect device")) }
                 OutlinedButton(onClick = { report = null; error = null }, enabled = !inspecting) {
                     Text(forgeText("Reset view"))
                 }
