@@ -2150,7 +2150,21 @@ private val indonesianUiText = mapOf(
     "Graphics codec, display resolution, RTT, bandwidth, channel redirection, and host CPU/GPU affect responsiveness." to "Codec grafis, resolusi layar, RTT, bandwidth, pengalihan saluran, dan CPU/GPU host memengaruhi responsivitas.",
     "Use gateways or managed remote-access architecture, limit clipboard/drive/device redirection, audit sessions, and enforce account lockout and patch policy." to "Gunakan gateway atau arsitektur akses jarak jauh yang dikelola, batasi pengalihan clipboard/drive/perangkat, lakukan audit sesi, serta terapkan kebijakan penguncian akun dan kebijakan pembaruan perangkat lunak.",
     "Check authentication/NLA, TLS, gateway policy, licensing, session host resources, UDP/TCP transport, and device redirection restrictions." to "Periksa otentikasi/NLA, TLS, kebijakan gateway, lisensi, sumber daya host sesi, transportasi UDP/TCP, dan batasan pengalihan perangkat.",
-    "Microsoft protocol specifications: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/ ; security guidance: https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/" to "Spesifikasi protokol Microsoft: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/ ; panduan keamanan: https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/",
+    "Microsoft protocol specifications: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/ ; security guidance: https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/" to "Spesifikasi protokol Microsoft: https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/ ; panduan keamanan: https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/",,
+    "Architecture & component roles" to "Arsitektur & peran komponen",
+    "Packet, frame & message model" to "Model paket, bingkai, dan pesan",
+    "Operation lifecycle" to "Siklus hidup operasi",
+    "Security model & trust boundaries" to "Model keamanan & batas kepercayaan",
+    "Performance characteristics" to "Karakteristik kinerja",
+    "Deployment & interoperability" to "Penerapan & interoperabilitas",
+    "Troubleshooting methodology" to "Metodologi pemecahan masalah",
+    "Primary specifications & references" to "Spesifikasi utama & referensi",
+    "Full technical chapter" to "Bab teknis lengkap",
+    "A protocol-specific chapter has not yet been added for this entry." to "Bab khusus protokol untuk entri ini belum ditambahkan.",
+    "Standards status verification" to "Verifikasi status standar",
+    "An RFC number is a document identifier, not an automatic claim of Internet Standard status. Check the current RFC Editor and IETF Datatracker record for status, updates, obsoletes, errata, and any Internet Standard (STD) assignment. IEEE, ISO/IEC, ITU-T, OASIS, and project specifications use their own publication and maintenance processes. Internet-Drafts are work in progress and may expire or change.\n\nRFC Editor: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nIANA Protocol Registries: https://www.iana.org/protocols" to "Nomor RFC adalah pengenal dokumen, bukan klaim otomatis atas status Standar Internet. Periksa catatan RFC Editor dan IETF Datatracker terkini untuk mengetahui status, pembaruan, pencabutan, errata, dan penetapan Standar Internet (STD) apa pun. IEEE, ISO/IEC, ITU-T, OASIS, dan spesifikasi proyek menggunakan proses publikasi dan pemeliharaan masing-masing. Internet-Drafts merupakan dokumen yang masih dalam proses pengembangan dan dapat kedaluwarsa atau berubah.\n\nEditor RFC: https://www.rfc-editor.org/\nIETF Datatracker: https://datatracker.ietf.org/\nPendaftaran Protokol IANA: https://www.iana.org/protocols",
+    "protocol and protocol-family references · offline learning guide" to "referensi protokol dan keluarga protokol · panduan belajar tanpa koneksi internet",
+    "result(s)" to "hasil",
 )
 
 @Composable
