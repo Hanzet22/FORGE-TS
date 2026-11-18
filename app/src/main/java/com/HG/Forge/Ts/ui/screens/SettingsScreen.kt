@@ -106,7 +106,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-        AccountLifecycleSection()
+        AccountLifecycleSection(language)
         Text(forgeTextFor("Default DNS record type", language), style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("A", "AAAA", "MX", "TXT").forEach { type ->
@@ -229,7 +229,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AccountLifecycleSection() {
+private fun AccountLifecycleSection(language: ForgeLanguage) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val session = ForgeAuthSessionState.session
