@@ -59,7 +59,7 @@ fun LinuxUserlandFoundationPanel() {
                 },
                 enabled = !preparing
             ) {
-                Text(if (preparing) "Preparing…" else "Prepare Linux workspace")
+                Text(if (preparing) forgeText("Preparing…") else forgeText("Prepare Linux workspace"))
             }
             error?.let { Text(forgeText("Preparation error: $it"), color = MaterialTheme.colorScheme.error) }
             report?.let { current ->
