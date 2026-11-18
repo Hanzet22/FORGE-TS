@@ -420,6 +420,16 @@ private val indonesianUiText = mapOf(
     "Loaded" to "Dimuat",
     "No saved mirror URL for" to "Belum ada URL mirror yang tersimpan untuk",
     "Password updated successfully." to "Kata sandi berhasil diperbarui.",
+    "Workspace: prepared and verified" to "Ruang kerja: sudah disiapkan dan diverifikasi",
+    "Workspace: not prepared / not verified" to "Ruang kerja: belum disiapkan / belum diverifikasi",
+    "Refresh workspace" to "Segarkan ruang kerja",
+    "Prepare workspace" to "Siapkan ruang kerja",
+    "Workspace prepared" to "Ruang kerja siap",
+    "Workspace not prepared" to "Ruang kerja belum siap",
+    "Prepare" to "Siapkan",
+    "Installing…" to "Menginstal…",
+    "Install rootfs" to "Instal rootfs",
+    "Device resources and persistent registry refreshed." to "Sumber daya perangkat dan registri persisten berhasil diperbarui.",
 )
 
 @Composable
