@@ -234,14 +234,14 @@ fun ApplicationProtocolCenterScreen(modifier: Modifier = Modifier) {
                     FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(category) })
                 }
             }
-            Text(visible.size.toString() + " entries", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(visible.size.toString() + forgeText(" entries"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             visible.forEach { profile ->
                 Card(onClick = { selectedProfile = profile }, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(profile.category.uppercase(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                         Text(profile.name, style = MaterialTheme.typography.titleMedium)
                         Text(profile.overview, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(profile.classification + " · Tap for full technical details", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
+                        Text(profile.classification + " · " + forgeText("Tap for full technical details"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
