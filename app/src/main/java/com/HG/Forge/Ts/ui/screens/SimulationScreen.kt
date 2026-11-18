@@ -56,14 +56,14 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     var internetValidated by remember { mutableStateOf(false) }
     var selectedModule by remember { mutableStateOf(SimulationModule.REDIS) }
-    var statusMessage by remember { mutableStateOf("Ready. Offline engines are available.") }
+    var statusMessage by remember { mutableStateOf(forgeText("Ready. Offline engines are available.")) }
     var redisKey by remember { mutableStateOf("demo:welcome") }
     var redisValue by remember { mutableStateOf("FORGE-TS") }
     var redisTtl by remember { mutableStateOf("") }
-    var redisOutput by remember { mutableStateOf("No command executed yet.") }
+    var redisOutput by remember { mutableStateOf(forgeText("No command executed yet.")) }
     var supabaseLabel by remember { mutableStateOf("lab-note") }
     var supabaseValue by remember { mutableStateOf("Hello from the local simulator") }
-    var loopbackOutput by remember { mutableStateOf("Local server is stopped.") }
+    var loopbackOutput by remember { mutableStateOf(forgeText("Local server is stopped.")) }
     var loopbackRunning by remember { mutableStateOf(false) }
     val loopbackServer = remember { LoopbackLabServer() }
 
@@ -106,8 +106,8 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(forgeText(if (internetValidated) "INTERNET AVAILABLE" else "INTERNET UNAVAILABLE"), fontWeight = FontWeight.Bold)
                 Text(
-                    if (internetValidated) "Internet is validated. Simulation Center labs remain local; this screen does not start cloud requests."
-                    else "Internet is unavailable. Local simulation remains available; no cloud request is made.",
+                    if (internetValidated) forgeText("Internet is validated. Simulation Center labs remain local; this screen does not start cloud requests.")
+                    else forgeText("Internet is unavailable. Local simulation remains available; no cloud request is made."),
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(forgeText("Supabase Auth is managed by the shared app-level authentication gate. Simulation modules on this screen are local."), style = MaterialTheme.typography.labelSmall)
@@ -133,7 +133,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                         try {
                             val ttl = redisTtl.toLongOrNull()
                             redisOutput = "SET ${redisKey}\n${RedisOfflineEngine.set(redisKey, redisValue, ttl)}"
-                        } catch (e: Exception) { redisOutput = e.message ?: "SET failed." }
+                        } catch (e: Exception) { redisOutput = e.message ?: forgeText("SET failed.") }
                     }) { Text(forgeText("SET")) }
                     OutlinedButton(onClick = { redisOutput = "GET ${redisKey}\n${RedisOfflineEngine.get(redisKey) ?: "(nil)"}" }) { Text(forgeText("GET")) }
                     OutlinedButton(onClick = { redisOutput = if (RedisOfflineEngine.delete(redisKey)) "DEL • 1 key removed" else "DEL • 0 keys removed" }) { Text(forgeText("DEL")) }
@@ -170,7 +170,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
                         scope.launch {
-                            loopbackOutput = "Starting local server..."
+                            loopbackOutput = forgeText("Starting local server...")
                             val result = withContext(Dispatchers.IO) {
                                 runCatching { loopbackServer.start() }
                             }
@@ -178,7 +178,7 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                                 loopbackRunning = true
                                 loopbackOutput = "Listening on 127.0.0.1:$port\nGET /health"
                             }.onFailure { error ->
-                                loopbackOutput = error.message ?: "Could not start localhost server."
+                                loopbackOutput = error.message ?: forgeText("Could not start localhost server.")
                             }
                         }
                     }, enabled = !loopbackRunning) { Text(forgeText("Start localhost")) }
@@ -186,10 +186,10 @@ fun SimulationScreen(modifier: Modifier = Modifier) {
                 }
                 Button(onClick = {
                     scope.launch {
-                        loopbackOutput = "Sending local GET /health..."
+                        loopbackOutput = forgeText("Sending local GET /health...")
                         loopbackOutput = withContext(Dispatchers.IO) {
                             runCatching { loopbackServer.requestHealth() }
-                                .getOrElse { it.message ?: "Local request failed." }
+                                .getOrElse { it.message ?: forgeText("Local request failed.") }
                         }
                     }
                 }, enabled = loopbackRunning, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Send local GET /health")) }
