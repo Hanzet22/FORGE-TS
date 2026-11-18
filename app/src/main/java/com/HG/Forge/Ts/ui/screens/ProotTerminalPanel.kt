@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
@@ -17,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,16 +35,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.HG.Forge.Ts.data.simulation.HybridRuntimeManager
 import com.HG.Forge.Ts.data.simulation.ProotDistribution
+import com.HG.Forge.Ts.data.simulation.ProotMirrorProfileStore
 import com.HG.Forge.Ts.data.simulation.RuntimeEnvironmentId
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.connectbot.terminal.Terminal
 import org.connectbot.terminal.TerminalEmulatorFactory
 import java.security.SecureRandom
+
+private data class MirrorCountryOption(val code: String, val name: String)
+
+private fun loadMirrorCountryOptions(context: android.content.Context): List<MirrorCountryOption> {
+    val json = context.assets.open("dns-catalog/country-index.json").bufferedReader().use { it.readText() }
+    val countries = JSONObject(json).getJSONArray("countries")
+    return buildList {
+        for (index in 0 until countries.length()) {
+            val item = countries.getJSONObject(index)
+            val code = item.optString("code")
+            val name = item.optString("name")
+            if (code.matches(Regex("[A-Z]{2}")) && name.isNotBlank()) add(MirrorCountryOption(code, name))
+        }
+    }
+}
 
 @Composable
 fun ProotTerminalPanel() {
     val context = LocalContext.current
     val manager = remember(context) { HybridRuntimeManager(context) }
+    val mirrorProfiles = remember(context) { ProotMirrorProfileStore(context) }
+    val mirrorCountries = remember(context) { runCatching { loadMirrorCountryOptions(context) }.getOrElse { emptyList() } }
     val scope = rememberCoroutineScope()
     var distribution by remember { mutableStateOf(ProotDistribution.DEBIAN) }
     var lifecycle by remember { mutableStateOf("Loading runtime registry…") }
@@ -49,6 +72,9 @@ fun ProotTerminalPanel() {
     var vncPassword by remember { mutableStateOf("") }
     var vncReady by remember { mutableStateOf(false) }
     var showBuiltInVnc by remember { mutableStateOf(false) }
+    var showMirrorCountryPicker by remember { mutableStateOf(false) }
+    var mirrorCountryQuery by remember { mutableStateOf("") }
+    var selectedMirrorCountry by remember { mutableStateOf<MirrorCountryOption?>(null) }
     var mirrorUrl by remember(distribution) { mutableStateOf("") }
 
     val terminalEmulator = remember(manager, distribution) {
@@ -87,6 +113,7 @@ fun ProotTerminalPanel() {
         terminalEmulator.clearScreen()
         vncPassword = ""
         vncReady = false
+        mirrorUrl = selectedMirrorCountry?.let { mirrorProfiles.get(distribution, it.code) }.orEmpty()
         refreshState()
     }
 
@@ -130,6 +157,17 @@ fun ProotTerminalPanel() {
                     )
                 }
             }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { showMirrorCountryPicker = true }, enabled = !busy) {
+                    Text(selectedMirrorCountry?.let { "${it.name} mirror profile" } ?: "Choose country profile")
+                }
+                selectedMirrorCountry?.let { country ->
+                    TextButton(onClick = {
+                        mirrorUrl = mirrorProfiles.get(distribution, country.code).orEmpty()
+                        status = if (mirrorUrl.isBlank()) "No saved ${distribution.name} URL for ${country.name}. Enter an official HTTPS mirror URL." else "Loaded ${country.name} HTTPS mirror profile."
+                    }, enabled = !busy) { Text("Load saved") }
+                }
+            }
             OutlinedTextField(
                 value = mirrorUrl,
                 onValueChange = { mirrorUrl = it.take(300) },
@@ -140,9 +178,19 @@ fun ProotTerminalPanel() {
                     ProotDistribution.UBUNTU -> "https://mirror.example/ubuntu-ports"
                     ProotDistribution.ALPINE -> "https://mirror.example/alpine"
                 }) },
-                supportingText = { Text("Any reachable HTTPS mirror with the matching repository path works across countries. Package signatures stay enabled.") },
+                supportingText = { Text("Enter an official HTTPS URL. You can save it to one of ${mirrorCountries.size} country profiles; package signatures remain enabled.") },
                 singleLine = true
             )
+            selectedMirrorCountry?.let { country ->
+                OutlinedButton(
+                    onClick = {
+                        runCatching { mirrorProfiles.save(distribution, country.code, mirrorUrl) }
+                            .onSuccess { status = "Saved HTTPS mirror profile for ${country.name} (${distribution.name})." }
+                            .onFailure { status = it.message ?: "Could not save this mirror profile." }
+                    },
+                    enabled = !busy && mirrorUrl.isNotBlank()
+                ) { Text("Save ${country.name} profile") }
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
                     onClick = {
@@ -165,7 +213,14 @@ fun ProotTerminalPanel() {
                         scope.launch {
                             busy = true
                             try {
-                                status = manager.configureProotPackageMirror(distribution, mirrorUrl).message
+                                val result = manager.configureProotPackageMirror(distribution, mirrorUrl)
+                                status = result.message
+                                val country = selectedMirrorCountry
+                                if (result.applied && country != null) {
+                                    runCatching { mirrorProfiles.save(distribution, country.code, mirrorUrl) }
+                                        .onFailure { status = "${result.message} Profile save failed: ${it.message ?: "storage unavailable"}" }
+                                        .onSuccess { status = "${result.message} Saved for ${country.name}." }
+                                }
                             } finally { busy = false }
                         }
                     },
@@ -373,4 +428,53 @@ fun ProotTerminalPanel() {
     }
 
     if (showBuiltInVnc) ProotVncViewerDialog(onDismiss = { showBuiltInVnc = false })
+    if (showMirrorCountryPicker) {
+        val filteredCountries = mirrorCountries.filter {
+            mirrorCountryQuery.isBlank() || it.name.contains(mirrorCountryQuery, ignoreCase = true) || it.code.contains(mirrorCountryQuery, ignoreCase = true)
+        }
+        AlertDialog(
+            onDismissRequest = { showMirrorCountryPicker = false },
+            title = { Text("Choose a country profile") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "This profile saves a mirror URL you provide. Country selection does not imply a public mirror is hosted there.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = mirrorCountryQuery,
+                        onValueChange = { mirrorCountryQuery = it.take(50) },
+                        label = { Text("Search ${mirrorCountries.size} countries") },
+                        singleLine = true
+                    )
+                    LazyColumn(modifier = Modifier.height(320.dp)) {
+                        item(key = "no-country-profile") {
+                            TextButton(
+                                onClick = {
+                                    selectedMirrorCountry = null
+                                    mirrorCountryQuery = ""
+                                    showMirrorCountryPicker = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) { Text("Manual URL (no country profile)", modifier = Modifier.fillMaxWidth()) }
+                        }
+                        items(filteredCountries, key = { it.code }) { country ->
+                            TextButton(
+                                onClick = {
+                                    selectedMirrorCountry = country
+                                    mirrorUrl = mirrorProfiles.get(distribution, country.code).orEmpty()
+                                    status = if (mirrorUrl.isBlank()) "No saved URL for ${country.name}. Enter a public HTTPS mirror URL." else "Loaded ${country.name} mirror profile."
+                                    mirrorCountryQuery = ""
+                                    showMirrorCountryPicker = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) { Text("${country.name} (${country.code})", modifier = Modifier.fillMaxWidth()) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showMirrorCountryPicker = false }) { Text("Close") } }
+        )
+    }
 }
