@@ -39,6 +39,7 @@ fun SimulationEnvironmentLauncher() {
     var managerEvent by remember { mutableStateOf("Reading local event record…") }
     var installing by remember { mutableStateOf<ProotDistribution?>(null) }
     var commandOutput by remember { mutableStateOf("") }
+    val refreshedManagerMessage = forgeText("Device resources and persistent registry refreshed.")
 
     LaunchedEffect(manager) {
         val result = manager.initialize()
@@ -191,7 +192,7 @@ fun SimulationEnvironmentLauncher() {
             OutlinedButton(onClick = {
                 scope.launch {
                     snapshot = manager.inspect(); managerEvent = manager.lastManagerEvent()
-                    message = forgeText("Device resources and persistent registry refreshed.")
+                    message = refreshedManagerMessage
                 }
             }, modifier = Modifier.fillMaxWidth()) { Text(forgeText("Refresh manager status")) }
         }
