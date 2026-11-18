@@ -12,11 +12,14 @@ import com.HG.Forge.Ts.data.sync.CrashReportStore
 import com.HG.Forge.Ts.data.sync.ForgeDiagnostics
 import com.HG.Forge.Ts.data.preferences.AppPreferencesRepository
 import com.HG.Forge.Ts.data.preferences.ForgeThemeMode
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.HG.Forge.Ts.ui.ForgeApp
 import com.HG.Forge.Ts.ui.DiagnosticConsentGate
+import com.HG.Forge.Ts.ui.localization.ForgeLanguageState
+import com.HG.Forge.Ts.ui.localization.LocalForgeLanguage
 import com.HG.Forge.Ts.ui.theme.ForgeTheme
 import kotlinx.coroutines.launch
 
@@ -35,11 +38,14 @@ class MainActivity : ComponentActivity() {
         ForgeDiagnostics.log(this, "INFO", "MainActivity", "activity.on_create.enter")
         setContent {
             val preferences = remember { AppPreferencesRepository(applicationContext) }
+            val languageState = remember { ForgeLanguageState(applicationContext) }
             val themeMode by preferences.themeMode.collectAsState(initial = ForgeThemeMode.DYNAMIC_COLOR)
             ForgeTheme(themeMode = themeMode) {
-                Surface(Modifier.fillMaxSize()) {
-                    ForgeApp()
-                    DiagnosticConsentGate()
+                CompositionLocalProvider(LocalForgeLanguage provides languageState) {
+                    Surface(Modifier.fillMaxSize()) {
+                        ForgeApp()
+                        DiagnosticConsentGate()
+                    }
                 }
             }
         }
