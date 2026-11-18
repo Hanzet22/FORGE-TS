@@ -5,6 +5,7 @@
 - Local technical logging starts in every build, including release builds, when the Android Application process starts.
 - The app records bounded lifecycle events locally. Runtime lifecycle events remain in the separate bounded runtime journal.
 - On first launch, the user sees a diagnostics notice and chooses whether remote diagnostics may be uploaded.
+- The notice is rendered beneath the same root-level `LocalForgeLanguage` provider as `ForgeApp`. `MainActivity` owns one remembered `ForgeLanguageState` instance and provides it to both sibling composables. This keeps consent text aligned with the saved EN/ID preference and prevents the prior fresh-install crash caused by reading `LocalForgeLanguage` outside its provider scope.
 - If allowed, the complete bounded local diagnostic journal is sent as one JSON envelope when the app moves to the background. WorkManager persists the request, waits for connectivity, and retries transient failures. Pending events are recovered on the next app launch if Android terminates the process before the background callback can run.
 - The user can revoke remote upload permission at any time in Settings. Revocation cancels pending unique upload work. Local logging remains enabled.
 
