@@ -1,7 +1,7 @@
 # FORGE-TS Development Handoff
 
-**Snapshot date:** 2026-11-18  
-**Snapshot commit:** Latest `main` revision; this handoff is refreshed with the current change.  
+**Snapshot date:** 2026-11-19  
+**Snapshot commit:** `cbaa37a9ea5b99d649a4441681fa098f23dd410d` (verified source snapshot).  
 **Branch:** `main`  
 **Audience:** the next developer or coding agent opening this repository without conversation history.
 
@@ -20,7 +20,7 @@ The product combines local network utilities and educational references with bou
 | Area | Current behavior | Main source locations | Limits to preserve |
 |---|---|---|---|
 | App shell and navigation | Six Compose tabs, animated transitions, saveable per-tab state, central auth gate for Simulate/Tools | `ui/ForgeApp.kt`, `ui/screens/ToolsScreen.kt`, `ui/screens/SimulationScreen.kt` | Runtime actions remain behind auth; do not bypass the shared gate. |
-| EN/ID UI | Settings stores EN/ID preference locally; localization catalog contains 2,132 unique EN→ID source entries, including Protocol Center profiles and deep technical chapters | `ui/localization/ForgeLanguage.kt`, `ui/screens/SettingsScreen.kt` | Dynamic outputs and lesson explanations remain partly English. This is a Kotlin UI-string catalog, not Android resource-based localization. |
+| EN/ID UI | Settings stores EN/ID preference locally; localization catalog contains 2,205 unique EN→ID source entries, including Protocol Center profiles and deep technical chapters | `ui/localization/ForgeLanguage.kt`, `ui/screens/SettingsScreen.kt` | Dynamic outputs and lesson explanations remain partly English. This is a Kotlin UI-string catalog, not Android resource-based localization. |
 | Intro video | Full-screen `TextureView`; center-crop transform preserves source aspect ratio and re-centers after size changes; timeout fallback skips a stuck prepare/first frame | `ui/IntroVideoTextureView.kt`, `ui/ForgeApp.kt` | Center crop intentionally trims edges on mismatched screen aspect ratios. |
 | Network | Local IPv4/IPv6/CIDR/VLSM tools, public IP lookup, one authorized host/TCP/TLS check, Android network snapshot | `data/network/`, `ui/screens/CoreNetworkingScreen.kt` | Host checker is a single selected endpoint check, not a port scanner. |
 | DNS and protocol references | DoH lookups and offline protocol references | `data/network/DnsLookupRepository.kt`, `ui/screens/DnsProtocolsScreen.kt`, `ui/screens/ProtocolCenterScreen.kt` | DNS requests disclose queried names to their configured public resolver. |
@@ -73,7 +73,7 @@ docs/                 architecture, privacy, feature history and operational ref
 - There is no checked-in Gradle wrapper. GitHub Actions installs JDK 17 and Gradle 8.13, then runs `gradle --no-daemon :app:assembleDebug`.
 - Workflow: `.github/workflows/android-debug.yml`; output artifact is `FORGE-TS-debug-apk` with 14-day retention.
 - CodeQL workflow: `.github/workflows/codeql.yml`; it builds Java/Kotlin and C/C++ manually before analysis.
-- Snapshot CI for `411e67f`: [Android Debug APK run 44254561194](https://github.com/Hanzet22/FORGE-TS/actions/runs/44254561194) passed; [CodeQL run 44254561146](https://github.com/Hanzet22/FORGE-TS/actions/runs/44254561146) passed. No test suite was run for that change.
+- Verified CI for `cbaa37a`: [Android Debug APK run 44357426580](https://github.com/Hanzet22/FORGE-TS/actions/runs/44357426580) passed and uploaded the debug APK; [CodeQL Advanced run 44357426574](https://github.com/Hanzet22/FORGE-TS/actions/runs/44357426574) passed all four language jobs. No test suite was run for that change.
 - Confirm current CI before claiming a newer revision is green. Build success does not establish on-device runtime compatibility.
 
 ## Supabase, Redis and secrets
